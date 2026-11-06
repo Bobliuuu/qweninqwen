@@ -1,0 +1,64 @@
+{
+ "chunks": [
+  72,
+  73,
+  74,
+  75,
+  76,
+  77
+ ],
+ "rows": 6,
+ "steps_per_row": [
+  2097152,
+  2097153,
+  2097153,
+  2097152,
+  2097152,
+  1201328
+ ],
+ "steps_run": 2097153,
+ "seconds": 822.4509570598602,
+ "agg_tok_per_s": 15299.292779765437,
+ "forced_kinds": [],
+ "free_tokens": [
+  2091648,
+  2094081,
+  2097153,
+  2097152,
+  2097152,
+  1201328
+ ],
+ "forced_tokens": [
+  5504,
+  3072,
+  0,
+  0,
+  0,
+  0
+ ],
+ "free_mismatches": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "first_free_mismatch": [
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+ ],
+ "forced_raw_disagreements": [
+  5466,
+  3070,
+  0,
+  0,
+  0,
+  0
+ ],
+ "gpu": "NVIDIA A10G"
+}
