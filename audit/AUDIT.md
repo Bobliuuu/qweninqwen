@@ -46,9 +46,9 @@ approximation, not a host trick, but it means "exact" claims hold only for |x| <
 
 ## Recommended audit command lines (no code edits needed)
 ```bash
-A=/Users/jhome/qweninqwen-work/trueqiq_audit; PY=/Users/jhome/qweninqwen-work/.venv/bin/python
+A=trueqiq_audit; PY=python
 # B (CPU, ~4 s)
-cd /Users/jhome/qweninqwen-work/trueqiq_state && $PY $A/run_audit.py --mode log --check-outer \
+cd trueqiq_state && $PY $A/run_audit.py --mode log --check-outer \
   --scope weight_prep:engine.py:write_frames --scope weight_prep:engine.py:init_frames --scope weight_prep:engine.py:_norm_comp \
   --scope weight_prep:engine.py:tile_weights --scope build:engine.py:compile --scope build:engine.py:__init__ \
   --scope transport:engine.py:read_frames --scope transport:engine.py:new_frames --scope reference:test_tiled.py:'<module>' test_tiled.py
