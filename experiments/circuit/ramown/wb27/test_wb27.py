@@ -35,7 +35,7 @@ def program(rng, bases, n_runs, n_words):
 
 def ref27(prog):
     """Reference with S.WP_BITS = 27: record the full WB value (token payload masked to 15 bits, WROM read mod 2^15)."""
-    seen, otok, ob = [], S.tok, S.WP_BITS
+    seen, otok, ob, vd = [], S.tok, S.WP_BITS, []
 
     def tok(name, payload=0):
         if name == "WB":
@@ -44,18 +44,19 @@ def ref27(prog):
 
     class M27(ref.Machine):
         def wrom_cells(self, wp):
+            vd.append(wp & ((1 << 27) - 1))   # the VDOT's 27-bit weight address (wb27 + anchor + n)
             return ref.Machine.wrom_cells(self, wp & 0x7FFF)
     S.tok, S.WP_BITS = tok, 27
     try:
         m = M27.from_program(prog); toks = m.run(10**6)
     finally:
         S.tok, S.WP_BITS = otok, ob
-    return toks, seen, m.wb
+    return toks, seen, m.wb, vd
 
 
 def check(c, cw, prog, name, log):
     toks = ref.Machine.from_program(prog).run(10**6)
-    toks27, wb27s, wbend = ref27(prog)
+    toks27, wb27s, wbend, vdwp = ref27(prog)
     assert toks27 == toks, "27-bit reference trace differs from the 15-bit one"
     cw.snapshot(c, ref.Machine.from_program(prog))
     t0 = time.time(); mat = ir.evaluate(c, toks, check=True, kernel=len(toks) < 1500); te = time.time() - t0
@@ -85,6 +86,13 @@ def check(c, cw, prog, name, log):
              positions_checked=int(steady.sum()), wb27_mismatch=nbad, exec_pos_hi_mismatch=exec_hi_bad, ref_final_wb27=hex(wbend),
              circ_final_wb27=hex(int(circ27[-1])), token_mismatch=len(bad), eval_s=round(te, 1))
     print(json.dumps(r), flush=True); log.write(json.dumps(r) + "\n"); log.flush()
+    if getattr(c, "wp27", None) is not None:   # every reference VDOT address appears, in order, in the circuit's wp27 sequence
+        wpc = sum(b << i for i, b in enumerate(val(c.wp27))); j = 0; found = 0
+        for v in vdwp:
+            while j < len(wpc) and wpc[j] != v: j += 1
+            found += j < len(wpc)
+        r.update(vdot_records=len(vdwp), vdot_wp27_found_in_order=found, vdot_wp27_upper_nonzero=sum(1 for v in vdwp if v >> 15))
+        print("WP27", json.dumps(r), flush=True); log.write("WP27 " + json.dumps(r) + "\n"); assert found == len(vdwp)
     assert nbad == 0 and exec_hi_bad == 0 and int(circ27[-1]) == wbend
     return r
 
@@ -93,7 +101,8 @@ if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else "wb27_test.jsonl"
     log = open(out, "w")
     t0 = time.time(); c0 = core0.build(); s0 = c0.stats(); t_b0 = time.time() - t0
-    cw = wb27.load_core(); t0 = time.time(); c = cw.build(); s1 = c.stats(); t_b1 = time.time() - t0
+    WP = bool(int(__import__("os").environ.get("WP27", "0")))
+    cw = wb27.load_core(wp27=WP); t0 = time.time(); c = cw.build(); s1 = c.stats(); t_b1 = time.time() - t0
     nodes = lambda cc: len(cc.nodes)
     st = dict(baseline=s0, wb27=s1, nodes=(nodes(c0), nodes(c)), build_s=(round(t_b0, 1), round(t_b1, 1)))
     print("STATS", json.dumps(st, default=str), flush=True); log.write("STATS " + json.dumps(st, default=str) + "\n")

@@ -1,0 +1,8 @@
+injections per row [166130]... (RAM-type [23246]), inj file inj, ramimg False, unaddressable-WROM VDOTs forced [512]...
+/usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
+  warn_once(FP_FUSION_DEFAULT_WARNING)
+rows 1, steps/row 300,000, forced kinds [], forced fraction [0.0017066666623577476]
+step 100,000/300,000 19s 5,159 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 200,000/300,000 39s 5,179 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 256 of 256
+step 300,000/300,000 58s 5,185 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 511 of 512
+{"wf_mode": false, "inj_file": "inj", "ramimg": false, "injections": [166130], "ram_injections": [23246], "chunks": [0], "rows": 1, "steps_per_row": [300000], "steps_run": 300000, "seconds": 57.858354806900024, "agg_tok_per_s": 5185.076465104225, "forced_kinds": [], "free_tokens": [299488], "forced_tokens": [512], "free_mismatches": [0], "first_free_mismatch": [null], "forced_raw_disagreements": [511], "gpu": "NVIDIA A100-SXM4-80GB"}

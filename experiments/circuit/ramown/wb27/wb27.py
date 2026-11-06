@@ -34,14 +34,20 @@ _NEW_SNAP = ('    c.tables["wbase"].init = [{0: wb}]\n'
              '        c.tables["wbase_hi"].init = [{0: wbh}]\n')
 
 
-def patch_core_src(src: str) -> str:
-    for old, new in ((_OLD_ADD, _NEW_ADD), (_OLD_CASE, _NEW_CASE), (_OLD_SNAP, _NEW_SNAP)):
+_WP27 = ('    # WB27 option wp27: the VDOT weight address WP27 = wbase27 + w mod 2^27 (same as the reference ref_big VDOT address), not consumed\n'
+         '    c.wp27 = add_nibbles(c, wbd + wbhi_rd + [Expr()], w[:16] + [Expr()] * 12, 7, [], "wp27")[:27]\n')
+
+
+def patch_core_src(src: str, wp27: bool = False) -> str:
+    """wp27=True also builds the 27-bit VDOT address adder (for the WROW composition; off in the chain runs)."""
+    case = _NEW_CASE + (_WP27 if wp27 else '')
+    for old, new in ((_OLD_ADD, _NEW_ADD), (_OLD_CASE, case), (_OLD_SNAP, _NEW_SNAP)):
         assert src.count(old) == 1, old
         src = src.replace(old, new)
     return src
 
 
-def load_core(extra=()):
+def load_core(extra=(), wp27=False):
     """The patched core as a module (extra: further (old, new) replacements, applied first)."""
     import types
     from chipformer.rv import core as core0
@@ -50,7 +56,7 @@ def load_core(extra=()):
         assert old in src, old
         src = src.replace(old, new)
     mod = types.ModuleType('chipformer.rv.core_wb27'); mod.__file__ = core0.__file__
-    exec(compile(patch_core_src(src), 'core_wb27.py', 'exec'), mod.__dict__)
+    exec(compile(patch_core_src(src, wp27), 'core_wb27.py', 'exec'), mod.__dict__)
     return mod
 
 
