@@ -25,3 +25,6 @@
 | 2026-11-06 | Lambda A100 (lambda-final) | `experiments/circuit/e2e/hfcheck.py` (npucheck, q3.elf, merged Qwen3.5-4B Qwenputer-npu HF modules, first run) | CRASHED at the first mismatch (non-RV token in the error path); log logs/hfcheck_q3_crash.log; diagnosis follows |
 | 2026-11-06 | Lambda A100 CPU | `gen_q3.py --hf` (HF Qwen3ForCausalLM fp64 with the dequantized weights vs numpy ref) | tokens equal (15/15 generated), teacher-forced logit max err 7.7e-7; logs/gen_q3_hf.log |
 | 2026-11-06 | Mac (CPU only, tiny) | `cd experiments/circuit/kernels && python run_all.py && python project.py` (Qwenputer npu-branch reference Machine, 22 bit-exact matvec kernels, 220x1024) | done: plain 8.0 tok/MAC -> VDOT blocked 0.163 (existing compiler kernel 0.180); proposed VDOT16 0.082, VDOTA16 0.071; results in experiments/circuit/kernels/README.md, res_kernels.json, res_projection.json |
+| 2026-11-06 | Modal CPU (ap-wZF3oE2b3muOu5Q2WOOC4a) | `modal_algo.py::main --job iss` (RV32IM+SMAQA/VDOT ISS matvec kernels, 192x1024) | done: 8.01 -> 0.159 instr/MAC, all bit-exact; experiments/circuit/algo/results/iss.json |
+| 2026-11-06 | Modal A100 (ap-nocBpoCBdmvy7IQRidec90) | `--job lmhead` exact lm-head pruning | queued |
+| 2026-11-06 | Modal A100 (ap-u3WtFSMu77qbOZDCuR8HED) | `--job quant` quantisation + block-zero study | queued |
