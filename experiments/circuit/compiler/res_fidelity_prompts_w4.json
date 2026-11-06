@@ -1,0 +1,114 @@
+{
+ "wbits": 4,
+ "ext": true,
+ "algo12_match": 72,
+ "algo12_total": 140,
+ "held_match": 43,
+ "held_total": 116,
+ "per_prompt": [
+  {
+   "prompt": "The capital of France is",
+   "n": 5,
+   "match": 3,
+   "pos0_ok": false,
+   "pos1plus_match": 3,
+   "instr": 679666609
+  },
+  {
+   "prompt": "In 1969, humans first landed on the Moon",
+   "n": 15,
+   "match": 9,
+   "pos0_ok": false,
+   "pos1plus_match": 9,
+   "instr": 2056615083
+  },
+  {
+   "prompt": "def fibonacci(n):\n    if n < 2:\n        ",
+   "n": 14,
+   "match": 9,
+   "pos0_ok": false,
+   "pos1plus_match": 9,
+   "instr": 1918434509
+  },
+  {
+   "prompt": "Water boils at 100 degrees Celsius at se",
+   "n": 13,
+   "match": 8,
+   "pos0_ok": false,
+   "pos1plus_match": 8,
+   "instr": 1780331413
+  },
+  {
+   "prompt": "The quick brown fox jumps over the lazy ",
+   "n": 12,
+   "match": 5,
+   "pos0_ok": false,
+   "pos1plus_match": 5,
+   "instr": 1642293576
+  },
+  {
+   "prompt": "Photosynthesis is the process by which p",
+   "n": 8,
+   "match": 5,
+   "pos0_ok": false,
+   "pos1plus_match": 5,
+   "instr": 1092289102
+  },
+  {
+   "prompt": "Once upon a time, in a small village by ",
+   "n": 15,
+   "match": 5,
+   "pos0_ok": false,
+   "pos1plus_match": 5,
+   "instr": 2056615083
+  },
+  {
+   "prompt": "The theory of general relativity describ",
+   "n": 9,
+   "match": 5,
+   "pos0_ok": false,
+   "pos1plus_match": 5,
+   "instr": 1229677975
+  },
+  {
+   "prompt": "Q: What is 12 times 12?\nA:",
+   "n": 14,
+   "match": 6,
+   "pos0_ok": false,
+   "pos1plus_match": 6,
+   "instr": 1918433501
+  },
+  {
+   "prompt": "import numpy as np\nx = np.arange(10)\npri",
+   "n": 17,
+   "match": 10,
+   "pos0_ok": false,
+   "pos1plus_match": 10,
+   "instr": 2333544569
+  },
+  {
+   "prompt": "Le chat est sur la table et le chien",
+   "n": 10,
+   "match": 4,
+   "pos0_ok": false,
+   "pos1plus_match": 4,
+   "instr": 1367143001
+  },
+  {
+   "prompt": "The largest planet in the solar system i",
+   "n": 8,
+   "match": 3,
+   "pos0_ok": false,
+   "pos1plus_match": 3,
+   "instr": 1092288762
+  },
+  {
+   "prompt": "<held-out 128-token passage>",
+   "n": 116,
+   "match": 43,
+   "pos0_ok": false,
+   "pos1plus_match": 43,
+   "instr": 16845672297
+  }
+ ]
+}
