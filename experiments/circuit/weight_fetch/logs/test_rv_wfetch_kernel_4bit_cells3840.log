@@ -1,0 +1,18 @@
+....
+WF_STATS W=1 {'layers': 12, 'dims': 6865, 'heads': 101, 'ffn_units': 49989, 'max_units': 9216, 'max_heads': 16}
+.....
+WF_STATS W=8 {'layers': 12, 'dims': 7145, 'heads': 102, 'ffn_units': 52901, 'max_units': 9216, 'max_heads': 16}
+.
+CHUNK W=1 N=20 VDOTs: rows used 1, trace tokens 99 (ROW 20), WROM baseline 78; extra tokens/VDOT 1.050; circuit teacher-forced exact over 99 positions
+.
+CHUNK W=1 N=300 VDOTs: rows used 1, trace tokens 785 (ROW 300), WROM baseline 449; extra tokens/VDOT 1.120; circuit teacher-forced exact over 785 positions
+.
+CHUNK W=8 N=64 VDOTs: rows used 1, trace tokens 127 (ROW 8), WROM baseline 119; extra tokens/VDOT 0.125; circuit teacher-forced exact over 127 positions
+.
+CHUNK W=8 N=300 VDOTs: rows used 1, trace tokens 492 (ROW 38), WROM baseline 454; extra tokens/VDOT 0.127; circuit teacher-forced exact over 492 positions
+.
+CHUNK W=16 N=96 VDOTs: rows used 1, trace tokens 156 (ROW 6), WROM baseline 149; extra tokens/VDOT 0.073; circuit teacher-forced exact over 156 positions
+.
+CHUNK W=16 N=600 VDOTs: rows used 2, trace tokens 833 (ROW 38), WROM baseline 775; extra tokens/VDOT 0.097; circuit teacher-forced exact over 833 positions
+.
+16 passed in 127.38s (0:02:07)

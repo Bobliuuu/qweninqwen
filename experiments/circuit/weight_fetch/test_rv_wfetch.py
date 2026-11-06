@@ -66,7 +66,8 @@ def check(c, prog, tab, W):
     m2.rowtab, m2.wrow_w = tab, W
     toks = m2.run()
     t0 = time.time()
-    mat = ir.evaluate(c, toks, check=True)
+    # kernel=True also replays every head read the way the HF torch kernels compute it (upstream: short traces)
+    mat = ir.evaluate(c, toks, check=True, kernel=len(toks) < 1500 and os.environ.get('WF_NOKERNEL') is None)
     pred = core.predictions(c, mat)
     bad = [(i, S.name(toks[i + 1]), pred[i]) for i in range(len(toks) - 1) if pred[i] != toks[i + 1]]
     assert not bad, bad[:5]

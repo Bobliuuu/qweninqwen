@@ -39,9 +39,11 @@ for W, n in ((1, 300), (8, 300), (16, 600)):
     _, tab0, _, exp, _ = T.chunk(rng, W, n)
     bs, _, wrom, exp2, _ = T.chunk(random.Random(100 + W), W, n, rows=False)
     prog = assemble(bs + "\n.wrom\n" + "\n".join(f".byte {', '.join(str(b) for b in wrom[i:i + 64])}" for i in range(0, len(wrom), 64)))
+    core.NPAY = 16  # the baseline has no 18-bit payload (the executor needs every payload bit to exist)
     c0 = core.build()
     run(f"baseline11_wrom_chunk_N{n}", c0, prog, {}, a.steps); del c0
     S.ROW_TABLE = tab0
+    core.NPAY = 18
     c = core.build(wrow=W)
     src, tab, _, _, _ = T.chunk(random.Random(100 + W), W, n)
     run(f"wf_W{W}_chunk_N{n}", c, assemble(src), dict(rowtab=tab, wrow_w=W), a.steps); del c

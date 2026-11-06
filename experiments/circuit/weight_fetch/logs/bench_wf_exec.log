@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/qiq-wf/qp/experimental/riscv/tests/bench_wf_exec.py", line 43, in <module>
+    run(f"baseline11_wrom_chunk_N{n}", c0, prog, {}, a.steps); del c0
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/qiq-wf/qp/experimental/riscv/tests/bench_wf_exec.py", line 24, in run
+    fr = fusedexec.FreeRun3(c, 1, "cuda"); fr.load(0, S.tok("GO")); fr.capture()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/qiq-wf/qp/experimental/riscv/chipformer/rv/fusedexec.py", line 306, in __init__
+    fr2 = fastexec.FreeRun(c, batch, device, compile_=False, v2=True)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/qiq-wf/qp/experimental/riscv/chipformer/rv/fastexec.py", line 256, in __init__
+    self.pay_idx = lt([self._dim(e) for e in c.out_pay])
+                       ^^^^^^^^^^^^
+  File "/home/ubuntu/qiq-wf/qp/experimental/riscv/chipformer/rv/fastexec.py", line 290, in _dim
+    ((d, w),) = e.terms.items()
+    ^^^^^^^^^
+ValueError: not enough values to unpack (expected 1, got 0)
