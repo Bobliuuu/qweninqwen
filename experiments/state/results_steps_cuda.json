@@ -1,0 +1,29 @@
+{
+ "nL1_G1": {
+  "D": 3186,
+  "nL": 1,
+  "G": 1,
+  "single_frame_steps_per_s": 529.8367149978146,
+  "stream_frames_per_s": 124026.25784374595,
+  "unique_weights_per_frame": 1008,
+  "state_MB": 1.048576
+ },
+ "nL2_G2": {
+  "D": 5457,
+  "nL": 2,
+  "G": 2,
+  "single_frame_steps_per_s": 308.7476200588963,
+  "stream_frames_per_s": 46828.85852834149,
+  "unique_weights_per_frame": 2016,
+  "state_MB": 2.097152
+ },
+ "nL5_G1": {
+  "D": 15286,
+  "nL": 5,
+  "G": 1,
+  "single_frame_steps_per_s": 136.34246719395586,
+  "stream_frames_per_s": 8931.367369484331,
+  "unique_weights_per_frame": 5040,
+  "state_MB": 5.24288
+ }
+}

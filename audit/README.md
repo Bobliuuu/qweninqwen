@@ -4,7 +4,7 @@ Claim being protected: the FULL real inner Qwen runs INSIDE a stock `Qwen3_5ForC
 weights / tokens / embeddings / addresses / flags / position ids, and do outer argmax + append. No host matmul, attention, norm,
 activation, softmax, RoPE, residual add or sampling of the inner model (INTERFACE.md s2).
 
-Run everything with the repo venv: `python` (torch 2.15, transformers 5.22.1).
+Run everything with the repo venv: `/Users/jhome/qweninqwen-work/.venv/bin/python` (torch 2.15, transformers 5.22.1).
 
 | tool | file | what it proves |
 |---|---|---|
@@ -18,7 +18,7 @@ Run everything with the repo venv: `python` (torch 2.15, transformers 5.22.1).
 ## 1. Auditing any agent's driver (5 commands)
 ```bash
 cd <driver dir>      # so its relative imports work
-A=trueqiq_audit; PY=python
+A=/Users/jhome/qweninqwen-work/trueqiq_audit; PY=/Users/jhome/qweninqwen-work/.venv/bin/python
 # 1 dynamic guard (log mode lists everything; use --mode raise to stop at first violation; --fast = no per-op stack walk, for GPU/big runs)
 $PY $A/run_audit.py --mode log --check-outer --out audit0.json  driver.py [driver args]
 # 2 token-independence (two runs, different host randomness; compare streams)

@@ -10,7 +10,7 @@ A homage to [Qwenputer](https://github.com/divagr18/qwenputer), in which a CPU l
 
 </div>
 
-> **Status in one paragraph.** Every ingredient has been built and measured separately on real Qwen3-0.6B / Qwen2.5-0.5B weights: all 197 weight matrices of Qwen3-0.6B are paged through DeltaNet state and contracted in-model (relative error 5.6e-7, 41.95 s on an A10G), and the non-matvec operations (RMSNorm, SwiGLU, RoPE + softmax attention with KV, an argmax over the full 151,936-token vocabulary) are each verified at full inner dimensions. **These pieces have not yet been chained into one inner token.** Every current driver is teacher-forced: the activations that enter the machine are written into frames by the test harness (or come from the Hugging Face inner model), not produced by an earlier round of the machine. The paging run used harness-fed random activations, not a real token. Nothing in this repository claims otherwise; see [What is verified today](#what-is-verified-today) and [Status by tier](#status-by-tier).
+> **Status in one paragraph.** A complete **toy** inner Qwen3-architecture model (random weights, d=128, 2 layers, vocab 512) generates tokens end to end inside a stock `Qwen3_5ForCausalLM`: outer logits match the Hugging Face model to 5e-7..1.9e-6 at every step and the generated tokens are identical. The toy is a debugging and validation vehicle, **not the real model**. For the real Qwen3-0.6B, the pieces are verified separately: all 197 weight matrices are paged through DeltaNet state and contracted in-model (relative error 5.6e-7, 41.95 s on an A10G, teacher-forced harness-fed activations), and the non-matvec operations (RMSNorm, SwiGLU, RoPE + softmax attention with KV, an argmax over the full 151,936-token vocabulary) are verified at full inner dimensions. **A real-dimension chained token has not been produced yet; it is in progress.** See [What is verified today](#what-is-verified-today) and [Status by tier](#status-by-tier).
 
 ## The idea in 30 seconds
 
@@ -32,27 +32,22 @@ The host feeds frames (vectors of the outer model's hidden size) into the outer 
 | Full-attention layers | Inner RoPE (rotate-half, theta), GQA, causal softmax with the inner KV held in the outer KV cache; also the in-model argmax over the vocabulary. | `experiments/ops/ops.py` |
 | Outer `lm_head` | Decodes the 18-bit address code produced by the in-model argmax into the outer token id. | `experiments/ops/ops.py` |
 
-The outer layers are strictly feed-forward, so data produced at depth `d` of a step can only feed shallower layers in a **later** outer forward call, through state or KV cache. One inner token is therefore a sequence of outer forward calls ("rounds"), each a chunked prefill of `[WRITE frames..., READ frame(s)]`. Interface contract and hazards (L2-normalised q/k, conv SiLU, gated RMSNorm, ballast trick): [`docs/INTERFACE.md`](docs/INTERFACE.md).
+The outer layers are strictly feed-forward: layer `l` at step `t` sees only the outputs of earlier layers at step `t` and the state of layer `l` from earlier steps, and that state only contains functions of layers shallower than `l`. State and KV therefore carry data **deeper** in the stack, never back to shallower layers. The consequence, and the design basis of the toy, is an **unrolled pipeline in depth**: every inner op gets its own outer layers in dependency order, and a register is a DeltaNet layer placed between the op that writes it and the op that reads it. One inner token is one outer forward call (a chunked prefill of the WRITE frames followed by the READ frame of each bank). Roughly 15 outer layers are needed per inner layer, and every frame flows through all of them. Contract and hazards (L2-normalised q/k, conv SiLU, gated RMSNorm, ballast trick): [`docs/INTERFACE.md`](docs/INTERFACE.md) (section 5b supersedes section 5, which assumed per-round state hand-off).
 
 ### DeltaNet state as weight memory
 
 ![state as memory](docs/assets/state_memory.svg)
 
-### How a token is computed, round by round
+### How a token is computed
 
-For each inner layer the schedule has four dependent rounds (six for Qwen3, which adds per-head q/k norm and two gain-product rounds), because every op consumes a matvec result from an earlier outer call:
+![unrolled pipeline](docs/assets/unrolled_pipeline.svg)
 
-![layer timeline](docs/assets/layer_timeline.svg)
+1. **Embed.** The host places the embedding row of the current token in the stream (a lookup, no arithmetic) together with position id (the inner token clock) and flags.
+2. **Per inner layer, in depth order.** RMSNorm (a GDN gated-RMSNorm head, or a norm layer); the `W_qkv` bank (WRITE frames load weight rows into DeltaNet state, the READ frame contracts the activation against them); a register layer; for Qwen3, q/k norm plus a gain product in MLP gadgets; RoPE and softmax attention in an outer full-attention layer that appends to and reads the KV cache; `W_o` and the residual add; the second RMSNorm; `W_gate, W_up`; SwiGLU in an MLP layer; `W_down` and the residual add.
+3. **After the last layer.** Final RMSNorm, the LM-head contraction, and an in-model hard-max attention over all vocabulary positions whose value is the address code of the winner; the outer `lm_head` decodes the code.
+4. **The host does the outer argmax and appends the token.** That is the only host-side decision and the only deep-to-shallow channel.
 
-1. **Embed.** The host places the embedding row of the current token in the stream (a table lookup: token to row, no arithmetic).
-2. **Round 1.** The host writes the `W_qkv` tiles into the state. In the READ frame the outer norm layer produces the normalised hidden state and the state read returns `q, k, v`.
-3. **Round 2.** RoPE and softmax attention run in an outer attention layer, appending the new `k, v` to the KV cache and reading the whole cache; the `W_o` read and the residual add follow.
-4. **Round 3.** The second RMSNorm and the `W_gate, W_up` read.
-5. **Round 4.** SwiGLU in the MLP layer, then the `W_down` read and the residual add.
-6. **After the last layer.** Final RMSNorm, the LM-head contraction against the (paged) embedding matrix, and an in-model hard-max attention over all 151,936 positions whose value is the address code of the winner. The outer `lm_head` decodes that code.
-7. **The host does the outer argmax and appends the token.** That is the only host-side decision.
-
-This schedule is the design from the depth rule, with each step verified in isolation. It has not yet been executed end to end.
+This is exactly what the toy executes today (all of steps 1 to 4, on a tiny random model). Doing it at real dimensions is the open work: the stock config is uniform per layer, so `D x depth` parameters get large for the real model (the toy's outer is already 2.02 B parameters), which calls for layer-streamed execution or a smaller outer width.
 
 ## What is verified today
 
@@ -60,6 +55,7 @@ Only claims with a result file or a test in this repository are listed.
 
 | Claim | Evidence |
 |---|---|
+| **Toy end to end.** A random-weight Qwen3-architecture inner model (d=128, 4 q / 2 kv heads of 32, inter 256, 2 layers, vocab 512, q/k-norm) generates 4 prompt + 4 generated tokens inside a stock `Qwen3_5ForCausalLM` (34 layers, D=5641, 2.02 B fp32 parameters): outer logits vs Hugging Face 5e-7..1.9e-6 at every step, argmax identical. All norms, matvecs (GDN state banks), registers, SwiGLU, q/k-norm gain products, RoPE/GQA/KV attention and the LM head run in the outer model; the host writes flags, one-hot addresses, position ids, SiLU-pre-inverted gain-folded weight payloads and the embedding row, and does argmax + append. 1530 outer steps and about 12 to 14 s per inner token on an A100. **Toy only: tiny and random, not Qwen3-0.6B.** Reported from an A100 run; not re-run on the machine that built this repository. | [`experiments/vslice/VSLICE_RESULTS.md`](experiments/vslice/VSLICE_RESULTS.md), `experiments/vslice/vslice.py`, `experiments/vslice/toy_test.py` |
 | All 197 weight matrices of Qwen3-0.6B (28 layers + LM head, 595,984,384 real weights, 519,430 outer frames) are written into DeltaNet state and contracted in-model on an A10G in 41.95 s; worst relative error vs an fp64 reference 5.6e-7; argmax identical on all 197 matrices. **Activations were harness-fed (random) and the matrices were not chained: this is not a real token.** | [`experiments/run/token_results.jsonl`](experiments/run/token_results.jsonl), [`experiments/run/README.md`](experiments/run/README.md), `experiments/run/run_token.py` |
 | Whole Qwen3-0.6B LM head (151,936 x 1024) through the state bank: 3.70 s on an A100 (nL=2), error 3.8e-7 | [`experiments/run/a100_results.jsonl`](experiments/run/a100_results.jsonl) |
 | RMSNorm at full dims on real activations: 1.0e-7 to 1.7e-7 (max error / max abs), `eps` handled exactly | [`experiments/ops/res_norm_swiglu_fp32_1e+08.json`](experiments/ops/res_norm_swiglu_fp32_1e+08.json) |
@@ -80,18 +76,19 @@ Reported in a findings file but without a result file in the repository (treat a
 | Tier | What runs inside the outer Qwen's weights | Status |
 |---|---|---|
 | T0 | A single signed MAC / gadget (state write + read, SwiGLU multiplier, norm, product) | **Verified** in isolation, teacher-forced inputs (errors in the table above) |
-| T1 | A full projection on real weights, accumulation inside the model | **Verified for all 197 matrices of Qwen3-0.6B**, teacher-forced (harness-fed activations), rel. err 5.6e-7. Reading the activation from an earlier round's output (round hand-off) is open. |
-| T2 | A real decoder op chain: norm, QKV, RoPE, attention with KV, SwiGLU | **Partial.** Each op is verified at full inner dims on real activations; the ops are not yet chained across rounds with the matvecs. |
-| T3 | The full model produces a token entirely inside the outer weights | **In progress; not yet achieved.** |
-| T4 | Measured cost model for the full model | **Partial.** Weight streaming is measured (41.95 s per token's worth of weights on an A10G); the op-layer rounds are estimated, not measured. |
+| T1 | A full projection on real weights, accumulation inside the model | **Verified for all 197 matrices of Qwen3-0.6B**, teacher-forced (harness-fed activations), rel. err 5.6e-7. Chaining the output of one matrix into the next is demonstrated only in the toy. |
+| T2 | A real decoder op chain: norm, QKV, RoPE, attention with KV, SwiGLU | **Partial.** Each op is verified at full inner dims on real activations; the ops are chained with the matvecs only in the toy, not at real dimensions. |
+| T3-toy | A complete toy inner model (random weights, 2 layers, d=128) generates tokens entirely inside the outer weights | **Achieved** (validation vehicle, not the real model) |
+| T3 real | Real Qwen3-0.6B (or Qwen2.5-0.5B) produces a token entirely inside the outer weights | **In progress; not yet achieved.** |
+| T4 | Measured cost model for the full model | **Partial.** Weight streaming is measured (41.95 s per token's worth of weights on an A10G); the op layers are not yet measured at real dimensions; the toy's full-token time (12 to 14 s on an A100) is not a real-model figure. |
 
-Known open items, from the agents' notes and the audit ([`audit/AUDIT.md`](audit/AUDIT.md)): the chain from one round's output to the next round's input does not exist yet (the audit measured that streamed READ frames differ when host randomness changes, so current drivers are not token-independent); the BALLAST constant differs between modules (`machine.py` 2^27, the state engine 1e6) and one value must be chosen for a shared model; the outer argmax/append loop has only been exercised in the argmax test, with logits host-injected; per-layer RMSNorm gain vectors need a vector write path (or folding into the streamed weights, which is exact); the large `XS` scale of the norm trick must end a round; K accumulation across tiles for small banks; bf16 is not exact; no long-context attention test (T=25 only); no longrope test.
+Known open items, from the agents' notes and the audit ([`audit/AUDIT.md`](audit/AUDIT.md)): the chain from one op's output to the next op's input exists only in the toy; the audit (written before the toy) measured that streamed READ frames differ when host randomness changes in the per-matrix drivers, so those are not token-independent, and the toy has not been audited; the BALLAST constant differs between modules (`machine.py` 2^27, the state engine 1e6) and one value must be chosen for a shared model; the outer argmax/append loop has only been exercised in the argmax test, with logits host-injected; per-layer RMSNorm gain vectors need a vector write path (or folding into the streamed weights, which is exact); the large `XS` scale of the norm trick must end a round; K accumulation across tiles for small banks; bf16 is not exact; no long-context attention test (T=25 only); no longrope test.
 
 ## Cost model
 
 ![cost model](docs/assets/cost_model.svg)
 
-Measured: **41.95 s** for the weight-streaming part of one Qwen3-0.6B token on an A10G with the torch reference GDN kernel and an `nL=4` bank (12.4 k frames/s). Estimates, labelled as such in the figure: smaller banks are faster per frame, and the extrapolated 7 to 19 s come from the runner's `plan()` function, not from a run. Not included in any measured number: roughly 113 dependent rounds of op layers (an estimate), the in-model argmax (18 to 44 s on a Mac CPU, not yet measured on GPU), and per-round launch overhead. Frame cost scales roughly with the square of the bank size and the path is fp32 compute-bound, not bandwidth-bound.
+Measured: **41.95 s** for the weight-streaming part of one Qwen3-0.6B token on an A10G with the torch reference GDN kernel and an `nL=4` bank (12.4 k frames/s). Estimates, labelled as such in the figure: smaller banks are faster per frame, and the extrapolated 7 to 19 s come from the runner's `plan()` function, not from a run. Not included in any measured number: the op layers and the deeper pipeline they require (about 15 outer layers per inner layer, so every frame costs several times more than in the bank-only run), and the in-model argmax (18 to 44 s on a Mac CPU, not yet measured on GPU). Frame cost scales roughly with the square of the bank size and the path is fp32 compute-bound, not bandwidth-bound.
 
 ### Circuit route versus state-as-memory route
 
@@ -117,15 +114,15 @@ What the host **may not** do: compute any inner activation, matmul, norm, softma
 - `run_audit.py` runs any driver under the guard and exits non-zero on violations. Two demo drivers are included: `demo_good_driver.py` passes, `demo_cheat_driver.py` (a host `bmm`) fails.
 - `compare.py` / `compare_runs.py` compare in-model traces against an HF inner reference per op (T1 op, T2 layer, T3 model).
 
-Limits: the guard is a strong check, not a proof. Declared scopes (`transport`, `weight_prep`, `reference`) are listed in its report so a reviewer can read them, and a human still has to read those. **The chained drivers (T2, T3) do not exist yet, so they have not been audited.** The audit so far ([`audit/AUDIT.md`](audit/AUDIT.md)) ran HostGuard on the CPU-sized state-engine and glue tests (pass, with declared scopes) and read the GPU drivers without executing them; it found no host arithmetic on activations inside what is claimed today, and found that all current results are teacher-forced. The GPU paging runner (`experiments/run/run_token.py`) was read, not run under HostGuard.
+Limits: the guard is a strong check, not a proof. Declared scopes (`transport`, `weight_prep`, `reference`) are listed in its report so a reviewer can read them, and a human still has to read those. **The chained toy driver (`experiments/vslice`) has not been run under HostGuard yet; no audit result for it exists.** The audit so far ([`audit/AUDIT.md`](audit/AUDIT.md)) ran HostGuard on the CPU-sized state-engine and glue tests (pass, with declared scopes) and read the GPU drivers without executing them; it found no host arithmetic on activations inside what is claimed today, and found that all current results are teacher-forced. The GPU paging runner (`experiments/run/run_token.py`) was read, not run under HostGuard. The audit predates the toy.
 
 ## Repository layout
 
 ```
 README.md
 docs/
-  INTERFACE.md           outer-machine interface: layout, frames, what the host may do, rounds
-  assets/                SVG figures (architecture, state memory, layer timeline, cost, comparison)
+  INTERFACE.md           outer-machine interface: layout, frames, what the host may do, depth ordering
+  assets/                SVG figures (architecture, state memory, unrolled pipeline, cost, comparison)
   make_figures.py        regenerates the SVGs from the numbers quoted in this README
 qweninqwen/
   machine.py             Layout, make_outer (zeroed stock Qwen3_5ForCausalLM), BALLAST
@@ -134,6 +131,7 @@ experiments/
   ops/                   non-matvec ops in outer layers: ops.py, tests, res_*.json results
   alt/                   alternative matvec: SwiGLU-as-multiplier (mlpmul.py), findings
   run/                   full-model weight-streaming runner and its measured results
+  vslice/                end-to-end toy inner model inside the outer model (T3-toy) and its results
   bench/                 outer step throughput, circuit-route baseline results
 audit/                   HostGuard, outer-model check, static scan, demo drivers, AUDIT.md findings
 reference/              the original circuit-based Qwen-in-Qwen lab (bit-level arithmetic in GDN state)
@@ -159,6 +157,9 @@ cd experiments/state && python test_silu_inv.py && python test_tiled.py
 
 # ops at full inner dims (writes res_*.json)
 cd experiments/ops && python test_norm_swiglu.py fp32 1e8 && python test_attn.py fp32
+
+# end-to-end toy (A100 reported; needs ~8 GB for the 2 B-parameter outer)
+cd experiments/vslice && python toy_test.py 4
 
 # the full-token weight-streaming measurement (GPU; args: model nL layers lm_head)
 cd experiments/run && NOFLA=1 python run_token.py q3 4

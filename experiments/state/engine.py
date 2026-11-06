@@ -38,7 +38,7 @@ def silu_inv(t, bis=14, newton=5):
 
 class StateMV:
     """Spec of a bank of nL GDN layers (H heads each) acting as a paged float matvec unit."""
-    def __init__(self, layout, nL=1, H=16, dk=128, dv=128, K=None, B=BALLAST0, Rq=100.0, Bg=1e8, name='B', G=1):
+    def __init__(self, layout, nL=1, H=16, dk=128, dv=128, K=None, B=2.0 ** 27, Rq=100.0, Bg=1e8, name='B', G=1):
         assert nL % G == 0
         self.G_, self.KL = G, nL // G          # G output groups x KL layers (K-tile layers) per group
         self.nL, self.H, self.dk, self.dv, self.B, self.Rq, self.Bg = nL, H, dk, dv, B, Rq, Bg
@@ -154,8 +154,74 @@ class StateMV:
         return torch.arange(2 * P, device=self.dev), pl
 
 
-def build_state_matvec(layout, nL=1, H=16, K=896, B=BALLAST0, name='B', dk=128, dv=128, G=1):
+def build_state_matvec(layout, nL=1, H=16, K=896, B=2.0 ** 27, name='B', dk=128, dv=128, G=1):
     """Step 1 of the INTERFACE contract: allocate fields (call BEFORE make_outer so layout.n is final).
     spec = build_state_matvec(layout, nL, H, K);  model = make_outer(layout, [...'linear_attention'...], gdn=dict(hk=H,hv=H,dk=dk,dv=dv));
     spec.compile(model, l0)   # writes weights into layers l0..l0+nL-1.  Needs frame BALLAST value spec.B (>=1e6 recommended)."""
     return StateMV(layout, nL=nL, H=H, dk=dk, dv=dv, K=K, B=B, name=name, G=G)
+
+
+class RegFile:
+    """In-model activation register file: hand-off of a bank's output Y (round r) to another bank's input X (round r+1) and
+    multi-pass K accumulation, with NO host-computed activation.
+
+    DEPTH RULE (important): data can only move to deeper-or-equal layers (a layer only sees its own state + shallower layers).
+    So the stack for a chain of dependent ops is  [bank_1][REG_1][bank_2][REG_2]...  ; REG_j is ONE set of GDN layers that both
+      * WRITES src.Y (residual, after bank_j) into register row `row` (one-hot SELR) of head group b (flag HP[b]), and
+      * READS (later frame, flag RR[n-1] + multi-hot SELQ over n rows) the SUM of the n rows into dst.X (read by bank_{j+1}, deeper).
+    Head t = (b*gy + w) stores Y[w*63:(w+1)*63] as silu(+y)/silu(-y) pair columns plus a ballast column (v=Bg*h0/B); X[t*63+j]=sum_a y_a.
+    The activation scale (transparent-norm factor) cancels exactly.  n>1 = in-model accumulation of n passes.
+    Host: flags + one-hot row addresses only."""
+    def __init__(self, layout, src, dst=None, nmax=4, Bg=1e8, name='R'):
+        dst = dst or src
+        self.src, self.dst, self.nmax, self.Bg, self.layout = src, dst, nmax, Bg, layout
+        self.H, self.dk, self.dv = src.H, src.dk, src.dv
+        self.T = dst.KL * dst.H; self.nL = -(-self.T // self.H)       # heads needed = tiles of dst's X
+        self.gy = 2 * src.G_                                          # heads fed per Y frame
+        self.nHP = -(-self.T // self.gy)
+        a = layout.alloc
+        self.HP = a(name + '_HP', self.nHP); self.SELR = a(name + '_SELR', self.dk); self.SELQ = a(name + '_SELQ', self.dk)
+        self.RR = a(name + '_RR', nmax)
+        self.Pv = (self.dv - 2) // 2
+        assert src.O == 2 * self.Pv and dst.P == self.Pv
+
+    def compile(self, model, l0):
+        D, H, dk, dv, P, B, KB = self.layout.n, self.H, self.dk, self.dv, self.Pv, self.src.B, 60.0
+        kd = H * dk; G2 = self.Bg / (math.sqrt(dv) * 40.0)
+        for l in range(self.nL):
+            L = model.model.layers[l0 + l]; g = L.linear_attn
+            with torch.no_grad():
+                L.input_layernorm.weight.fill_(B / math.sqrt(D) - 1.0)
+                g.conv1d.weight.zero_(); g.conv1d.weight[:, 0, -1] = 1.0
+                g.A_log.zero_(); g.dt_bias.zero_(); g.norm.weight.fill_(1.0)
+                g.in_proj_a.weight.zero_(); g.in_proj_a.weight[:, 0] = -30.0 / B
+                for w in (g.in_proj_qkv.weight, g.in_proj_z.weight, g.in_proj_b.weight, g.out_proj.weight): w.zero_()
+                Wq = g.in_proj_qkv.weight
+                g.in_proj_b.weight[:, 0] = -60.0 / B      # beta=sigmoid(-60)~1e-26: unflagged heads must not leak (RMSNorm would amplify)
+                g.in_proj_z.weight[:, 0] = -40.0 / B
+                for n in range(1, self.nmax + 1): g.in_proj_z.weight[:, self.RR.start + n - 1] = 40.0 * (n + 1)   # read gate = 40 n
+                for h in range(H):
+                    t = l * H + h
+                    if t >= self.T: continue
+                    b, w = divmod(t, self.gy)
+                    g.in_proj_b.weight[h, self.HP.start + b] = 120.0                         # write only when group b flagged
+                    for r in range(dk):
+                        Wq[h * dk + r, 0] = -KB / B; Wq[h * dk + r, self.SELQ.start + r] = 2 * KB     # q: multi-hot read address
+                        Wq[kd + h * dk + r, 0] = -KB / B; Wq[kd + h * dk + r, self.SELR.start + r] = 2 * KB   # k: one-hot write row
+                    for j in range(P):
+                        Wq[2 * kd + h * dv + j, self.src.Y.start + w * P + j] = 1.0
+                        Wq[2 * kd + h * dv + P + j, self.src.Y.start + w * P + j] = -1.0
+                        xi = t * P + j
+                        if xi < self.dst.K:
+                            g.out_proj.weight[self.dst.X.start + xi, h * dv + j] = G2
+                            g.out_proj.weight[self.dst.X.start + xi, h * dv + P + j] = -G2
+                    Wq[2 * kd + h * dv + dv - 1, 0] = self.Bg / B
+        return model
+
+    # frame decorators (flags/addresses only)
+    def add_write(self, frames, b, row):
+        frames[:, self.HP.start + b] = 1.0; frames[:, self.SELR.start + row] = 1.0; return frames
+    def add_read(self, frames, rows):
+        frames[:, self.RR.start + len(rows) - 1] = 1.0
+        for r in rows: frames[:, self.SELQ.start + r] = 1.0
+        return frames

@@ -8,7 +8,7 @@ inner Qwen. Shared code: `trueqiq/machine.py` (Layout, make_outer, gdn_const_ini
   Qwen3_5ForCausalLM with ALL parameters zeroed (each layer is the identity on the residual stream) in fp32.
   Compilers then write their weights. `layer_types` may mix 'linear_attention' (GatedDeltaNet) and
   'full_attention' (C uses full-attention layers for inner softmax attention + KV; B uses GDN state).
-* One shared `Layout` (frame/residual layout): slot 0 `BALLAST` = 1e4 constant in every frame. Each of B/C
+* One shared `Layout` (frame/residual layout): slot 0 `BALLAST` = 2^27 constant (standardised; 1e4 gives 1e-3..5e-4 transparent-norm error) in every frame. Each of B/C
   allocs its own named slots from the same Layout (so names must not collide: prefix `B_` / `C_`).
   For integration the final model's D is `layout.n`.  Dims are free (e.g. D = a few thousand).
 * The outer RMSNorm in every layer (input_layernorm/post_attention_layernorm) is made *transparent*: set

@@ -1,5 +1,5 @@
 import sys,time,torch
-sys.path.insert(0,'/home/ubuntu/qiq/alt/trueqiq')
+
 from machine import Layout, make_outer
 torch.backends.cuda.matmul.allow_tf32=False
 def tm(f,n=3):

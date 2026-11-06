@@ -105,32 +105,31 @@ def state_memory():
     b += tx(24, 468, 'pre-inverted SiLU payload (weights only). See experiments/state/README.md. Values above are illustrative, not data.', 's')
     return svg(1000, 492, b, 'DeltaNet state as weight memory', 'Animated: weight rows are written into a DeltaNet state matrix one key row at a time, then a query vector reads out S transposed times q.')
 
-# ------------------------------------------------------------------ (c) one inner layer as rounds
+# ------------------------------------------------------------------ (c) unrolled pipeline in depth
 def layer_timeline():
-    b = tx(24, 34, 'One inner layer as a timeline of outer rounds', 't')
-    b += tx(24, 54, 'Planned schedule from the depth rule (INTERFACE.md section 5): every op consumes the matvec result of an earlier outer forward call. Qwen2.5-0.5B: 4 rounds per layer.', 's')
-    lanes = [('Host (transport only)', 'ho'), ('DeltaNet state (weights)', 'st'), ('Compiled op layers', 'op'), ('Attention layers + KV', 'at')]
-    x0, lw = 190, 196; ys = [100, 170, 240, 310]; H = 54
-    rounds = ['Round 1', 'Round 2', 'Round 3', 'Round 4']
-    for i, r in enumerate(rounds):
-        b += tx(x0 + i * lw + lw / 2 - 4, 88, r, 'b', 'c')
-        b += f'<line x1="{x0+i*lw-4}" x2="{x0+i*lw-4}" y1="94" y2="372" stroke="var(--line)" stroke-dasharray="4 4"/>'
-    for (n, c), y in zip(lanes, ys):
-        b += tx(24, y + 32, n, 'b')
-        b += f'<line x1="24" x2="976" y1="{y+H+8}" y2="{y+H+8}" stroke="var(--line)"/>'
-    def cell(rd, lane, text, sub, cls, wfrac=1.0, off=0.0):
-        x = x0 + rd * lw + off * (lw - 12); w = (lw - 14) * wfrac
-        return box(x, ys[lane], w, H, cls, 6) + tx(x + w / 2, ys[lane] + 24, text, 'b c', 'c') + tx(x + w / 2, ys[lane] + 42, sub, 's', 'c')
-    wr = ['W_qkv tiles', 'W_o tiles', 'W_gate, W_up tiles', 'W_down tiles']
-    for i in range(4): b += cell(i, 0, 'write ' + wr[i], 'weights, addresses, flags', 'ho')
-    st = [('q, k, v read', 'S^T x per tile'), ('o_proj read', '+ residual add'), ('gate, up read', 'S^T x per tile'), ('down read', '+ residual add')]
-    for i, (a, s) in enumerate(st): b += cell(i, 1, a, s, 'st')
-    b += cell(0, 2, 'RMSNorm 1', 'ends the round', 'op', 0.55) + cell(1, 2, 'residual', 'free', 'op', 0.5, 0.5)
-    b += cell(2, 2, 'RMSNorm 2', 'ends the round', 'op', 0.55) + cell(3, 2, 'SwiGLU', 'act(gate) * up', 'op', 0.55)
-    b += cell(1, 3, 'RoPE + softmax attn', 'append k, v; read all', 'at', 0.7)
-    b += tx(x0, 396, 'Qwen3 adds per-head q/k norm and two gain-product rounds per layer (6 rounds). One final norm + the LM head run once per token.', 's')
-    b += tx(x0, 414, 'Status: each op and each matvec is verified separately (see README); a chained multi-round layer or token has not been demonstrated yet.', 's')
-    return svg(1000, 436, b, 'Layer timeline', 'Four outer rounds per inner decoder layer, showing which lane (host, DeltaNet state, op layers, attention) works in each round.')
+    b = tx(24, 34, 'The unrolled pipeline: one inner token in one outer forward call', 't')
+    b += tx(24, 54, 'State and KV only carry data deeper (to layers at or below the layer that holds them), so each inner op gets its own outer layers, in dependency order.', 's')
+    chips = [('op', 'RMSNorm', 'GDN gated-norm head'), ('st', 'W_qkv bank', 'GDN state read'), ('st', 'register', 'GDN state'), ('op', 'q/k norm', 'norm + gain product'), ('at', 'RoPE + attention', 'outer KV = inner KV'), ('st', 'register', 'GDN state'),
+             ('st', 'W_o bank', 'read + residual'), ('op', 'RMSNorm', 'GDN gated-norm head'), ('st', 'W_gate, W_up bank', 'GDN state read'), ('op', 'SwiGLU', 'MLP gadget'), ('st', 'register', 'GDN state'), ('st', 'W_down bank', 'read + residual')]
+    b += tx(24, 90, 'depth (outer layers)  ->', 'b') + tx(976, 90, 'one inner layer = roughly 15 outer layers', 's', 'r')
+    cw, gap, h = 140, 22, 64
+    for row in range(2):
+        y = 106 + row * 100
+        for i in range(6):
+            c, t1, t2 = chips[row * 6 + i]; x = 24 + i * (cw + gap)
+            b += box(x, y, cw, h, c, 6) + tx(x + cw / 2, y + 28, t1, 'b', 'c') + tx(x + cw / 2, y + 48, t2, 's', 'c')
+            if i < 5: b += arrow(f'M{x+cw+2} {y+h/2} L{x+cw+gap-2} {y+h/2}')
+        if row == 0: b += arrow(f'M{24+5*(cw+gap)+cw/2} {y+h+2} L{24+5*(cw+gap)+cw/2} {y+h+14} L{24+cw/2} {y+h+14} L{24+cw/2} {y+98}')
+    b += tx(24, 316, 'repeat for each inner layer, then:', 's')
+    tail = [('op', 'final RMSNorm'), ('st', 'LM-head bank'), ('at', 'argmax attention'), ('ho', 'outer lm_head')]
+    for i, (c, t) in enumerate(tail):
+        x = 24 + i * 176
+        b += box(x, 326, 150, 40, c, 6) + tx(x + 75, 351, t, 'b', 'c')
+        if i < 3: b += arrow(f'M{x+152} 346 L{x+174} 346')
+    b += arrow('M706 346 L760 346') + box(762, 326, 214, 40, 'ho', 6) + tx(869, 351, 'host: argmax + append', 'b', 'c')
+    b += tx(24, 400, 'Weights are paged in the same call: WRITE frames precede the READ frame of each bank, one chunked prefill per inner token.', 's')
+    b += tx(24, 418, 'The only deep-to-shallow channel is the emitted token: outer argmax, host append, next embedding row. Toy run: 1530 outer steps per inner token. Schematic order; q/k norm is Qwen3 only.', 's')
+    return svg(1000, 440, b, 'Unrolled pipeline', 'Each inner op occupies its own outer layers in dependency order; registers are DeltaNet layers placed between producer and consumer; one forward call per inner token.')
 
 # ------------------------------------------------------------------ log bar helper
 def logbars(title, sub, rows, xmin, xmax, unit_ticks, footer, w=1000):
@@ -160,7 +159,7 @@ def cost_model():
     s, _ = logbars('Cost model: weight streaming through DeltaNet state (Qwen3-0.6B)',
         'All 197 weight matrices incl. LM head = 595,984,384 real weights, fp32, A10G, torch-reference GDN, worst relative error 5.6e-7 (experiments/run/token_results.jsonl).',
         rows, 1, 300, [(1, '1 s'), (3, '3 s'), (10, '10 s'), (30, '30 s'), (100, '100 s'), (300, '300 s')],
-        ['Matvec streaming only. Not included: ~113 dependent rounds of op layers (estimate), the in-model argmax, per-round launch overhead.',
+        ['Matvec streaming only. Not included: op layers and the ~15-layer-per-inner-layer pipeline depth, the in-model argmax.',
          'Activations in the 41.95 s run were harness-fed (random): a throughput and accuracy measurement of the paging machine, NOT a chained token.'])
     save('cost_model.svg', s)
 
@@ -177,6 +176,6 @@ def comparison():
     save('comparison.svg', s)
 
 os.makedirs(OUT, exist_ok=True)
-save('architecture.svg', architecture()); save('state_memory.svg', state_memory()); save('layer_timeline.svg', layer_timeline())
+save('architecture.svg', architecture()); save('state_memory.svg', state_memory()); save('unrolled_pipeline.svg', layer_timeline())
 cost_model(); comparison()
 print('ok')

@@ -7,7 +7,7 @@ if os.environ.get('NOFLA'): sys.modules['fla'] = None
  
 import os, sys  # PATHS_SET
 _h=os.path.dirname(os.path.abspath(__file__))
-sys.path[:0]=[os.path.join(_h,'..','..','qweninqwen'), os.path.join(_h,'..','state')]
+sys.path[:0]=[os.path.join(_h,'..','..','qweninqwen'), os.path.join(_h,'..','state'), os.path.join(_h,'..','ops')]
 from machine import Layout, make_outer
 from engine import StateMV
 from stream import *
