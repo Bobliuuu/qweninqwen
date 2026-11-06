@@ -1,0 +1,6 @@
+{"run": "storyrun.py q3.elf (fusedexec.FreeRun3, checked against ref.Machine)",
+ "hardware": "NVIDIA A100-SXM4-40GB (lambda-final), torch 2.14, no fla kernels",
+ "outer": "chip circuit core.build() = 11 chip layers (hidden 4096 layout of the Qwen3.5-4B Qwenputer 'rv1' merge); fused executor runs only the chip layers' compiled math, NOT the HF 4B checkpoint. The HF-module check on the real merged Qwenputer-npu (Qwen3.5-4B base) is hfcheck.py, see hf log.",
+ "base_checkpoint_note": "Qwen3.5-0.8B not supported by the Qwenputer core (1 value head per key head, core needs 2); 4B is the base",
+ "model": "tiny Qwen3-arch, dim 64, 8q/4kv heads hd 8, hid 128, 1 layer, vocab 128, int4 weights (45056), int8 acts",
+ "trace_tokens": 708921, "model_tokens": 16, "instructions": 529035, "tok_per_s": 4225, "s_per_model_token": 10.5, "result": "exact"}
