@@ -29,3 +29,10 @@ All launch visuals are generated from one status switchboard and the committed l
 
 ### Tier changes in general
 - Tier table rows live in `tier_rows()` in `make_media.py` and in the README tier table; keep the two in sync. The mermaid block in the README must be re-pasted from `docs/assets/flow_tiers.mmd` after re-running.
+
+### Circuit-route tier measured (Qwenputer-style CPU in a real Qwen3.5)
+Source of truth: `docs/TIERS.md`; a row flips only from a committed `experiments/circuit/integrate/results/*.json` with `measured: true`.
+- README: status board row "Circuit route"; "Status by tier (detail)" circuit-route paragraph; headline box only if a full Qwen3-0.6B token ran.
+- `make_media.py`: add the new tier as its own rung/bar (do not reuse the compiled-route T-names; label it "circuit T<n>"); regenerate tier ladder and climb GIF, add the measured s/token as a separate bar in `sc_cost`.
+- `TWEET.md`: add one line with tier, model size actually run (tiny/0.6B), trace tokens, s/token; keep "projected" wording for unmeasured tiers.
+- `PROVENANCE.md`: row with the result JSON path.
