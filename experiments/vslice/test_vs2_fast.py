@@ -21,7 +21,8 @@ def run_fast(positions=2, nlayers=28, vocab=151936, tf32=False, **rk):
     emb = lambda t: toy.model.embed_tokens.weight[t].float()
     rn = FastRunner(S, c, plan, P, dev=dev, **rk)
     out = dict(rk=rk, tf32=tf32, layers=len(plan), D=S.D, steps=[], prompt=prompt)
-    t0 = time.time(); pr = Prog(S, c, plan, dev); init_steps(pr); rn.run(pr); torch.cuda.synchronize(); out['init_s'] = time.time() - t0
+    g_ = rn.graph; rn.graph = False
+    t0 = time.time(); pr = Prog(S, c, plan, dev); init_steps(pr); rn.run(pr); rn.graph = g_; torch.cuda.synchronize(); out['init_s'] = time.time() - t0
     print('init_s', out['init_s'], flush=True)
     seq = list(prompt)
     for step in range(positions):
