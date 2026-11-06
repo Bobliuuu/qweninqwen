@@ -120,3 +120,14 @@ RESULTS_PLACEHOLDER
 5. Unaddressable-WROM VDOT forcing (290,944 tokens over the full run).
 
 Removed: the LOAD/SB/SH host role for RAM (stack, activations, accumulators, SB/SH merge words) on the remapped firmware, in the measured chunks. Not shown: that the other 75 chunks behave the same (only chunks 0-2 were simulated/run), that the remapped firmware's full-run answer equals the legacy one is the other agent's claim (argmax 13 in `ramown` reference run), and the patched `in_drom` is still a bring-up patch.
+
+## 6. Update: chunks chained circuit-to-circuit (legacy firmware), measured 2026-11-06
+
+Code: `experiments/circuit/fullrun/circuit_run.py --chain | --handoff`; reference additions in `ref_big.py` (per-chunk `bn`, and per RAM slot the last-touched word address, its value and whether a load, SB/SH or SW touched it). Logs: `experiments/circuit/fullrun/logs/chain/`. Results table and caveats: `docs/TIERS.md`, section "Chained circuit replay".
+
+What changed for section 2, row "Start of each 2.1 M-step segment": for the chained runs the host restores state only at step 0 of the first chunk. After that the registers, pc anchor, `n`, the 15-bit weight base, `bn` and the 32 KB RAM are whatever the circuit holds. They were read back from the circuit's head states at every chunk boundary and equal the reference snapshot (0 of 31 registers wrong in each of the three register-file copies; pc, `n`, `wbase`, `bn` equal; all 8192 RAM slots equal after the SB/SH block-B decoder fix). `--handoff` restarted the circuit from only that read-back state at three boundaries and ran 8.4 M steps with 0 free-token mismatches. So "chunks are independent snapshots" is no longer true for the chained chunks; it remains true for the unchained ones.
+
+The answer to "do circuit stores ever get read back": in this firmware, no. The stores are right (SW-last and SB/SH-last RAM slots equal the reference at every boundary), but every LOAD word is injected from the reference before the load, so a wrong store could not change a later load. The boundary readback is what shows the stores are right; the loads would not have.
+
+Still host-served in the chained run (counts per 2.1 M-step chunk, chunks 0-5): VDOT weight words 0.83-1.04 M (88-89 % of injections) and the upper 12 bits of the 27-bit weight pointer (the circuit's `wbase` is 15 bits; the reference's full pointer, e.g. 5,503,361 at the end of chunk 5, exists only in the host); LOAD/SB/SH RAM words 142-170 k (removed only on the remapped firmware of section 5, not chained here); 3,200-4,096 forced VDOT records (0.15-0.20 %); the injection schedule; chunk 0's initial registers/pc; the `in_ram := 1` patch on the legacy firmware. Not chained: 58+ of 78 chunks, and the remapped-firmware run.
+
