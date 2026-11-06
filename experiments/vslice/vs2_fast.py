@@ -2,7 +2,7 @@
 
 What it changes versus vs2.Runner.run (each switch is independent and measured in PERF_NOTES.md):
   fastbuild    construct outer layers on the meta device + to_empty (no random init of ~1-4 GB of weights that compile_entry zeroes anyway)
-  sparse       after compile_entry, every nn.Linear weight is converted to a CSR *sparse* weight (the compiled weights have 1-3 nonzeros per row;
+  sparse       after compile_entry, every nn.Linear weight is converted to a COO *sparse* weight (the compiled weights have 1-3 nonzeros per row;
                zeros are skipped, nothing is approximated).  Also removes the dense 1-4 GB layer from memory.
   cache_layers keep the compiled layers on the GPU across positions (needs sparse: a dense layer is up to 4 GB) instead of rebuilding 1006 layers per position
   cache_pay    keep the token-independent weight payload tiles (silu-inverse of the inner weights, computed once) on the GPU across positions
@@ -37,12 +37,12 @@ SUBMODS = ['input_layernorm', 'post_attention_layernorm', 'mlp', 'mlp.gate_proj'
 
 
 def sparsify(layer):
-    """dense nn.Linear weights -> CSR sparse weights (exact: only structural zeros are dropped)."""
+    """dense nn.Linear weights -> COO sparse weights (exact: only structural zeros are dropped)."""
     with torch.no_grad():
         for m in layer.modules():
             if isinstance(m, nn.Linear):
                 w = m.weight.data
-                m.weight = nn.Parameter(w.to_sparse_csr(), requires_grad=False)
+                m.weight = nn.Parameter(w.to_sparse(), requires_grad=False)
                 del w
     return layer
 
