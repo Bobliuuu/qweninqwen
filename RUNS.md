@@ -42,3 +42,4 @@
 | 2026-11-06 11:30 UTC | gpuB (A10G) | `capture_layers.py` + `bench_corrected.py` (corrected ROM+SELECT+MAC+acc, MEMORY_DESIGN s.10) | k=14 (110 layers): 1.078 ms/step on ROM_DOT tokens (928 tok/s), predicate skip 0.897 on others, graph-level skip 0.200; skip bit-exact for all 17 layers with P=2^ceil(log2(2 zmax+128)) |
 | 2026-11-06 | Modal A100 (ap-fBThed1pYehleksI46QqqO) | `--job lmshort` SVD shortlist head | done: no saving |
 | 2026-11-06 | Modal A100 (ap-tHRNr6w2lbtiE9EimUFLVs) | `--job quant` grid 2 (weight-only, per-group acts, mixed) | queued behind workspace GPU limit at handback |
+| 2026-11-06 | Modal A100 (ap-AEelnKmdTf68dXJIaUNjmc) | `--job quant` repeated compiler prompt, 130 tokens, W4 per-row/g128 + A8 per-token | launched (queued) |
