@@ -59,15 +59,15 @@ def _put(S, SV: tl.constexpr, bat, ty, b0, cc0, d):
         val = tl.where(dim < 2, 16777216.0, tl.where(dim < 34, bit, 0.0))
         tl.store(base + b0 + dim, val)
     elif ty == 3:    # DROM word: 4 byte values in dims cc0..cc0+3 (cc0 = 2 + 32*half + 4*k)
-        lane = tl.arange(0, 4)
-        tl.store(base + b0 + cc0 + lane, ((d >> (8 * lane)) & 255).to(tl.float32))
+        ln4 = tl.arange(0, 4)
+        tl.store(base + b0 + cc0 + ln4, ((d >> (8 * ln4)) & 255).to(tl.float32))
     else:            # WROM word: 8 cells u in dims 2+cc (cc >= 63 in the row 64 below)
         lane = tl.arange(0, 8); cc = cc0 + lane
         off = b0 + tl.where(cc >= 63, 8192, 0) + 2 + cc
         tl.store(base + off, ((d >> (4 * lane)) & 15).to(tl.float32))
 
 @triton.jit
-def _inject(S0, S1, S2, S3, SV0: tl.constexpr, SV1: tl.constexpr, SV2: tl.constexpr, SV3: tl.constexpr, kind, base0, cc0, data, ictr, N):
+def _inject(S0, S1, S2, S3, S4, S5, S6, S7, SV0: tl.constexpr, SV1: tl.constexpr, SV2: tl.constexpr, SV3: tl.constexpr, SV4: tl.constexpr, SV5: tl.constexpr, SV6: tl.constexpr, SV7: tl.constexpr, kind, base0, cc0, data, ictr, N):
     bat = tl.program_id(0)
     c = tl.load(ictr + bat)
     kd = tl.load(kind + bat * N + c).to(tl.int32)
@@ -77,7 +77,11 @@ def _inject(S0, S1, S2, S3, SV0: tl.constexpr, SV1: tl.constexpr, SV2: tl.conste
         if sid == 0: _put(S0, SV0, bat, ty, b0, cc, d)
         elif sid == 1: _put(S1, SV1, bat, ty, b0, cc, d)
         elif sid == 2: _put(S2, SV2, bat, ty, b0, cc, d)
-        else: _put(S3, SV3, bat, ty, b0, cc, d)
+        elif sid == 3: _put(S3, SV3, bat, ty, b0, cc, d)
+        elif sid == 4: _put(S4, SV4, bat, ty, b0, cc, d)
+        elif sid == 5: _put(S5, SV5, bat, ty, b0, cc, d)
+        elif sid == 6: _put(S6, SV6, bat, ty, b0, cc, d)
+        else: _put(S7, SV7, bat, ty, b0, cc, d)
     tl.store(ictr + bat, c + 1)
 
 cfg = json.load(open(a.tuned))
@@ -136,9 +140,9 @@ for si, st in enumerate(fr.ex.steps):
     for nd in st['heads']:
         if id(nd) in tabid: loc[tabid[id(nd)]] = (si, j)
         j += len(nd.vheads())
-used = sorted({si for si, _ in loc.values()}); assert len(used) <= 4, used
+used = sorted({si for si, _ in loc.values()}); assert len(used) <= 8, used
 sidx = {si: n for n, si in enumerate(used)}
-Ss = [fr.ex.steps[si]['S'] for si in used] + [fr.ex.steps[used[0]]['S']] * (4 - len(used))
+Ss = [fr.ex.steps[si]['S'] for si in used] + [fr.ex.steps[used[0]]['S']] * (8 - len(used))
 SVs = [int(x.shape[1]) for x in Ss]
 I_kind = np.zeros((B, N), np.int8); I_base = np.zeros((B, N), np.int32); I_cc = np.zeros((B, N), np.int16); I_dat = np.zeros((B, N), np.int32)
 wromf = np.memmap(a.wrom, dtype=np.uint8, mode='r') if a.wrom else None
@@ -179,7 +183,7 @@ if os.environ.get('NOVD'): I_kind[I_kind >> 3 == 2] = 0
 I_kind, I_base, I_cc, I_dat = (torch.from_numpy(x).to('cuda') for x in (I_kind, I_base, I_cc, I_dat)); ICTR = torch.zeros(B, dtype=torch.int32, device='cuda')
 _orig_step = fr._step
 def _step_inj():
-    _inject[(B,)](Ss[0], Ss[1], Ss[2], Ss[3], SV0=SVs[0], SV1=SVs[1], SV2=SVs[2], SV3=SVs[3], kind=I_kind, base0=I_base, cc0=I_cc, data=I_dat, ictr=ICTR, N=N)
+    _inject[(B,)](*Ss, **{f'SV{i}': SVs[i] for i in range(8)}, kind=I_kind, base0=I_base, cc0=I_cc, data=I_dat, ictr=ICTR, N=N)
     _orig_step()
 fr._step = _step_inj
 print(f'injections per row {n_inj.tolist()[:4]}... (RAM-type {n_ramin.tolist()[:4]}), inj file {a.inj}, ramimg {a.ramimg}, unaddressable-WROM VDOTs forced {n_zone.tolist()[:4]}...', flush=True)
