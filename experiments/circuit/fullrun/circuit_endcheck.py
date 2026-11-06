@@ -159,7 +159,9 @@ def machine(stt, ch=None):
     m = ref.Machine.from_program(prog);
     if a.ramimg and not (a.reset0 and ch == 0): m.ram = [int(v) for v in np.load(f'{a.refdir}/ramimg_{ch:04d}.npy')]
     if a.reset0 and ch == chunks[0] and ch == 0:   # step-0 state comes from the program alone
-        assert list(stt['x']) == list(m.x) and stt['anchor'] == m.anchor and stt['n'] == m.n == 0 and stt['wb'] == 0, 'reference state_0000 != program reset state'
+        # the reference's initial sp (x2) is a build parameter of ref_big (enlarged-memory map), not the circuit tree's S.SP_INIT: it is the ONE step-0 value supplied from outside; all else must equal the program reset state
+        assert [v for i, v in enumerate(stt['x']) if i != 2] == [v for i, v in enumerate(m.x) if i != 2] and stt['anchor'] == m.anchor and stt['n'] == m.n == 0 and stt['wb'] == 0, 'reference state_0000 != program reset state (ignoring sp)'
+        print(f"reset0: step-0 sp from outside = {stt['x'][2]:#x} (tree S.SP_INIT {m.x[2]:#x}); every other register/pc/n/wb = program reset state", flush=True); m.x[2] = stt['x'][2]
         if a.ramimg: assert all(int(v) == int(w) for v, w in zip(np.load(f'{a.refdir}/ramimg_{ch:04d}.npy'), m.ram)), 'ramimg_0000 != program initial RAM'
         if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
         return m
