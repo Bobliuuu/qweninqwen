@@ -102,3 +102,17 @@ breakdown shows the glue is almost all soft-float: `__mulsf3` 1.25e9, `__addsf3`
 So ~85-90% of their current instruction count is exactly the nonlinear/glue work priced here: replacing it with the fixed-point kernels of this directory is 1.1e7 (T=1) to 2.3e7 (T=512) instructions
 per token without extensions and 6e6 to 9e6 with them, i.e. ~30-60x fewer than their ~4.6e8 soft-float glue instructions per position (my T=1..512 vs their prompt positions 0..3). That swap has NOT been run end to end
 (accuracy of an all-fixed-point forward vs HF is untested; their run's position-0 argmax already differs from HF in q4v mode).
+
+## Attention dot products (QK scores and probability-weighted V), hd=128, int8 K/V (`kernels3.c`, `res_attn.json`)
+Not nonlinear, but it is the only other per-token cost that grows with context T and it turns out to be larger than the nonlinears. Instructions per cached position per (layer, q head), 128 MACs each:
+| kernel | instr / position | tokens / position | instr per MAC |
+|---|---|---|---|
+| scores, plain RV32IM (lb,lb,mul,add) | 620 | 749 | 4.8 |
+| scores, SMAQA, 4 keys share each q-word load | 81.75 | 181 | 0.64 |
+| PV, plain (int16 Q15 prob x int8 V) | 747 | 1208 | 5.8 |
+| PV, SMAQA with int8 probabilities, V stored transposed (t contiguous) | 88 | 194 | 0.69 |
+Both SMAQA kernels are bit-exact vs numpy int dot products. Per token (448 = 28 layers x 16 q heads rows): SMAQA 448 x 170 x T = 7.6e4 x T instructions (T=64: 4.9e6, T=512: 3.9e7, T=2048: 1.6e8); plain 6.1e5 x T (T=512: 3.1e8).
+So past T ~ 250 the attention dot products exceed the whole nonlinear budget, and past T ~ 1300 they exceed an 8-row VDOT matvec (9.7e7). Accuracy caveat: int8 probabilities (per-row scale) give 1.4-2.1% relative L2 error on the PV output
+(real probs from the 6 captured layers, random V) versus 1.8e-4..4.6e-4 for int16 probabilities, so the SMAQA PV path needs a hi/lo byte split (2 x 88 instr) or a check against HF before use.
+No cheap new instruction was found for these: a fused "16-byte dot from RAM" needs 4+4 word reads per instruction and each RAM read port is a separate copy of the RAM key heads (state x4), so I did not propose one;
+KV bytes (57 KB per position for int8 K,V over 28 layers) also exceed the 32 KB RAM, which is the real constraint (KV cache placement is outside this directory).

@@ -1,0 +1,23 @@
+{
+ "score_mul": {
+  "instr_per_pos": 620.0,
+  "tokens_per_pos": 749.34375
+ },
+ "score_smaqa4": {
+  "instr_per_pos": 81.75,
+  "tokens_per_pos": 180.671875
+ },
+ "pv_mul": {
+  "instr_per_pos": 747.0,
+  "tokens_per_pos": 1207.96875
+ },
+ "pv_smaqa": {
+  "instr_per_pos": 88.0,
+  "tokens_per_pos": 193.859375
+ },
+ "correct": [
+  true,
+  true
+ ],
+ "macs_per_pos": 128
+}
