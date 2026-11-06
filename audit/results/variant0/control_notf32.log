@@ -1,0 +1,10 @@
+tf32 flags False False highest
+Current Python version 3.10 is below the recommended 3.11 version. It is recommended to upgrade to Python 3.11 or higher for the best experience.
+
+prompt [785, 6722, 315, 9625, 374]
+[real151936_L28] d=1024 D=40775 outer_layers=1006 I_MLP=8192
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+  worst blocks [(351, 6.0219, 6.2511), (13, 8.8351, 9.0086), (563, 6.2918, 6.4452), (418, 4.0583, 3.9074)] nblk 594
+  rails [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0] top code score 17.999149322509766
+{'step': 0, 'frames': 293068, 'sec': 316.7795832157135, 'build_s': 27.99486780166626, 'run_s': 269.97248458862305, 'maxrel': 0.01771765574812889, 'outer_argmax': 15846, 'hf_argmax': 15846}
+{"tag": "real151936_L28", "d": 1024, "D": 40775, "layers": 1006, "tokens": [785, 6722, 315, 9625, 374], "maxrel_worst": 0.01771765574812889, "params_per_layer_M": null}

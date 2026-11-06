@@ -1,0 +1,75 @@
+Current Python version 3.10 is below the recommended 3.11 version. It is recommended to upgrade to Python 3.11 or higher for the best experience.
+
+prompt [785, 6722, 315, 9625, 374]
+[real151936_L28] d=1024 D=40775 outer_layers=1006 I_MLP=8192
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+  [progress] layer 0/1006 R build_s=0.1 run_s=0.6 rows=1
+  [progress] layer 50/1006 W build_s=2.7 run_s=1.1 rows=60
+  [progress] layer 100/1006 R build_s=5.8 run_s=1.6 rows=119
+  [progress] layer 150/1006 R build_s=8.9 run_s=2.0 rows=180
+  [progress] layer 200/1006 W build_s=12.1 run_s=2.5 rows=240
+  [progress] layer 250/1006 NG build_s=15.2 run_s=2.9 rows=300
+  [progress] layer 300/1006 NG build_s=18.2 run_s=3.4 rows=360
+  [progress] layer 350/1006 R build_s=21.3 run_s=3.8 rows=421
+  [progress] layer 400/1006 W build_s=24.3 run_s=4.3 rows=480
+  [progress] layer 450/1006 R build_s=27.5 run_s=4.8 rows=539
+  [progress] layer 500/1006 R build_s=30.6 run_s=5.2 rows=600
+  [progress] layer 550/1006 W build_s=33.7 run_s=5.7 rows=660
+  [progress] layer 600/1006 NG build_s=36.8 run_s=6.1 rows=720
+  [progress] layer 650/1006 NG build_s=39.9 run_s=6.6 rows=780
+  [progress] layer 700/1006 R build_s=43.0 run_s=7.1 rows=841
+  [progress] layer 750/1006 W build_s=46.1 run_s=7.6 rows=900
+  [progress] layer 800/1006 R build_s=49.1 run_s=8.2 rows=959
+  [progress] layer 850/1006 R build_s=52.0 run_s=8.8 rows=1020
+  [progress] layer 900/1006 W build_s=55.0 run_s=9.3 rows=1080
+  [progress] layer 950/1006 NG build_s=57.9 run_s=9.9 rows=1140
+  [progress] layer 1000/1006 TM build_s=61.1 run_s=10.5 rows=1198
+  [progress] layer 0/1006 R build_s=0.0 run_s=0.2 rows=1996
+  [progress] layer 50/1006 W build_s=1.5 run_s=13.0 rows=112036
+  [progress] layer 100/1006 R build_s=2.8 run_s=26.0 rows=223100
+  [progress] layer 150/1006 R build_s=4.1 run_s=38.7 rows=334164
+  [progress] layer 200/1006 W build_s=5.5 run_s=52.4 rows=445740
+  [progress] layer 250/1006 NG build_s=7.0 run_s=64.7 rows=554756
+  [progress] layer 300/1006 NG build_s=8.4 run_s=77.8 rows=665308
+  [progress] layer 350/1006 R build_s=9.8 run_s=90.6 rows=777396
+  [progress] layer 400/1006 W build_s=11.1 run_s=102.9 rows=887436
+  [progress] layer 450/1006 R build_s=12.5 run_s=115.9 rows=998500
+  [progress] layer 500/1006 R build_s=13.8 run_s=128.9 rows=1109564
+  [progress] layer 550/1006 W build_s=15.1 run_s=141.4 rows=1221140
+  [progress] layer 600/1006 NG build_s=16.5 run_s=154.1 rows=1330156
+  [progress] layer 650/1006 NG build_s=18.0 run_s=167.1 rows=1440708
+  [progress] layer 700/1006 R build_s=19.4 run_s=179.9 rows=1552796
+  [progress] layer 750/1006 W build_s=21.0 run_s=193.6 rows=1662836
+  [progress] layer 800/1006 R build_s=22.4 run_s=206.4 rows=1773900
+  [progress] layer 850/1006 R build_s=23.9 run_s=219.5 rows=1884964
+  [progress] layer 900/1006 W build_s=25.2 run_s=232.5 rows=1996540
+  [progress] layer 950/1006 NG build_s=26.5 run_s=244.7 rows=2105556
+  [progress] layer 1000/1006 TM build_s=27.8 run_s=268.7 rows=2289068
+  worst blocks [(351, 6.0219, 6.2511), (13, 8.8351, 9.0086), (563, 6.2918, 6.4452), (418, 4.0583, 3.9074)] nblk 594
+  rails [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0] top code score 17.999149322509766
+{'step': 0, 'frames': 293068, 'sec': 316.93352603912354, 'build_s': 27.9217426776886, 'run_s': 269.79783296585083, 'maxrel': 0.01771765574812889, 'outer_argmax': 15846, 'hf_argmax': 15846}
+  [progress] layer 0/1006 R build_s=0.0 run_s=0.2 rows=1996
+  [progress] layer 50/1006 W build_s=1.3 run_s=12.5 rows=112036
+  [progress] layer 100/1006 R build_s=2.7 run_s=25.9 rows=223100
+  [progress] layer 150/1006 R build_s=4.0 run_s=38.7 rows=334164
+  [progress] layer 200/1006 W build_s=5.3 run_s=51.3 rows=445740
+  [progress] layer 250/1006 NG build_s=6.6 run_s=63.4 rows=554756
+  [progress] layer 300/1006 NG build_s=7.9 run_s=76.7 rows=665308
+  [progress] layer 350/1006 R build_s=9.2 run_s=89.3 rows=777396
+  [progress] layer 400/1006 W build_s=10.4 run_s=101.5 rows=887436
+  [progress] layer 450/1006 R build_s=11.8 run_s=115.3 rows=998500
+  [progress] layer 500/1006 R build_s=13.1 run_s=127.8 rows=1109564
+  [progress] layer 550/1006 W build_s=14.3 run_s=140.5 rows=1221140
+  [progress] layer 600/1006 NG build_s=15.8 run_s=153.8 rows=1330156
+  [progress] layer 650/1006 NG build_s=17.2 run_s=166.3 rows=1440708
+  [progress] layer 700/1006 R build_s=18.7 run_s=179.5 rows=1552796
+  [progress] layer 750/1006 W build_s=20.2 run_s=192.3 rows=1662836
+  [progress] layer 800/1006 R build_s=21.6 run_s=205.2 rows=1773900
+  [progress] layer 850/1006 R build_s=23.1 run_s=218.7 rows=1884964
+  [progress] layer 900/1006 W build_s=24.5 run_s=231.7 rows=1996540
+  [progress] layer 950/1006 NG build_s=26.0 run_s=244.7 rows=2105556
+  [progress] layer 1000/1006 TM build_s=27.6 run_s=269.5 rows=2289068
+  worst blocks [(94, 6.7474, 12.7668), (37, 8.1141, 13.9964), (21, 9.2518, 14.2298), (12, 12.0308, 16.8172)] nblk 594
+  rails [1.0, 0.0, 1.0, -0.0, -0.0, 1.0, 1.0, -0.0] top code score 18.000455856323242
+{'step': 1, 'frames': 293068, 'sec': 318.15927171707153, 'build_s': 27.66988492012024, 'run_s': 270.6904466152191, 'maxrel': 0.33217117190361023, 'outer_argmax': 315, 'hf_argmax': 315}
+{"tag": "real151936_L28", "d": 1024, "D": 40775, "layers": 1006, "tokens": [785, 6722, 315, 9625, 374], "maxrel_worst": 0.33217117190361023, "params_per_layer_M": null}
