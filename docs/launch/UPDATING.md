@@ -38,3 +38,5 @@ Source of truth: `docs/TIERS.md`; a row flips only from a committed `experiments
 - `PROVENANCE.md`: row with the result JSON path.
 
 Current state (2026-11-06): the only measured circuit-route run is the tiny-model fused-executor run (eb4f4f3, `docs/TIERS.md` tiny-model table). Do not feature it as a tier-ladder rung; if media mention it, label it "toy model, 16 tokens". Qwen3-0.6B instruction counts are measured but s/token is computed from assumed rates and must be drawn hatched/labelled "projected". Tier media must state context length (ctx 1 vs 128 vs 1024).
+
+Circuit route outer model: the Qwenputer core requires 2 value heads per key head, so the base is Qwen3.5-4B, not 0.8B; any media saying "0.8B/4B" for the circuit route must say 4B. The combined 5.5-7 h/token (ctx 1) figure in `docs/TIERS.md` is PROJECTED (matvec token costs measured on the reference machine, nonlinear and attention parts from separate kernels, no merged build); show it hatched, never as a result bar. Weight memory (ROM in appended layers vs host streaming) is an open ruling and changes what "weights stay in the model" means in the media.

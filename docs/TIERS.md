@@ -35,9 +35,9 @@ Correction (multicore, 44ba97c, modeled not run): lane-level parallelism inside 
 
 | Run | Inner model | Outer / executor | Trace tokens | Rate | Exactness | Evidence | Commit |
 |---|---|---|---|---|---|---|---|
-| tiny Qwen3-architecture firmware, 16 generated tokens | dim 64, 8 heads / 4 kv, head size 8, hidden 128, 1 layer, vocab 128, random weights | Qwenputer fused circuit executor (checkpoint size and GPU not stated in the log; asked e2e) | 708,920 steps (reference 708,921 tokens, 529,035 instr: 1.34 tok/instr) = 44.3k trace tokens per generated token | 4,225 tok/s (0.237 ms/step) = 10.5 s per tiny token [M] | fused trace "exact" vs reference emulator; HF check of the same firmware at f32 rel err 6.3e-7 (compiler `res_tiny.json`) | `experiments/circuit/e2e/logs/fused_q3_16tok.log` | eb4f4f3 |
+| tiny Qwen3-architecture firmware, 16 generated tokens | dim 64, 8 heads / 4 kv, head size 8, hidden 128, 1 layer, vocab 128, random weights | Qwenputer fused executor on A100-40GB (lambda-final), running ONLY the compiled math of the 11 chip layers (hidden 4096 layout of the Qwen3.5-4B Qwenputer merge), not the HF 4B checkpoint; HF-module check of the real merged checkpoint is `e2e/hfcheck.py` (separate, see its log) | 708,920 steps (reference 708,921 tokens, 529,035 instr: 1.34 tok/instr) = 44.3k trace tokens per generated token | 4,225 tok/s (0.237 ms/step) = 10.5 s per tiny token [M] | fused trace "exact" vs reference emulator; HF check of the same firmware at f32 rel err 6.3e-7 (compiler `res_tiny.json`) | `experiments/circuit/e2e/logs/fused_q3_16tok.log`, `.meta.json` | eb4f4f3, 135cfdc |
 
-This is the first MEASURED circuit-route run. It validates the pipeline (firmware -> executor -> exact trace) at toy size only. Nothing here is a Qwen3-0.6B number.
+Base checkpoint note from the run metadata: Qwen3.5-0.8B is NOT supported by the Qwenputer core (it has 1 value head per key head, the core needs 2), so 4B is the base; the README's "0.8B/4B" outer should read 4B until the core is re-scheduled. This is the first MEASURED circuit-route run. It validates the pipeline (firmware -> executor -> exact trace) at toy size only. Nothing here is a Qwen3-0.6B number.
 
 ## Qwen3-0.6B: MEASURED instruction counts, s/token COMPUTED from assumed rates
 
@@ -55,6 +55,27 @@ Reconciliation of q4v 1.7 days with the T3 projection of 6-12 h: the q4v build h
 
 Fidelity flag: `res_full_q4v.json` records `argmax_fw` [13, 315, 279, 374] vs `argmax_hf` [15846, 315, 279, 374] on the 4-token prompt: the q4v firmware differs from HF at position 0 (agrees at 1-3). Argmax vs HF is not yet a pass; this belongs under R4 (numeric contract).
 
+## Combined projection (PROJECTED): blocked or W4A4 matvec + merged nonlinear kernels + attention
+
+Built from measured per-op token costs, nothing run end to end. Components, tokens per inner token:
+- Matvec (kernels agent, exact on Qwenputer `ref.Machine`, token-accurate): blocked VDOT + requant epilogue 0.1765 tok/MAC on layers, 0.1656 on the LM head (fused argmax) = 1.035e8. Proposed VDOT16 (W4A4, K9): 0.0921 / 0.084 = 5.36e7 (modelled on the same Machine, not built in the circuit).
+- Nonlinear with custom instructions (nonlinear agent, `res_counts.json`, ext_tokens): 9.57e6 at T=1, 1.02e7 at T=64, 1.47e7 at T=512 (linear in T between); I subtract requant (3.02e6) and unfused argmax (1.5e5) because the K6/K7 kernels already include them.
+- Attention score and PV MACs (114,688 x T int8 x int8, not in either table): estimated at 1.325 tok/MAC (SMAQA K2 class). ESTIMATE; no attention kernel is measured.
+- Effects here are additive (different instruction sets of one program), not multiplied. Seconds = tokens / rate; B adds x12/11 for one extra chip layer (kernels agent's depth scaling). Rates: 5,562 tok/s is the upstream L4 number the kernels agent used; 4,225 tok/s is our measured fused rate on A100 for the tiny build (11 chip layers) and is the more honest rate here.
+
+| Build | ctx | trace tokens/token | h/token at 5,562 tok/s | h/token at 4,225 tok/s |
+|---|---|---|---|---|
+| A: blocked VDOT + ext nonlinear + attention | 1 | 1.10e8 | 5.5 | 7.2 |
+| A | 128 | 1.31e8 | 6.5 | 8.6 |
+| A | 1024 | 2.76e8 | 13.8 | 18.1 |
+| B: VDOT16 W4A4 (proposed hardware, A4 quality risk) | 1 | 6.0e7 | 3.3 | 4.3 |
+| B | 128 | 8.1e7 | 4.4 | 5.8 |
+| B | 1024 | 2.26e8 | 12.3 | 16.2 |
+
+All PROJECTED [needs R2, R4]. Not included: ROM read overhead and address writes (memory agent: unmeasured), fork/join, fidelity fixes for the q4v argmax mismatch, the embedding lookup. Attention dominates at long context (ctx 1024: 56 % of A), so long-context speed is bounded by attention kernels, and W4A4 only helps the weight matvec. Note these combined numbers (5-7 h at ctx 1) are 3-5x below the q4v measured-instruction route (1.7 days) because they assume the merged fixed-point build, which does not exist yet.
+
+Reconciling the two tok/MAC views: the compiler reports 0.176 instr/MAC and applies an assumed 1.19-1.40 tok/instr (0.21-0.25 tok/MAC); the kernels agent measures tokens directly on `ref.Machine` and gets 0.18 for the same kernel structure (about 1.02 tok/instr, since VDOT records are one small token). For VDOT-dominated code use the kernels figure; the 1.19-1.40 ratio is for general C and overstates the matvec by about 20-40 %.
+
 ## Measured components (not full-model tiers)
 
 | Component | Value | Evidence |
@@ -63,6 +84,9 @@ Fidelity flag: `res_full_q4v.json` records `argmax_fw` [13, 315, 279, 374] vs `a
 | fp32 mul as gate netlist, bitsliced verified | 4,332 neurons, depth 124, max rel err 4.0e-7 | `experiments/circuit/nonlinear/res_fp.json` |
 | fp32 add as gate netlist | 2,670 neurons, depth 176, max rel err 1.2e-7 | same |
 | Qwenputer upstream numbers (stories260K token: 2.43M / 225k / 53k trace tokens; executor 5,562 tok/s batch 1) | upstream, not reproduced here | plan sec. 2 |
+| Matvec firmware, exact token costs on Qwenputer `ref.Machine` (bit-exact vs numpy), K=1024: plain C 8.007 tok/MAC, unrolled 4.32, SMAQA 1.325, VDOT one-row 0.708, existing compiler kernel 0.180, blocked VDOT (22 accumulators) 0.163, + requant epilogue 0.1765, LM-head fused argmax 0.1656. Matvec-only at assumed 5,562 tok/s: plain 238 h, SMAQA 39 h, existing VDOT 5.36 h, blocked 5.17 h (glue excluded) | M (reference Machine; seconds assumed) | `experiments/circuit/kernels/res_kernels.json`, `res_projection.json`, README | 1955ed0 |
+| Proposed VDOT16+WB16 (W4A4): 0.082 tok/MAC measured on the modelled Machine, hardware estimate +~500 MLP units and 0-1 chip layer; projected ~2.9 h matvec-only; risk: A4 activation quality. VDOTA16 (W4A8) 0.071 tok/MAC but +3 chip layers, net 3.0 h, not worth building (agent's call) | modelled, not built in circuit | same | 1955ed0 |
+| Weight memory: ROM in an MLP down_proj is exact (100 % of entries at 1-8 bits, stock-shaped Qwen3.5 MLP sublayer at 0.8B and 4B geometry, max abs err 3e-4 at 8 bits). Recommended design: ROM in ~13 appended layers at 4B (0.8B would need 82). Blocker: npu WROM is 32,640 words with a 15-bit WB index, 0.6B needs ~55M words (26-bit index), so WB must widen or take two tokens. MAC on the read word and address-from-register are untested | M for ROM read only; design PROPOSED | `experiments/circuit/memory/MEMORY_DESIGN.md`, `rom_mlp_results.json` | 1d383f7 |
 | Nonlinear kernels on RV32IM: rsqrt 68.7 -> 3 instr, exp2 38 -> 3 instr (extension), rel err 5e-6; RMSNorm scalar part ~6.2k instr (base and ext) | M (emulator) | `experiments/circuit/nonlinear/res_kernels.json` |
 | Lane exactness: row-split int8 matvec on 1-16 lockstep lanes equals numpy; bus-limited speedup 1.5x (2 lanes) to 2.5x (16) of matvec phase | M (Qwenputer ref.Machine) | `experiments/circuit/multicore/res_tiny.json` |
 | Compiled route (different thing): 1 token, 268.6 s untuned, A100 | measured | `experiments/vslice/logs/real_L28.log` |
@@ -70,7 +94,7 @@ Fidelity flag: `res_full_q4v.json` records `argmax_fw` [13, 315, 279, 374] vs `a
 ## Open items and rulings
 
 1. RESOLVED (coordinator): target ISA is RV32IM Qwenputer (plus VDOT/SMAQA) in the real Qwen3.5-0.8B/4B. Compiler lowers to RV32IM firmware; tensor-op `compiler/isa.py` is an intermediate form only.
-2. OPEN, pending user ruling: weight paging (M1) vs embedding-ROM (M2). Every full-token row depends on it (298 MB int4 vs 261,120 nibbles in state). Marked [needs R2] below.
+2. OPEN, pending user ruling: weight memory. Proposed default (memory agent): ROM-in-appended-layers of the outer checkpoint (the weights become parameters of the outer model; the checkpoint is then not exactly stock Qwen3.5); fallback: host streaming weights (labelled bring-up only, same footing as the compiled route). Also needs the WB index widened (15 to 26 bits). Every full-token row depends on it (298 MB int4 vs 261,120 nibbles in state). Marked [needs R2] below.
 3. OPEN, pending user ruling: cross-session activation transport. T5, T6 depend on it [needs R3].
 4. OPEN, pending user ruling: numeric contract (W4A8 vs W8A8, fixed-point nonlinear ops, meaning of "equals"). All rows depend on it [needs R4]; argmax-vs-HF agreement is reported separately.
 
