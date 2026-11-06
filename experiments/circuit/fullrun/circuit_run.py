@@ -132,7 +132,7 @@ for r in range(B):
     F_fid[r, :len(t)] = torch.from_numpy(fid.astype(np.int32)); F_p[r, :len(t)] = torch.from_numpy(p.astype(np.int32)); TREF[r, :len(t)] = torch.from_numpy(t.astype(np.int32))
     MASK[r, :len(t)] = torch.from_numpy(np.isin(kinds[r], forced_kinds).astype(np.uint8))
 # ---- injection tables ----
-tabid = {id(v): k for k, v in c.tables.items() if k.startswith('ram') or k.startswith('wrom') or (REALMAP and k.startswith('drom'))}
+tabid = {id(v): k for k, v in c.tables.items() if k.startswith('ram') or k.startswith('wrom') or (REALMAP and k.startswith('drom')) or (bool(os.environ.get('DUMPREG')) and k.startswith('regs.'))}
 loc = {}                                                  # table name -> (sublayer step idx, first value-head index j)
 for si, st in enumerate(fr.ex.steps):
     if st['kind'] != 'head': continue
@@ -309,6 +309,13 @@ while done < N:
     msg = f'step {done:,}/{N:,} {el:.0f}s {done*B/el:,.0f} agg tok/s; free-token mismatches {int(nbad_free.sum())} (rows with any: {sum(x is not None for x in first_bad)}), forced-token raw disagreements {int(nbad_forced.sum())} of {int(n_forced.sum()):,}'
     print(msg, flush=True); log.write(msg + '\n'); log.flush()
     if all(x is not None for x in first_bad): print('all rows diverged; stop', flush=True); break
+if os.environ.get('DUMPREG'):   # debug: the three register-file ports' view of registers (comma list)
+    for rg in (int(x) for x in os.environ['DUMPREG'].split(',')):
+        out_ = []
+        for pn in ('rs1', 'rs2', 'rd'):
+            si_, j_ = loc[f'regs.{pn}']; vec = Ss[sidx[si_]][0].reshape(-1)[j_ * 16384 + rg * 128: j_ * 16384 + rg * 128 + 128].cpu().numpy()
+            v_ = sum((1 << i) for i in range(32) if vec[c.reg_cols[i][0]] > 64); out_.append((pn, v_ - (1 << 32) if v_ >> 31 else v_))
+        print('REG x%d' % rg, out_, flush=True)
 if os.environ.get('DUMPSLOT'):   # debug: print the circuit's current RAM head state for slots (comma list), row 0
     for sl_ in (int(x) for x in os.environ['DUMPSLOT'].split(',')):
         sid_, jb, row_ = (int(v) for v in lut_ram[sl_]); vec = Ss[sid_][0].reshape(-1)[jb: jb + 128] if False else Ss[sid_][0].reshape(-1)[jb * 16384 + row_ * 128: jb * 16384 + row_ * 128 + 128].cpu().numpy()
