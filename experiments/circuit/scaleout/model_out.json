@@ -1,0 +1,180 @@
+{
+ "independent": [
+  {
+   "tier": "T1 plain C",
+   "gpu": "L4",
+   "tok_per_token": 5600000000.0,
+   "step_ms_b1": 0.177,
+   "s_per_token": 991200.0,
+   "s_per_token_amortised_b32": 262850.0,
+   "usd_per_token_b1": 220.0464,
+   "usd_per_token_b32": 58.3527
+  },
+  {
+   "tier": "T2 VDOT/SMAQA",
+   "gpu": "L4",
+   "tok_per_token": 517999999.99999994,
+   "step_ms_b1": 0.177,
+   "s_per_token": 91685.99999999999,
+   "s_per_token_amortised_b32": 24313.624999999996,
+   "usd_per_token_b1": 20.354291999999997,
+   "usd_per_token_b32": 5.397624749999999
+  },
+  {
+   "tier": "T3 QwenPU+algo",
+   "gpu": "L4",
+   "tok_per_token": 120399999.99999999,
+   "step_ms_b1": 0.177,
+   "s_per_token": 21310.799999999996,
+   "s_per_token_amortised_b32": 5651.274999999999,
+   "usd_per_token_b1": 4.730997599999999,
+   "usd_per_token_b32": 1.2545830499999997
+  }
+ ],
+ "split": [
+  {
+   "tier": "T1 plain C",
+   "K": 1,
+   "gpus": 1,
+   "s_per_token": 991200.0,
+   "usd_per_token": 220.0464,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T1 plain C",
+   "K": 8,
+   "gpus": 1,
+   "s_per_token": 308799.666,
+   "usd_per_token": 68.553525852,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T1 plain C",
+   "K": 32,
+   "gpus": 1,
+   "s_per_token": 263189.452,
+   "usd_per_token": 58.428058344,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T1 plain C",
+   "K": 128,
+   "gpus": 4,
+   "s_per_token": 68250.752,
+   "usd_per_token": 60.606667775999995,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T1 plain C",
+   "K": 512,
+   "gpus": 16,
+   "s_per_token": 17325.752,
+   "usd_per_token": 61.541071104000004,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T1 plain C",
+   "K": 2048,
+   "gpus": 64,
+   "s_per_token": 4594.502,
+   "usd_per_token": 65.278684416,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T2 VDOT/SMAQA",
+   "K": 1,
+   "gpus": 1,
+   "s_per_token": 91685.99999999999,
+   "usd_per_token": 20.354291999999997,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T2 VDOT/SMAQA",
+   "K": 8,
+   "gpus": 1,
+   "s_per_token": 28654.415999999997,
+   "usd_per_token": 6.361280352,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T2 VDOT/SMAQA",
+   "K": 32,
+   "gpus": 1,
+   "s_per_token": 24653.076999999997,
+   "usd_per_token": 5.472983094,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T2 VDOT/SMAQA",
+   "K": 128,
+   "gpus": 4,
+   "s_per_token": 6631.502,
+   "usd_per_token": 5.888773776000001,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T2 VDOT/SMAQA",
+   "K": 512,
+   "gpus": 16,
+   "s_per_token": 1920.9395,
+   "usd_per_token": 6.823177104,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T2 VDOT/SMAQA",
+   "K": 2048,
+   "gpus": 64,
+   "s_per_token": 743.298875,
+   "usd_per_token": 10.560790416,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T3 QwenPU+algo",
+   "K": 1,
+   "gpus": 1,
+   "s_per_token": 21310.799999999996,
+   "usd_per_token": 4.730997599999999,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T3 QwenPU+algo",
+   "K": 8,
+   "gpus": 1,
+   "s_per_token": 6736.715999999999,
+   "usd_per_token": 1.4955509519999999,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T3 QwenPU+algo",
+   "K": 32,
+   "gpus": 1,
+   "s_per_token": 5990.726999999999,
+   "usd_per_token": 1.3299413939999998,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T3 QwenPU+algo",
+   "K": 128,
+   "gpus": 4,
+   "s_per_token": 1810.602,
+   "usd_per_token": 1.607814576,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T3 QwenPU+algo",
+   "K": 512,
+   "gpus": 16,
+   "s_per_token": 715.7145,
+   "usd_per_token": 2.542217904,
+   "gpu": "L4"
+  },
+  {
+   "tier": "T3 QwenPU+algo",
+   "K": 2048,
+   "gpus": 64,
+   "s_per_token": 441.992625,
+   "usd_per_token": 6.279831216,
+   "gpu": "L4"
+  }
+ ]
+}
