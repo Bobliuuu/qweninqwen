@@ -100,3 +100,95 @@ def test_stats(circ_tab):
     st = c.stats()
     print(f"\nWF_STATS W={W} {st}")
     assert st["max_heads"] <= c.target.key_heads and st["max_units"] <= c.target.intermediate
+
+
+# ---- a chunk of N VDOTs, weights chosen first and the table laid out for them (PC-linear) -------
+REGS = ["a0", "a1", "a2", "a3", "a4", "a5", "t0", "t1", "t2", "s1"]
+
+
+def chunk(rng, W, n_vdot, rows=True):
+    """n_vdot VDOTs with random weights (cells 0..15). rows=True: one `wrow` before every W VDOTs
+    (the latch window), the table laid out so the circuit reads exactly these weights, with D
+    constant (no WB per window: the window is WP[7:logW] at the ROW, the word is WP mod W);
+    rows=False: the same VDOTs on the WROM (the baseline). Returns
+    (source, table, wrom_bytes, expected accumulator, token-free info)."""
+    vals = [word(rng) for _ in REGS]
+    pick = [(rng.randrange(10), rng.randrange(10)) for _ in range(n_vdot)]
+    want = [[rng.randrange(16) for _ in range(8)] for _ in range(n_vdot)]
+    pre = [f"li {r}, {sx32(v)}" for r, v in zip(REGS, vals)] + ["li s2, 0", "li s5, 0", "wb zero"]
+    n0 = len(assemble("\n".join(pre) + EXIT).text) - len(assemble(EXIT).text)  # words before body
+    w_wb = n0 - 1
+    D = (-(w_wb + 1)) & 0x7FFF  # WB zero: D = -w - 1, so wp(w) = w - w_wb - 1
+    body, w = [], n0
+    used: dict = {}  # row -> {col: u}
+    cur_row, tab_rows = 0, {}
+    nwin = S.ROW_CELLS // 8 // W
+    wrom = bytearray()
+    exp = 0
+    i = 0
+    while i < n_vdot:
+        if rows:
+            wp_next = (D + w + 1) & 0x7FFF
+            win = (wp_next & 255) // W
+            grp = list(range(i, min(i + W, n_vdot)))
+            need = {}
+            for j, v in enumerate(grp):
+                wiw = (D + w + 1 + j) & (W - 1)
+                for k in range(8):
+                    need[win * 8 * W + 8 * wiw + k] = want[v][k]
+            r = cur_row
+            while any(used.get(r, {}).get(c_, u) != u for c_, u in need.items()):
+                r += 1
+            if r != cur_row:
+                body.append(f"li s5, {r}")
+                w += 1
+                cur_row = r
+                continue  # the li moved the PC: recompute the window and the word slots
+            used.setdefault(r, {}).update(need)
+            body.append("wrow s5")
+            w += 1
+        else:
+            grp = [i]
+        for v in grp:
+            a, b = REGS[pick[v][0]], REGS[pick[v][1]]
+            body.append(f"vdot s2, {a}, {b}")
+            if not rows:
+                wrom += bytes(want[v])
+            w += 1
+            exp = (exp + RFvdot(vals[pick[v][0]], vals[pick[v][1]], want[v])) & 0xFFFFFFFF
+        i = grp[-1] + 1
+    src = "\n".join(pre + body) + EXIT
+    tab = np.zeros((max(used) + 1 if used else 1, S.ROW_CELLS), dtype=np.uint8)
+    for r, d in used.items():
+        for c_, u in d.items():
+            tab[r][c_] = u
+    return src, tab, bytes(wrom), exp, len(body)
+
+
+def RFvdot(a, b, cells):
+    return ref.vdot(a, b, cells) & 0xFFFFFFFF
+
+
+@pytest.mark.parametrize("W,n", [(1, 20), (1, 300), (8, 64), (8, 300), (16, 96), (16, 600)])
+def test_chunk(W, n):
+    S.ROW_TABLE = None
+    rng = random.Random(100 + W)
+    src, tab, _, exp, _ = chunk(rng, W, n)
+    S.ROW_TABLE = tab
+    c = core.build(wrow=W)
+    prog = assemble(src)
+    m = ref.Machine.from_program(prog)
+    m.rowtab, m.wrow_w = tab, W
+    m.run()
+    assert m.x[18] == exp  # s2: the independent oracle (the chosen weights, not the table code)
+    toks, dt = check(c, prog, tab, W)
+    base_src, _, wrom, exp2, nb = chunk(random.Random(100 + W), W, n, rows=False)
+    assert exp2 == exp
+    mb = ref.Machine.from_program(assemble(base_src + "\n.wrom\n" + "\n".join(
+        f".byte {', '.join(str(b) for b in wrom[i:i + 64])}" for i in range(0, len(wrom), 64))))
+    tb = mb.run()
+    assert mb.x[18] == exp
+    fam = [S.family(t)[0] for t in toks]
+    print(f"\nCHUNK W={W} N={n} VDOTs: rows used {len(tab)}, trace tokens {len(toks)} (ROW {fam.count('ROW')}), "
+          f"WROM baseline {len(tb)}; extra tokens/VDOT {(len(toks) - len(tb)) / n:.3f}; "
+          f"circuit teacher-forced exact over {len(toks)} positions")
