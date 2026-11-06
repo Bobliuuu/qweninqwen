@@ -104,3 +104,8 @@ step 1,900,000/2,097,154 1234s 18,477 agg tok/s; free-token mismatches 0 (rows w
 step 2,000,000/2,097,154 1299s 18,477 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 19052 of 41,472
 step 2,097,154/2,097,154 1362s 18,477 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 20555 of 43,648
 step 100,000/2,097,152 65s 18,449 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 3176 of 3,200
+step 200,000/2,097,152 130s 18,458 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 6353 of 6,400
+step 300,000/2,097,152 195s 18,461 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 9409 of 9,472
+step 400,000/2,097,152 260s 18,463 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 12591 of 12,672
+step 500,000/2,097,152 325s 18,467 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 15641 of 15,744
+step 600,000/2,097,152 390s 18,470 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 18690 of 18,816

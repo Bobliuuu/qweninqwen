@@ -127,3 +127,8 @@ wave [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71]
 injections per row [1478791, 1575899, 1575899, 1578174]..., unaddressable-WROM VDOTs forced [5504, 5376, 5504, 5504]...
 rows 12, steps/row 2,097,152, forced kinds [], forced fraction [0.00262451171875, 0.0025634765625, 0.00262451171875, 0.00262451171875]
 step 100,000/2,097,152 65s 18,449 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 3176 of 3,200
+step 200,000/2,097,152 130s 18,458 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 6353 of 6,400
+step 300,000/2,097,152 195s 18,461 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 9409 of 9,472
+step 400,000/2,097,152 260s 18,463 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 12591 of 12,672
+step 500,000/2,097,152 325s 18,467 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 15641 of 15,744
+step 600,000/2,097,152 390s 18,470 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 18690 of 18,816
