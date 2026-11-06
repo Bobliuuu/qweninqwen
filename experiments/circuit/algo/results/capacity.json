@@ -1,0 +1,41 @@
+{
+ "Qwen3.5-0.8B": {
+  "state_floats_per_gdn_layer": 262144,
+  "gdn_layers": 18,
+  "state_floats_all": 4718592,
+  "int4_weights_bit_layout": 1179648,
+  "bit_layout_bytes": 589824,
+  "int4_weights_24bit_layout": 28311552,
+  "int8_weights_24bit_layout": 14155776,
+  "bytes_24bit": 14155776,
+  "frame_bytes": 3072,
+  "frames_to_stream_int4_model": 97002.66666666667,
+  "ffn_params_per_layer": 11010048,
+  "ffn_params_all": 264241152,
+  "rom_int4_capacity": 1585446912,
+  "ffn_layers_needed_for_inner_int4": 9.021825396825397,
+  "fraction_of_inner_int4_in_state_24bit": 0.04750384869144491,
+  "fraction_in_state_bit_layout": 0.0019793270288102046
+ },
+ "Qwen3.5-4B": {
+  "state_floats_per_gdn_layer": 524288,
+  "gdn_layers": 24,
+  "state_floats_all": 12582912,
+  "int4_weights_bit_layout": 3145728,
+  "bit_layout_bytes": 1572864,
+  "int4_weights_24bit_layout": 75497472,
+  "int8_weights_24bit_layout": 37748736,
+  "bytes_24bit": 37748736,
+  "frame_bytes": 7680,
+  "frames_to_stream_int4_model": 38801.066666666666,
+  "ffn_params_per_layer": 70778880,
+  "ffn_params_all": 2264924160,
+  "rom_int4_capacity": 13589544960,
+  "ffn_layers_needed_for_inner_int4": 1.4033950617283952,
+  "fraction_of_inner_int4_in_state_24bit": 0.1266769298438531,
+  "fraction_in_state_bit_layout": 0.0052782054101605455
+ },
+ "qwenputer_int4_weights": 261120,
+ "inner_int4_bytes": 297992192,
+ "qwen_inner_vs_qwenputer": 2282.41568627451
+}
