@@ -1,0 +1,725 @@
+{
+ "PASS": false,
+ "transformers": "5.20.2",
+ "torch": "2.14.1+cu130",
+ "files_hash_verified": 14,
+ "pristine_code_diff": [],
+ "global_fails": [],
+ "global_warns": [],
+ "n_layers": 1006,
+ "layer_kinds": {
+  "R": 281,
+  "NG": 399,
+  "W": 197,
+  "NH": 56,
+  "A": 28,
+  "S": 28,
+  "TS": 8,
+  "TM": 8,
+  "AM": 1
+ },
+ "layers_failing": 85,
+ "max_distinct_nz_any_param": 2705,
+ "data_bearing_param_names": {
+  "mlp.gate_proj.weight": 57,
+  "mlp.down_proj.weight": 57,
+  "self_attn.q_proj.weight": 28,
+  "self_attn.k_proj.weight": 28
+ },
+ "inner_windows": 60313,
+ "inner_windows_raw": 30365,
+ "inner_windows_folded": 29948,
+ "layers_with_inner_hits": [],
+ "failing_layers_by_kind": {
+  "NG": 57,
+  "A": 28
+ },
+ "databearing_by_kind_param": {
+  "NG:mlp.gate_proj.weight": 57,
+  "NG:mlp.down_proj.weight": 57,
+  "A:self_attn.q_proj.weight": 28,
+  "A:self_attn.k_proj.weight": 28
+ },
+ "per_layer_failures": [
+  {
+   "li": 2,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 13,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 99 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 91 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 19,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 37,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 48,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 103 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 107 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 54,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 72,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 83,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 98 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 96 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 89,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 107,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 118,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 95 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 108 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 124,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 142,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 153,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 111 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 110 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 159,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 177,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 188,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 105 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 106 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 194,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 212,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 223,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 104 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 109 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 229,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 247,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 258,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 107 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 114 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 264,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 282,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 293,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 93 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 103 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 299,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 317,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 328,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 103 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 112 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 334,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 352,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 363,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 105 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 110 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 369,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 387,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 398,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 98 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 100 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 404,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 422,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 433,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 103 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 106 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 439,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 457,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 468,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 97 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 100 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 474,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 492,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 503,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 101 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 102 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 509,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 527,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 538,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 98 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 100 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 544,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 562,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 573,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 102 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 102 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 579,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 597,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 608,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 102 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 106 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 614,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 632,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 643,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 99 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 109 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 649,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 667,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 678,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 93 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 101 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 684,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 702,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 713,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 96 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 101 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 719,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 737,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 748,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 102 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 102 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 754,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 772,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 783,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 89 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 102 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 789,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 807,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 818,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 102 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 102 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 824,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 842,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 853,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 108 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 103 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 859,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 877,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 888,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 107 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 110 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 894,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 912,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 923,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 105 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 104 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 929,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 947,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 958,
+   "kind": "A",
+   "fails": [
+    "param self_attn.q_proj.weight has 87 distinct nonzero values (>64): data-bearing",
+    "param self_attn.k_proj.weight has 99 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 964,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  },
+  {
+   "li": 982,
+   "kind": "NG",
+   "fails": [
+    "param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing",
+    "param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing"
+   ]
+  }
+ ]
+}

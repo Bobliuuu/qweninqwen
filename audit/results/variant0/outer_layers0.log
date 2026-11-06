@@ -1,0 +1,38 @@
+Current Python version 3.10 is below the recommended 3.11 version. It is recommended to upgrade to Python 3.11 or higher for the best experience.
+
+  [outer-layers] 0/1006 t=0s
+  [outer-layers] 50/1006 t=125s
+  [outer-layers] 100/1006 t=246s
+  [outer-layers] 150/1006 t=372s
+  [outer-layers] 200/1006 t=517s
+  [outer-layers] 250/1006 t=629s
+  [outer-layers] 300/1006 t=745s
+  [outer-layers] 350/1006 t=829s
+  [outer-layers] 400/1006 t=966s
+  [outer-layers] 450/1006 t=1078s
+  [outer-layers] 500/1006 t=1170s
+  [outer-layers] 550/1006 t=1266s
+  [outer-layers] 600/1006 t=1354s
+  [outer-layers] 650/1006 t=1451s
+  [outer-layers] 700/1006 t=1513s
+  [outer-layers] 750/1006 t=1636s
+  [outer-layers] 800/1006 t=1734s
+  [outer-layers] 850/1006 t=1828s
+  [outer-layers] 900/1006 t=1965s
+  [outer-layers] 950/1006 t=2084s
+  [outer-layers] 1000/1006 t=2147s
+OUTER-LAYERS CHECK: layers=1006 kinds={'R': 281, 'NG': 399, 'W': 197, 'NH': 56, 'A': 28, 'S': 28, 'TS': 8, 'TM': 8, 'AM': 1} transformers=5.20.2 hash-verified files=14
+  layers failing=85; max distinct nonzero values in any param=2705 (thresh 64); inner windows searched=60313 (raw 30365 + gain-folded 29948); layers with fragment hits=[]
+  DATA-BEARING param mlp.gate_proj.weight: in 57 layers
+  DATA-BEARING param mlp.down_proj.weight: in 57 layers
+  DATA-BEARING param self_attn.q_proj.weight: in 28 layers
+  DATA-BEARING param self_attn.k_proj.weight: in 28 layers
+  FAIL layer 2 (NG): param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing
+  FAIL layer 2 (NG): param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing
+  FAIL layer 13 (A): param self_attn.q_proj.weight has 99 distinct nonzero values (>64): data-bearing
+  FAIL layer 13 (A): param self_attn.k_proj.weight has 91 distinct nonzero values (>64): data-bearing
+  FAIL layer 19 (NG): param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing
+  FAIL layer 19 (NG): param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing
+  FAIL layer 37 (NG): param mlp.gate_proj.weight has 2705 distinct nonzero values (>64): data-bearing
+  FAIL layer 37 (NG): param mlp.down_proj.weight has 2704 distinct nonzero values (>64): data-bearing
+OUTER IS REAL (layer-major): FAIL

@@ -13,3 +13,9 @@ Numerics on this box differ from the A100 log: maxrel 1.8e-2, 3.3e-1, 1.7e-1, 1.
 MISMATCH at position 5 (outer 11, HF 13). The unguarded control (control_unguarded.log, control_notf32.log with TF32 off) reproduces 1.77e-2 / 3.32e-1 bit-for-bit,
 so the guard does not change numerics; cause (A10G / torch 2.14.1 / transformers 5.20.2 vs A100 run) not isolated.
 static_scan.txt: 949 findings over experiments/vslice, 33 non-exempt HOT/MATMUL/HF: `codes @ amo` plus math.sqrt/log on config constants.
+
+## Outer-is-real per layer (outer_layers0.json/.log, audit/outer_check_layers.py): FAIL
+All 1006 layers are exact stock Qwen3_5DecoderLayer, no hooks/overrides, pristine library code, pip RECORD hashes ok (14 files). 85 layers FAIL the
+"data-bearing parameter" rule (>64 distinct nonzero values): 57 NG (norm-gain Newton stage) layers with mlp.gate_proj/down_proj (2705/2704 distinct values)
+and 28 attention layers (A) with self_attn.q_proj/k_proj. The A layers are the compiled inner q_norm/k_norm gains (inner weights, read from the checkpoint by build_attention);
+the NG ones are compiled constants (hinge/Newton schedule). Fingerprint search of raw + gain-folded inner matrices in outer params: 0 hits (60,313 windows), but 1-D gains are not searched.
