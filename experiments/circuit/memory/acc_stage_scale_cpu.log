@@ -1,0 +1,2 @@
+{"Pg": 5, "digits": 360, "positions": 32, "layers": 7, "layer_units": [["PRESPLIT", 5760], ["COMPRESS1", 4518], ["COMPRESS2", 711], ["COMPRESS3", 94], ["F1", 42], ["F2", 28], ["F3", 434]], "accumulate_exact": true, "rails_are_bits": true, "max_rail_dev": 2.384185791015625e-07, "result_bits": 28, "max_T": 5278277, "live_dims_peak_bound": 72}
+IndexError: pop from empty list

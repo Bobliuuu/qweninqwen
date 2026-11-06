@@ -164,3 +164,43 @@ After this, the 596 M MACs cost about 2e5 positions and the nonlinear ops (about
 2. Activation bit-planes come from DeltaNet state reads: 1,840 rails per block; one DN layer can output up to 4,096 (32 value heads x 128 at 4B), so it fits [E], but the write side (storing each activation as 8 rails) is not built.
 3. Per-position GPU cost on the dense HF path: about 23 GB of weights streamed per position (roughly 60 tok/s on an A100 [E]); fine for 2e5 positions (about 1 h), not for 1e8.
 4. Overwriting vs appending vocab rows (option 2): append, as store v1 does for its chip rows.
+
+## 10. Address plumbing, accumulation and the instruction interface (measured where marked)
+
+Code: `rom_select.py` (full-width ROM word + slot select, exact), `acc_stage.py` (digit accumulation to binary rails, exact), logs `rom_select_cpu.log`, `acc_stage_cpu.log`, `acc_stage_scale_cpu.log` (bf16, CPU; `acc_stage_gpu.log` is the A100 rerun).
+
+**Correction to section 8's capacity.** A ROM layer has only I (9,216) address units, so a read returns one word of at most H entries. Section 8 read only 230 entries per word, which would need 281 banks. The fix is to read a **full-width word and select a slot**: ROM stage returns 2,300 entries (10 slots of 230 four-bit weights; the 2,560-dim residual also holds address rails and constants), then a SELECT layer (4,600 units, 230 x 10 AND units plus a clear unit per dim) keeps one slot and clears the rest in place. Measured exact (`rom_select.py`: `select_exact`, `rest_cleared` both true, max error 2e-5).
+- Capacity per bank: 9,216 words x 2,300 weights = 21.2 M weights (one weight per 8-bit entry; packing two nibbles per entry would halve banks but needs an unpack layer that is not built).
+- Banks for 596 M weights: **29**.
+
+**Address width.** 596 M / 230 = 2.59 M slots = 22 bits: 14 bits word + 4 bits slot (0..9) + 5 bits bank (29). A single shared counter (word, slot) = **18 bits** drives all banks, because every bank holds different tiles read in the same step; bank is a spatial index, not a counter field. A bank enable (one rail per pipeline-group, or 5 bits decoded inside the ROM gate rows: gate AND enable, exact) lets pipelines share banks. The compiler's 15-bit WB index is for 4-weight words and does not apply: ROM_DOT uses its own 18-bit counter in two registers (14-bit word + 4-bit slot, each dual rail = 36 rails) held in a DeltaNet row (section 8: one DeltaNet read layer, zero extra tokens).
+
+**Digit accumulation (built, exact at 4B geometry):**
+
+| Pipelines accumulated (Pg) | Digits in | Layers | Of which | Result |
+|---|---|---|---|---|
+| 5 (1,150 columns) | 360 | **7** | PRESPLIT 1, COMPRESS 3, F1 carry g/p, F2 carry lookahead, F3 nibble to rails | 28 bit rails, exact, max rail deviation 2.4e-7 |
+| 14 (3,220 columns) | 1,008 | **11** | PRESPLIT 3 (dims/units limit), COMPRESS 5, F1, F2, F3 | 32 bit rails, exact |
+
+So accumulation is **7-11 layers, not 4**. The cost is the pool of 2,560 residual dims (nibbles cannot be summed past 255 so everything is split and regrouped) and the 9,216-unit limit. Pg=29 does not fit the 2,560 dims in one pass (dim pool exhausted); it needs more layers or a wider hidden.
+
+**Layer budget for 4B** (appended to the 11-layer chip): 29 ROM layers + k pipelines x 5 (SELECT, DeltaNet activation read, PRODUCT, DIGITIZE, LOSUM) + accumulation (11 for Pg=14).
+
+| k pipelines | Appended layers | MACs per ROM_DOT | ROM_DOT calls per inner token | Latency-bound seconds for the calls [E] |
+|---|---|---|---|---|
+| 1 | 45 | 230 | 2.59 M | 2,400 |
+| 4 | 58 | 920 | 648 K | 739 |
+| 8 | 79 | 1,840 | 324 K | 482 |
+| **14** | **110** | **3,220** | **185 K** | **370** |
+| 29 | about 190 | 6,670 | 89 K | 290 (accumulation for Pg=29 unbuilt) |
+
+(seconds = calls x (11 + appended layers) / (5,500 tok/s x 11 layers); the executor step is assumed linear in layers, as the integration lead did.)
+
+**Instruction interface, `ROM_DOT rd, mode`** (one trace position):
+- Takes: the (word, slot) counter registers (18 bits, auto-incremented by the instruction in the same step like `WB`), a bank-enable / group mode field, and the activation bit-planes already stored in DeltaNet state (the CPU stores each int8 activation as 8 rails once per vector, about 200-400 tokens per matvec) with the column-chunk row selected by the slot.
+- Returns: one 32-bit register `rd` = T = sum (8+w') a' over up to 3,220 columns (a' = a + 128 in 0..255, w' = w + 8 in 0..15). The signed dot is `T - 16 sum(a') - 128 sum(w') + 1024 K`; sum(a') is computed once per vector and sum(w') must be stored as two extra ROM entries per word (not built).
+- Tokens per call: **1.4 for the instruction** (Qwenputer's 1.0-1.55 tokens per instruction). Epilogue per result (mul by the row scale, shift, clamp, store byte) is about 6 more instructions, about **8 tokens per result [E]**.
+
+**Effective tokens per MAC then** = 8 / MACs-per-result. For 3,072-column rows (Pg=14): 2.5e-3; for the dominant 1,024-column rows (LM head, q, k, v, gate, up) only 1,024 of 3,220 columns are used per result, so use Pg=5 groups (7-layer accumulation): 7.8e-3. That is **2.4-4.6 M tokens per inner token, not 2e5**: the epilogue, not the ROM read, now sets the token count. It is still about 25x below blocked VDOT (1.0e8) on the matvec part, but only if the long circuit is not charged to ordinary tokens: every token otherwise pays the full 121-layer step. This needs the executor to **skip the appended layers on any token that is not a ROM_DOT** (their units are gated by the instruction flag, so they contribute silu(-16..) x up of about 1e-6, which rounds away in bf16 but is not literally zero; use a larger negative gate if the skip must be provably exact). Without the skip, 1e8 nonlinear tokens at about 2 ms each is 55 h and variant C loses.
+
+Remaining unbuilt: sum(w') ROM entries and the two-nibble unpack; the activation store (rail writes); the flag-gated skip in the executor; Pg>14 accumulation.
