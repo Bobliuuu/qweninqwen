@@ -15,8 +15,10 @@ sys.path.insert(0, sys.argv[6] if len(sys.argv) > 6 else os.path.expanduser('~/q
 from chipformer.rv import spec as S, ref, elf as E
 os.makedirs(out, exist_ok=True)
 blob = open(blob_path, 'rb').read(); wrom = open(wrom_path, 'rb').read()
-S.RAM_BASE, S.RAM_WORDS = 0x1000000, 1 << 20; S.SP_INIT = S.RAM_BASE + 4 * S.RAM_WORDS
-S.DROM_BASE, S.DROM_WORDS = 0x10000000, (len(blob) + 3) // 4
+REALMAP = bool(os.environ.get('REALMAP'))   # REALMAP=1: the firmware is linked for the real 32 KB RAM / 128 KB DROM map (ramown/fw_rom.ld); the weight/table blob is an extra host region at 0x10000000
+if not REALMAP:
+    S.RAM_BASE, S.RAM_WORDS = 0x1000000, 1 << 20; S.SP_INIT = S.RAM_BASE + 4 * S.RAM_WORDS
+    S.DROM_BASE, S.DROM_WORDS = 0x10000000, (len(blob) + 3) // 4
 S.WP_BITS = 27; S.WROM_WORDS = (len(wrom) + 7) // 8; S.WROM_BASE = 0x80000000
 M27 = (1 << 27) - 1; M32 = 0xFFFFFFFF
 MEMLOAD = ('LB', 'LBU', 'LH', 'LHU', 'LW')
@@ -24,21 +26,30 @@ KIND = dict(other=0, load=1, vdot=2, store=3, wb=4, ecall=5, branch=6, alu=7, di
 SRC = ['zero', 'image', 'ownstore', 'injected']
 CAUSES = ['cold', 'alias', 'merge']
 
+DROMW = [0] * 32768
 class Sim:
     """software model of the circuit's 32 KB RAM under one injection policy"""
     def __init__(self, name, policy): self.name, self.policy = name, policy; self.inj = []; self.reset(None)
     def reset(self, ram):
-        self.cs = [0] * 8192; self.own = [-1] * 8192; self.src = [0] * 8192
+        self.dr = list(DROMW); self.cs = [0] * 8192; self.own = [-1] * 8192; self.src = [0] * 8192
         if ram is not None:
             a = np.array(ram, dtype=np.int64); idx = np.nonzero(a)[0]
             for wi in idx.tolist(): s = wi & 0x1FFF; self.cs[s] = int(a[wi]); self.own[s] = wi; self.src[s] = 1
         self.st = dict(loads=0, sbsh=0, hit_zero=0, hit_image=0, hit_ownstore=0, hit_injected=0, hit_coincidence=0, need=0, need_blob=0, need_ram=0, injected=0,
-                       need_cold=0, need_alias=0, need_merge=0, need_sbsh=0, merge_err=0)
+                       drom_blob_loads=0, drom_real_loads=0, drom_hit=0, drom_need_blob=0, drom_need_real=0, need_cold=0, need_alias=0, need_merge=0, need_sbsh=0, merge_err=0)
     def cause(self, s, wi):
         if self.own[s] < 0: return 'cold'
         return 'alias' if self.own[s] != wi else 'merge'
     def load(self, nb, ea, w):
         st = self.st; wi = ea >> 2; s = wi & 0x1FFF; st['loads'] += 1
+        if REALMAP and (ea >= 0x10000000 or 0x20000 <= ea < 0x40000):
+            # DROM-class load (real 128 KB DROM at 0x20000, or the weight/table blob at 0x10000000): the circuit's DROM table, slot = word index mod 32768 (patched core: in_drom := not in_ram).
+            # Not a RAM role: constants. A blob word is injected into the DROM head state (host-served); a real-DROM word is the circuit's own unless a blob injection overwrote it.
+            ds = wi & 0x7FFF; blob = ea >= 0x10000000; st['drom_blob_loads' if blob else 'drom_real_loads'] += 1
+            if self.dr[ds] == w: st['drom_hit'] += 1; return
+            st['drom_need_blob' if blob else 'drom_need_real'] += 1
+            if self.policy != 'none': self.inj.append((nb, 3, ds, w)); self.dr[ds] = w
+            return
         if self.cs[s] == w:
             if self.own[s] == wi: st['hit_' + SRC[self.src[s]]] += 1
             elif self.own[s] < 0: st['hit_zero'] += 1
@@ -60,6 +71,11 @@ class Sim:
         self.cs[s] = self.cs[s] & ~(mask << sh) & M32 | (b & mask) << sh; self.own[s] = wi; self.src[s] = 2
 
 class Big(ref.Machine):
+    def drom_word(self, ea):
+        if REALMAP and ea >= 0x10000000:
+            o = ea - 0x10000000
+            return int.from_bytes(blob[o:o + 4].ljust(4, b'\0'), 'little') if 0 <= o < len(blob) else None
+        return super().drom_word(ea)
     def setup(self):
         self.wbset = set(); self.kind = [0] * len(self.rom); self.dec = [None] * len(self.rom); self.inj = []; self.inj2 = []; self.nbuf = lambda: 0
         self.sims = [Sim('F', 'all'), Sim('B', 'blob'), Sim('N', 'none')]
@@ -96,7 +112,9 @@ class Big(ref.Machine):
         return super().record()
 
 prog = E.program(elf_path)
-m = Big.from_program(prog); m.drom = blob; m.wrom = wrom; m.setup()
+m = Big.from_program(prog); m.drom = prog.rodata if REALMAP else blob; m.wrom = wrom; m.setup()
+if REALMAP:
+    _d = np.frombuffer(bytes(m.drom).ljust(4 * 32768, b'\0'), dtype='<u4'); DROMW[:] = [int(v) for v in _d]
 chunk = 0; ntok = 1; t0 = time.time()
 def dump_state():
     pickle_dump = __import__('pickle').dump

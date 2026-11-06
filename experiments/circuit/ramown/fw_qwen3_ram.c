@@ -51,10 +51,16 @@ static inline uint32_t x_amxr(uint32_t rst) { uint32_t r; __asm__ volatile(".ins
 #define REP (NH / NKV)
 // x: residual (persistent).  xb: norm output.  xqi: int8 input of every DIM-wide matvec.  hg: swiglu result, later reused in place as the int8 input of o_proj / down_proj.
 // v32: V (SINGLE: reused in place as the attention output).  accs_/hut: one tile of accumulators / of the "up" projection.
+#ifdef TWOPASS     // gate/up/swiglu computed twice (pass 1: amax of the swiglu output, pass 2: quantise straight into an int8 buffer): no 12 KB int32 hg buffer, +2/3 of the MLP VDOT work
+static int32_t x[DIM], xb[DIM], v32[KVD], hg[TILE];
+static int8_t xqb_[HID] __attribute__((aligned(4)));
+#define XQB xqb_
+#else
 static int32_t x[DIM], xb[DIM], hg[HID], v32[KVD];
+#define XQB ((int8_t *)hg)
+#endif
 static int8_t xqi[DIM + 64] __attribute__((aligned(4)));
 static int32_t accs_[APL * PMAX][TILE], hut[TILE];
-#define XQB ((int8_t *)hg)
 #if !SINGLE
 static int32_t q32[QD], k32[KVD], ao[QD];
 static int16_t qh[QD] __attribute__((aligned(4))), kh[KVD] __attribute__((aligned(4)));
@@ -292,6 +298,21 @@ static int forward(int tok, int pos) {
         MVF(x, 1, XQB, l, 3, DIM, QD, am, 12, 16);                       // x += o_proj(attn)
         rms(xb, x, BI(NORM_OFF[l][3]), DIM, DLOG, 16);
         am = quantize(xb, DIM, xqi);
+#ifdef TWOPASS
+        int32_t mx = 1;
+        for (int pass = 0; pass < 2; pass++) {
+            uint32_t rq = pass ? 0x7F000000u / (uint32_t)mx : 0;
+            for (int r0 = 0; r0 < HID; r0 += TILE) {
+                int t = HID - r0 < TILE ? HID - r0 : TILE;
+                mv_rows(hg, 0, xqi, SOFF[l][4], WBW[l][4], PLN[l][4], HID, r0, t, DIM, am, 12, 16);
+                mv_rows(hut, 0, xqi, SOFF[l][5], WBW[l][5], PLN[l][5], HID, r0, t, DIM, am, 12, 16);
+                swiglu(hg, hut, t);
+                if (!pass) { for (int i = 0; i < t; i++) { int32_t a = hg[i] < 0 ? -hg[i] : hg[i]; if (a > mx) mx = a; } }
+                else for (int i = 0; i < t; i++) XQB[r0 + i] = (int8_t)(((i64)hg[i] * rq + (1 << 23)) >> 24);
+            }
+        }
+        am = mx;
+#else
         for (int r0 = 0; r0 < HID; r0 += TILE) {                         // gate/up/swiglu per tile, result into hg
             int t = HID - r0 < TILE ? HID - r0 : TILE;
             mv_rows(hg + r0, 0, xqi, SOFF[l][4], WBW[l][4], PLN[l][4], HID, r0, t, DIM, am, 12, 16);
@@ -299,6 +320,7 @@ static int forward(int tok, int pos) {
             swiglu(hg + r0, hut, t);
         }
         am = quantize(hg, HID, XQB);                                     // in place
+#endif
         MVF(x, 1, XQB, l, 6, DIM, HID, am, 12, 16);                      // x += down_proj
     }
     rms(xb, x, BI(FINAL_NORM_OFF), DIM, DLOG, 16);

@@ -1,0 +1,123 @@
+{
+ "total_loads_data": 10428156,
+ "total_stores": 9166022,
+ "distinct_words_touched": 7514,
+ "distinct_words_stored": 6984,
+ "distinct_words_read_never_stored": 530,
+ "peak_live_stored_words": 4657,
+ "peak_live_incl_read_before_write": 5177,
+ "by_buffer": {
+  "NORM_OFF": {
+   "words": 55,
+   "words_stored": 0,
+   "words_ro": 55,
+   "loads": 55,
+   "stores": 0,
+   "bytes_declared": 448
+  },
+  "PLN": {
+   "words": 139,
+   "words_stored": 0,
+   "words_ro": 139,
+   "loads": 447,
+   "stores": 0,
+   "bytes_declared": 784
+  },
+  "SOFF": {
+   "words": 139,
+   "words_stored": 0,
+   "words_ro": 139,
+   "loads": 447,
+   "stores": 0,
+   "bytes_declared": 784
+  },
+  "WBW": {
+   "words": 139,
+   "words_stored": 0,
+   "words_ro": 139,
+   "loads": 447,
+   "stores": 0,
+   "bytes_declared": 784
+  },
+  "__clz_tab": {
+   "words": 56,
+   "words_stored": 0,
+   "words_ro": 56,
+   "loads": 2107,
+   "stores": 0,
+   "bytes_declared": 256
+  },
+  "accs_": {
+   "words": 256,
+   "words_stored": 256,
+   "words_ro": 0,
+   "loads": 7936000,
+   "stores": 7936000,
+   "bytes_declared": 1024
+  },
+  "hg": {
+   "words": 3072,
+   "words_stored": 3072,
+   "words_ro": 0,
+   "loads": 544768,
+   "stores": 315392,
+   "bytes_declared": 12288
+  },
+  "hut": {
+   "words": 256,
+   "words_stored": 256,
+   "words_ro": 0,
+   "loads": 237952,
+   "stores": 237952,
+   "bytes_declared": 1024
+  },
+  "other": {
+   "words": 73,
+   "words_stored": 71,
+   "words_ro": 2,
+   "loads": 829613,
+   "stores": 413222,
+   "bytes_declared": null
+  },
+  "v32": {
+   "words": 1024,
+   "words_stored": 1024,
+   "words_ro": 0,
+   "loads": 143360,
+   "stores": 57344,
+   "bytes_declared": 4096
+  },
+  "vk_x": {
+   "words": 1,
+   "words_stored": 1,
+   "words_ro": 0,
+   "loads": 31008,
+   "stores": 31008,
+   "bytes_declared": 4
+  },
+  "x": {
+   "words": 1024,
+   "words_stored": 1024,
+   "words_ro": 0,
+   "loads": 174080,
+   "stores": 58368,
+   "bytes_declared": 4096
+  },
+  "xb": {
+   "words": 1024,
+   "words_stored": 1024,
+   "words_ro": 0,
+   "loads": 116736,
+   "stores": 58368,
+   "bytes_declared": 4096
+  },
+  "xqi": {
+   "words": 256,
+   "words_stored": 256,
+   "words_ro": 0,
+   "loads": 411136,
+   "stores": 58368,
+   "bytes_declared": 1088
+  }
+ }
+}

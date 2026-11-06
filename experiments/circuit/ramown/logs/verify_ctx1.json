@@ -1,0 +1,3 @@
+{"cfg": "/home/ubuntu/ramown/rb/g785", "flags": [], "ntok": 1, "argmax_old": [13], "argmax_new": [13], "logits_identical": true, "n_logit_diff": 0, "instr_old": 157063956, "instr_new": 126952443, "instr_ratio": 0.8082850211667915}
+{"cfg": "/home/ubuntu/ramown/rb/g785", "flags": ["-DEXT=1"], "ntok": 1, "argmax_old": [13], "argmax_new": [13], "logits_identical": true, "n_logit_diff": 0, "instr_old": 153533256, "instr_new": 123965267, "instr_ratio": 0.8074163880169388}
+{"cfg": "/home/ubuntu/ramown/rb/g785", "flags": ["-DTWOPASS"], "ntok": 1, "argmax_old": [13], "argmax_new": [13], "logits_identical": true, "n_logit_diff": 0, "instr_old": 157063956, "instr_new": 172400901, "instr_ratio": 1.0976477696767042}
