@@ -27,3 +27,8 @@ In-code (committed in 8b6cf3e): reference (load HF Qwen3-0.6B; HF reference forw
 `control_demo_cheat.log`: demo_cheat_driver.py -> 1 violation (host `bmm`), AUDIT RESULT FAIL. `control_demo_good.log`: PASS. (CPU, fla off.)
 
 ## Token-independence: see COMPARE section appended below / in the run report.
+
+## Token-independence / compare (status at hand-off)
+`compare_runs.py audit0.json audit1.json` (gpuB variant 0 vs gpuA variant 1) printed `rounds: 0 vs 0 ... STREAM TOKEN-INDEPENDENT`. THIS VERDICT IS VACUOUS: `hostguard.py` records stream digests only when `entry != "layer"`, and this driver runs under `--entry layer`, so 0 rows were compared. No black-box token-independence evidence comes from compare_runs for this driver. (Output: `compare_audit0_vs_audit1.txt`.)
+Indirect evidence: a variant-0 run of the same command on gpuA (same box, same scopes) gave step-0 maxrel 1.0397381993243471e-04, bit-identical to variant 1 step 0, i.e. host RNG offset does not change the outer computation on one box. (Full gpuA variant-0 result pending; the run was still going at hand-off, files will be under `audit/results/variant0_gpuA/`.)
+UNEXPECTED: the committed gpuB variant-0 result has maxrel 1.8e-2 .. 3.3e-1 and a wrong last-position argmax (11 vs HF 13), while gpuA gives 1.0e-4 .. 3.2e-4 and argmax == HF at all 6 positions (A100 original: 7e-6 .. 5.8e-5). Cause not isolated (different physical box / environment; not host RNG, per the gpuA variant-0 step-0 match).
