@@ -1,0 +1,17 @@
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]Loading weights:  70%|██████▉   | 217/311 [00:00<00:00, 2168.72it/s]Loading weights: 100%|██████████| 311/311 [00:00<00:00, 2182.82it/s]
+prompt [785, 6722, 315, 9625, 374]
+[real151936_L28] d=1024 D=40775 outer_layers=1006 I_MLP=8192
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+  worst blocks [(593, 1.0439, 1.0447), (14, 7.4198, 7.4195), (1, 7.6111, 7.6108), (3, 6.3186, 6.3183)] nblk 594
+  rails [-0.0, 1.0, 1.0, -0.0, 1.0, -0.0, -0.0, 1.0] top code score 18.000669479370117
+{'step': 0, 'frames': 293068, 'sec': 300.6619920730591, 'build_s': 26.08480978012085, 'run_s': 266.06529235839844, 'maxrel': 5.8052050007972866e-05, 'outer_argmax': 15846, 'hf_argmax': 15846}
+  worst blocks [(505, 5.2054, 5.2056), (146, 8.3499, 8.35), (286, 4.9526, 4.9527), (64, 6.9842, 6.9841)] nblk 594
+  rails [1.0, -0.0, 1.0, 0.0, -0.0, 1.0, 1.0, -0.0] top code score 18.000085830688477
+{'step': 1, 'frames': 293068, 'sec': 268.4217495918274, 'build_s': 13.758687734603882, 'run_s': 242.00639748573303, 'maxrel': 6.920514806552092e-06, 'outer_argmax': 315, 'hf_argmax': 315}
+  worst blocks [(593, -2.916, -2.9157), (77, 9.1021, 9.1022), (357, 8.2686, 8.2687), (37, 13.4004, 13.4004)] nblk 594
+  rails [1.0, -0.0, 1.0, -0.0, 1.0, -0.0, -0.0, 1.0] top code score 18.001449584960938
+{'step': 2, 'frames': 293068, 'sec': 264.5892310142517, 'build_s': 13.80158805847168, 'run_s': 242.57338213920593, 'maxrel': 1.7638220015214756e-05, 'outer_argmax': 279, 'hf_argmax': 279}
+  worst blocks [(593, -2.8896, -2.8894), (466, 3.778, 3.7781), (108, 8.4588, 8.4589), (579, 1.6487, 1.6487)] nblk 594
+  rails [0.0, 1.0, 1.0, -0.0, 1.0, 0.0, -0.0, 1.0] top code score 17.99993133544922
+{'step': 3, 'frames': 293068, 'sec': 279.0429620742798, 'build_s': 13.85715627670288, 'run_s': 242.8489637374878, 'maxrel': 1.3691636013390962e-05, 'outer_argmax': 374, 'hf_argmax': 374}
