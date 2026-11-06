@@ -2,15 +2,140 @@
 
 # qweninqwen
 
-**A real Qwen, executed by the weights and recurrent state of another Qwen.**
+**A real Qwen3-0.6B token, computed by the weights and recurrent state of another, stock Qwen.**
+
+![Qwen inside Qwen](docs/assets/hero.gif)
+
+| outer argmax == Hugging Face | max relative logit error | per token |
+|:---:|:---:|:---:|
+| **15846 == 15846**, and 6 of 6 positions | **5.8e-5** | **268.6 s** (shared A100, fp32, untuned) |
+
+[Explainer video](docs/launch/video/explainer_16x9.mp4) | [Demo video](docs/launch/video/demo_16x9.mp4) | [Tweet draft](docs/launch/TWEET.md) | [Provenance of every number](docs/launch/PROVENANCE.md)
 
 A homage to [Qwenputer](https://github.com/divagr18/qwenputer), in which a CPU lives inside Qwen's weights. Here the machine runs a language model.
 
-![architecture](docs/assets/architecture.svg)
-
 </div>
 
-> **Status in one paragraph.** One full token of the **real, unscaled Qwen3-0.6B** (28 layers, real weights, the full 151,936-token LM head and an in-model argmax) has been executed inside a stock `Qwen3_5ForCausalLM`: for the prompt "The capital of France is" the outer argmax is 15846, identical to Hugging Face, with block-best logit error 5.8e-5 relative to max|logit|. It took 268.6 s on a shared A100 (fp32, 1006 outer layers, 293,068 outer frames). **A 6-position teacher-forced run (positions 0-5, positions 1-5 using the KV cache) also matches Hugging Face's argmax at every position (max relative logit error 6.9e-6 to 5.8e-5, about 265-300 s per position). Caveats: those are teacher-forced positions of one prompt, not free-running generation, and the HostGuard audit of this driver is pending.** A complete toy model (random weights, d=128) does generate multiple tokens end to end with outer logits matching Hugging Face to 1.9e-6; it is a validation vehicle, not the real model. See [What is verified today](#what-is-verified-today) and [Status by tier](#status-by-tier).
+> **Read this first.** One full token of the **real, unscaled Qwen3-0.6B** (28 layers, real weights, the full 151,936-token LM head, argmax computed in-model) runs inside a stock `Qwen3_5ForCausalLM` (1006 outer layers, D=40775, 293,068 frames) and matches Hugging Face. A 6-position run matches at every position. **Those are teacher-forced positions of one prompt, not free-running generation, and the host still does embedding lookup, flags, one-hot addresses, position ids, weight payloads, KV scratch truncation and the lm_head evaluation through 36 columns.** Free-running generation and the audit of the real driver are not done yet (status table below). The whole thing is ~4.5 minutes per token.
+
+## Status board
+
+Single source of truth for what is done and what is not. Pending rows are flipped by the maintainers when results land (see [`docs/launch/UPDATING.md`](docs/launch/UPDATING.md)).
+
+<!-- STATUS:BEGIN -->
+| Item | Status | Evidence |
+|---|---|---|
+| One real token, 28 layers, full vocab head, in-model argmax == HF | **done** | [`logs/real_L28.log`](experiments/vslice/logs/real_L28.log) |
+| 6-position teacher-forced run (KV used at positions 1-5) == HF at every position | **done** | [`logs/real_L28_gen.log`](experiments/vslice/logs/real_L28_gen.log), [`res_vs2_real151936_L28.json`](experiments/vslice/logs/res_vs2_real151936_L28.json) |
+| Free-running generation vs HF greedy (outer token fed back) | **in progress** | pending: result path `TBD` |
+| HostGuard audit of the real driver | **in progress** | pending: result path `TBD` |
+| Speedup work (tuned executor) | **in progress** | pending, see [`PERF_NOTES.md`](PERF_NOTES.md) / [`RUNS.md`](RUNS.md); the 268.6 s headline is the untuned baseline |
+<!-- STATUS:END -->
+
+## Watch it
+
+| Explainer (what it means, how it works) | Demo (the real 6-position run) |
+|---|---|
+| [`explainer_16x9.mp4`](docs/launch/video/explainer_16x9.mp4) ([square cut](docs/launch/video/explainer_square.mp4)) | [`demo_16x9.mp4`](docs/launch/video/demo_16x9.mp4) ([square cut](docs/launch/video/demo_square.mp4)) |
+
+The mechanism animations are **illustrations** and say so on screen; every number shown comes from the committed logs. The demo is a time-lapse replay of the recorded run, not a live one.
+
+![idea](docs/assets/idea.gif)
+
+## The tier ladder
+
+The project is organised as tiers: each tier is a harder claim than the one below it and needs the previous one. The staircase shows where the evidence stands today.
+
+![tier climb](docs/assets/tiers_climb.gif)
+
+| Tier | What it means | What is needed to reach it | Status and evidence |
+|---|---|---|---|
+| T0 | A single signed MAC or gadget (state write + read, SwiGLU multiplier, norm, product) runs in the outer weights | write/read protocol, one op at a time, teacher-forced inputs | **Verified.** [`experiments/state`](experiments/state/), [`experiments/ops`](experiments/ops/) `res_*.json` |
+| T1 | A full projection on real weights, with accumulation inside the model | page every weight matrix through DeltaNet state | **Verified for all 197 matrices** of Qwen3-0.6B, rel. err 5.6e-7, harness-fed activations: [`token_results.jsonl`](experiments/run/token_results.jsonl) |
+| T2 | A real decoder op chain (norm, QKV, RoPE, attention with KV, SwiGLU) at real dimensions | chain the ops with the matvec banks at real dims | **Partial.** Each op verified at full dims; chained only in the toy |
+| T3-toy | A complete toy inner model (random weights, d=128) generates tokens entirely inside the outer weights | every op chained, host limited to the allowed list | **Achieved** (validation vehicle): [`VSLICE_RESULTS.md`](experiments/vslice/VSLICE_RESULTS.md) |
+| T3 real | Real Qwen3-0.6B produces tokens entirely inside the outer weights | T3-toy at real size (1006 outer layers), layer-major executor | **One token achieved; 6 teacher-forced positions match HF.** Pending: free-running generation (**in progress**), HostGuard audit of the real driver (**in progress**) |
+| T4 | Measured cost model for the full model | timings of the real run, tuned kernels | **Measured for one token:** 268.6 s untuned. Speedup work: **in progress** |
+
+![tier ladder](docs/assets/tiers_ladder.png)
+
+```mermaid
+flowchart LR
+  T0["T0 gadget<br/>verified"]
+  T1["T1 projection<br/>verified"]
+  T2["T2 op chain<br/>partial"]
+  T3t["T3-toy<br/>achieved"]
+  T3r["T3 real<br/>partial"]
+  T4["T4 cost model<br/>partial"]
+  FR["free-running vs HF<br/>in progress"]
+  HG["HostGuard audit<br/>in progress"]
+  SP["speedup<br/>in progress"]
+  T0 --> T1
+  T1 --> T2
+  T2 --> T3t
+  T3t --> T3r
+  T3r --> T4
+  FR -->|completes| T3r
+  HG -->|completes| T3r
+  SP -->|improves| T4
+```
+
+(The same graph as a picture, for viewers without mermaid: [`flow_tiers.png`](docs/assets/flow_tiers.png).)
+
+## How it works at a glance
+
+```mermaid
+flowchart LR
+  H["Host streamer<br/>weights, ids, addresses,<br/>position ids"]
+  G["DeltaNet layers<br/>paged weight memory<br/>(matvec banks, registers)"]
+  O["Compiled norm / MLP layers<br/>RMSNorm, SwiGLU,<br/>residual, gadgets"]
+  A["Full-attention layers<br/>RoPE, softmax, KV<br/>(outer KV = inner KV)"]
+  L["In-model argmax<br/>+ outer lm_head<br/>36 rails -> token id"]
+  X["Host: outer argmax<br/>+ append"]
+  H --> G
+  G --> O
+  O --> A
+  A --> L
+  L --> X
+  X -->|next token| H
+```
+
+![who does what](docs/assets/flow_architecture.png)
+
+```mermaid
+flowchart LR
+  E["Embed (host row)"]
+  L["Inner layers x28<br/>norm, QKV bank, RoPE+attn,<br/>SwiGLU, residuals"]
+  N["Final RMSNorm"]
+  B["LM head<br/>594 blocks of 256"]
+  M["Block max/argmax<br/>(in model)"]
+  C["Hard-max attention<br/>over 594 winners"]
+  R["36 rails<br/>outer lm_head"]
+  T["Host argmax<br/>+ append token"]
+  E --> L
+  L --> N
+  N --> B
+  B --> M
+  M --> C
+  C --> R
+  R --> T
+```
+
+![one token](docs/assets/flow_token.png)
+
+### Results
+
+![six positions](docs/assets/results_table.png)
+
+![cost](docs/assets/cost_chart.png)
+
+The 3.4e7 s circuit-route figure in the cost chart is an extrapolation (estimate), not a run; see [Cost model](#cost-model).
+
+### The argmax tournament
+
+![tournament](docs/assets/tournament.gif)
+
+(Bar heights are an illustration; the winning block and the 18-bit code are derived from the real token id 15846.)
 
 ## The idea in 30 seconds
 
@@ -36,11 +161,15 @@ The outer layers are strictly feed-forward: layer `l` at step `t` sees only the 
 
 ### DeltaNet state as weight memory
 
-![state as memory](docs/assets/state_memory.svg)
+![state as memory](docs/assets/state_memory.gif)
+
+Illustration with a toy 4x5 matrix; static version: [`state_memory.png`](docs/assets/state_memory.png) (hand-drawn figure) and [`state_memory_toy.png`](docs/assets/state_memory_toy.png).
 
 ### How a token is computed
 
-![unrolled pipeline](docs/assets/unrolled_pipeline.svg)
+![unrolled pipeline](docs/assets/pipeline.gif)
+
+![unrolled pipeline, static](docs/assets/unrolled_pipeline.png)
 
 1. **Embed.** The host places the embedding row of the current token in the stream (a lookup, no arithmetic) together with position id (the inner token clock) and flags.
 2. **Per inner layer, in depth order.** RMSNorm (a GDN gated-RMSNorm head, or a norm layer); the `W_qkv` bank (WRITE frames load weight rows into DeltaNet state, the READ frame contracts the activation against them); a register layer; for Qwen3, q/k norm plus a gain product in MLP gadgets; RoPE and softmax attention in an outer full-attention layer that appends to and reads the KV cache; `W_o` and the residual add; the second RMSNorm; `W_gate, W_up`; SwiGLU in an MLP layer; `W_down` and the residual add.
@@ -51,7 +180,7 @@ Steps 1 to 4 have been executed for the real Qwen3-0.6B at one position, and for
 
 ### How the full-vocabulary LM head works in-model
 
-![LM head](docs/assets/lm_head.svg)
+![LM head](docs/assets/lm_head.png)
 
 The LM head is a 151,936 x 1024 matrix, so its logits are produced in 594 blocks of 256 by the same state-bank matvec as every other projection. Each block then reduces itself in the model: a per-block max/argmax tournament yields the block's best logit and the local index (8 bits). A hard-max attention over the 594 block winners (key = block best logit, value = a dual-rail code of the local index plus the block index, 8 + 10 = 18 bits, 36 rails) selects the global winner across blocks. The outer `lm_head` has only 36 non-zero columns and decodes the rails into the outer token id, and the host takes the outer argmax and appends it. In the full-token run the winning rails were clean: top code score 18.0007 against an ideal 18.
 
@@ -79,7 +208,7 @@ Only claims with a result file or a test in this repository are listed.
 
 Reported in a findings file but without a result file in the repository (treat as reported, not independently reproducible from committed outputs): an alternative exact matvec built from SwiGLU as a multiplier, `silu(w)x + silu(-w)(-x) = wx`, about 1e-6 relative error on real Qwen2.5-0.5B `q_proj` and `down_proj`, and 0.64 to 1.14 s per 494 M weights of MAC throughput on an A100 (this figure assumes the host copies the activation into every weight step, which the audit flags as outside the rules until replaced by an in-model read) ([`experiments/alt/FINDINGS.md`](experiments/alt/FINDINGS.md), code in `experiments/alt/`). The same file records that using the KV cache as weight storage was ruled out.
 
-## Status by tier
+## Status by tier (detail)
 
 | Tier | What runs inside the outer Qwen's weights | Status |
 |---|---|---|
@@ -94,13 +223,13 @@ Known open items, from the agents' notes and the audit ([`audit/AUDIT.md`](audit
 
 ## Cost model
 
-![cost model](docs/assets/cost_model.svg)
+![cost model](docs/assets/cost_model.png)
 
 Measured, full token of the real Qwen3-0.6B, single position: **268.6 s** on a shared A100 (fp32, torch-reference GDN, layer-major executor, untuned): 13.9 s building layers plus about 242 s running 293,068 outer frames (about 1.2 k frames/s) through 1006 outer layers at D=40775. The frame, layer and weight counts come from the planner and are reproducible without a GPU (`experiments/vslice/cost_model.py`). Measured, weight streaming alone (an `nL=4` bank on an A10G, 12.4 k frames/s, harness-fed activations): 41.95 s; this is a different, much shallower stack, so the two numbers do not add up or compare directly. Estimates, labelled as such in the figure: the 7 to 19 s smaller-bank figures come from the runner's `plan()` function, not from a run, and the 110 s paging bound is an untested design estimate. Not yet measured: a KV-using position, tuned kernels (the flash-linear-attention path was slower or inexact in the agents' tests), and the in-model argmax on its own (18 to 44 s on a Mac CPU in the op test). Frame cost scales with depth and `D`, and the path is fp32 compute-bound.
 
 ### Circuit route versus state-as-memory route
 
-![comparison](docs/assets/comparison.svg)
+![comparison](docs/assets/comparison.png)
 
 The circuit route in [`reference/`](reference/nested-qwen-lab) emulates arithmetic bit by bit in GDN state. Extrapolating its measured rates to 494 M projection MACs gives between about 12 days (488 MAC/s, small synthetic tiles) and about a year (14.7 to 15 MAC/s, real-weight rows) per token, before any non-matvec operation. The state-as-memory route moves the same contraction into the delta-rule read, which is why even the full chained token (268.6 s) is more than five orders of magnitude faster than the slower circuit number (3.4e7 s, matvecs only). That comparison is matvec against matvec; the full chained token for the state route (268.6 s) is a single-position measurement.
 
@@ -130,8 +259,9 @@ Limits: the guard is a strong check, not a proof. Declared scopes (`transport`, 
 README.md
 docs/
   INTERFACE.md           outer-machine interface: layout, frames, what the host may do, depth ordering
-  assets/                SVG figures (architecture, state memory, unrolled pipeline, cost, comparison)
-  make_figures.py        regenerates the SVGs from the numbers quoted in this README
+  assets/                PNG and GIF figures (no SVGs), mermaid sources (*.mmd)
+  make_figures.py        regenerates the static PNG figures from the numbers quoted in this README (needs rsvg-convert)
+  launch/                make_media.py (GIFs, PNGs, mp4s), TWEET.md, PROVENANCE.md, UPDATING.md, video/
 qweninqwen/
   machine.py             Layout, make_outer (zeroed stock Qwen3_5ForCausalLM), BALLAST
 experiments/
@@ -174,8 +304,8 @@ python -c "import vs2, cost_model as c; print(c.counts(vs2.Cfg(1024,16,8,128,307
 # the full-token weight-streaming measurement (GPU; args: model nL layers lm_head)
 cd experiments/run && NOFLA=1 python run_token.py q3 4
 
-# regenerate figures
-python docs/make_figures.py
+# regenerate figures and launch media (Pillow, numpy, matplotlib fonts, ffmpeg)
+python docs/make_figures.py && python docs/launch/make_media.py
 ```
 
 ## Credits

@@ -367,7 +367,7 @@ def frames(scenes, fps=FPS):
 def square(im, headline='Qwen inside Qwen', sub='a real Qwen3-0.6B token executed by a stock Qwen3.5 model'):
     c = Canvas(1080, 1080, 1.0); c.text(540, 70, headline, 54, FG, True, anchor='mm'); c.text(540, 125, sub, 22, MUT, anchor='mm')
     im2 = im.resize((1080, 607), Image.LANCZOS); c.im.paste(im2, (0, 236))
-    c.text(540, 920, 'illustrative animation | numbers from repo logs', 22, MUT, anchor='mm')
+    c.text(540, 920, 'illustrations + replay of recorded logs | numbers from repo logs', 22, MUT, anchor='mm')
     c.text(540, 965, 'one token: 268.6 s, shared A100, fp32, argmax == HF', 24, FG, anchor='mm')
     c.text(540, 1010, 'github.com/Bobliuuu/qweninqwen', 24, BLUE, anchor='mm')
     return c.im
