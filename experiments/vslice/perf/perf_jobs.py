@@ -40,3 +40,9 @@ def micro(rows=3000, D=40775, nout=8288, nnz_row=2):
     out['n_cols'] = int(cols.numel())
     print(json.dumps(out), flush=True)
     return out
+
+
+def run(variant='base', **kw):
+    from test_vs2_fast import run_fast
+    t = time.time(); r = run_fast(**kw); r['variant'] = variant; r['wall_s'] = time.time() - t
+    return r

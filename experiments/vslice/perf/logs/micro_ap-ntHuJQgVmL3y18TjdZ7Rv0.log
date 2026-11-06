@@ -1,0 +1,32 @@
+Building image im-QbCJ35AWYmGNLe6m8VRxB7
+
+=> Step 0: FROM base
+
+=> Step 1: RUN python -m pip install flash-linear-attention
+Looking in indexes: http://pypi-mirror.modal.local:5555/simple
+Collecting flash-linear-attention
+  Downloading flash_linear_attention-0.6.0-py3-none-any.whl.metadata (44 kB)
+Collecting fla-core==0.6.0 (from flash-linear-attention)
+  Downloading fla_core-0.6.0-py3-none-any.whl.metadata (44 kB)
+Collecting einops (from fla-core==0.6.0->flash-linear-attention)
+  Downloading einops-0.8.2-py3-none-any.whl.metadata (13 kB)
+Downloading flash_linear_attention-0.6.0-py3-none-any.whl (403 kB)
+Downloading fla_core-0.6.0-py3-none-any.whl (1.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 312.8 MB/s  0:00:00
+Downloading einops-0.8.2-py3-none-any.whl (65 kB)
+Installing collected packages: einops, fla-core, flash-linear-attention
+
+Successfully installed einops-0.8.2 fla-core-0.6.0 flash-linear-attention-0.6.0
+
+[notice] A new release of pip is available: 26.2.2 -> 26.3
+[notice] To update, run: pip install --upgrade pip
+Saving image...
+Image saved, took 728.65ms
+
+Built image im-QbCJ35AWYmGNLe6m8VRxB7 in 3.40s
+
+
+/repo/experiments/vslice/perf/perf_jobs.py:24: UserWarning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at /__w/pytorch/pytorch/aten/src/ATen/SparseCsrTensorImpl.cpp:49.)
+  Wc = Wd.to_sparse_csr(); Wcoo = Wd.to_sparse()
+{"torch": "2.15.0+cu132", "gpu": "NVIDIA A100 80GB PCIe", "transformers": "5.22.1", "dense_fp32_ms": 110.23411750793457, "dense_tf32_ms": 30.077838897705078, "tf32_relerr": 0.0004060305072925985, "F.linear_csr_relerr": 4.711423784442559e-08, "F.linear_csr_ms": 4.767465591430664, "F.linear_coo_relerr": 4.711423784442559e-08, "F.linear_coo_ms": 1.400136947631836, "spmm_csr_xT_relerr": 4.711423784442559e-08, "spmm_csr_xT_ms": 2.711009979248047, "spmm_coo_xT_relerr": 4.711423784442559e-08, "spmm_coo_xT_ms": 1.148366928100586, "spmm_csr_xTcontig_relerr": 4.711423784442559e-08, "spmm_csr_xTcontig_ms": 0.34046173095703125, "matmul_x_csrT_relerr": 4.711423784442559e-08, "matmul_x_csrT_ms": 4.767608642578125, "gather_dense_relerr": 4.711423784442559e-08, "gather_dense_ms": 37.29753494262695, "n_cols": 13674}
+PERFJSON {"torch": "2.15.0+cu132", "gpu": "NVIDIA A100 80GB PCIe", "transformers": "5.22.1", "dense_fp32_ms": 110.23411750793457, "dense_tf32_ms": 30.077838897705078, "tf32_relerr": 0.0004060305072925985, "F.linear_csr_relerr": 4.711423784442559e-08, "F.linear_csr_ms": 4.767465591430664, "F.linear_coo_relerr": 4.711423784442559e-08, "F.linear_coo_ms": 1.400136947631836, "spmm_csr_xT_relerr": 4.711423784442559e-08, "spmm_csr_xT_ms": 2.711009979248047, "spmm_coo_xT_relerr": 4.711423784442559e-08, "spmm_coo_xT_ms": 1.148366928100586, "spmm_csr_xTcontig_relerr": 4.711423784442559e-08, "spmm_csr_xTcontig_ms": 0.34046173095703125, "matmul_x_csrT_relerr": 4.711423784442559e-08, "matmul_x_csrT_ms": 4.767608642578125, "gather_dense_relerr": 4.711423784442559e-08, "gather_dense_ms": 37.29753494262695, "n_cols": 13674, "job": "micro", "args": {}}

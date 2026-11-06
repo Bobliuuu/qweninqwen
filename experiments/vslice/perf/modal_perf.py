@@ -9,12 +9,12 @@ app = modal.App('qweninqwen-perf')
 vol = modal.Volume.from_name('qweninqwen-perf', create_if_missing=True)
 hf = modal.Volume.from_name('qweninqwen-hf', create_if_missing=True)
 ign = ['**/__pycache__/**', '**/.git/**', '**/results/**', '**/logs/**', '**/*.json', '**/older/**', '**/reference/**']
-img = (modal.Image.debian_slim(python_version='3.11')
-       .pip_install('torch', 'numpy', 'safetensors', 'huggingface_hub', 'accelerate', 'transformers>=5.2')
-       .add_local_dir(REPO + '/experiments', '/repo/experiments', ignore=ign)
-       .add_local_dir(REPO + '/qweninqwen', '/repo/qweninqwen', ignore=ign)
-       .add_local_dir(REPO + '/audit', '/repo/audit', ignore=ign))
-img_fla = img.pip_install('flash-linear-attention')
+base = modal.Image.debian_slim(python_version='3.11').pip_install('torch', 'numpy', 'safetensors', 'huggingface_hub', 'accelerate', 'transformers>=5.2')
+def _loc(i): return (i.add_local_dir(REPO + '/experiments', '/repo/experiments', ignore=ign)
+                      .add_local_dir(REPO + '/qweninqwen', '/repo/qweninqwen', ignore=ign)
+                      .add_local_dir(REPO + '/audit', '/repo/audit', ignore=ign))
+img = _loc(base)
+img_fla = _loc(base.pip_install('flash-linear-attention'))
 KW = dict(timeout=6 * 3600, volumes={'/out': vol, '/hf': hf}, gpu='A100-80GB')
 
 def _go(job, args):
