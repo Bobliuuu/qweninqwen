@@ -1,0 +1,3 @@
+rounds: 0 vs 0
+stream rows compared: 0; differing: 0
+STREAM TOKEN-INDEPENDENT

@@ -1,0 +1,10 @@
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+=== HostGuard report [demo_cheat_driver.py] mode=log -> FAIL ===
+outer rounds=3 steps=12 bytes streamed=1,536 {'inputs_embeds': 1536}
+ATen ops INSIDE outer forward: 1,101 (top: view:141, mul:123, add:81, _unsafe_view:69, slice:66, detach:60, t:48, mm:48)
+host ops allowed: {'move:zeros': 3, 'move:lift_fresh': 3, 'move:select': 6, 'move:fill': 3, 'move:detach': 6, 'move:view': 8, 'argmax(outer-logits)': 3, 'move:transpose': 1, 'move:expand': 2, 'forbidden!:bmm': 1, 'move:_unsafe_view': 1}
+host readbacks: 0 (non-logits: 0)
+VIOLATION x1 host-math: op=bmm at demo_cheat_driver.py:12 in <module>
+sources hashed: 4
+AUDIT RESULT: FAIL

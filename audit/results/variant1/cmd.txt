@@ -1,0 +1,8 @@
+# on the box, cwd = experiments/vslice (see run_variant.sh in this directory); equivalent single command:
+python3 audit/nofla_launch.py --variant 1 --mode log --fast --entry layer --out audit1.json \
+  --scope weight_prep:vs2.py:tile_payload --scope weight_prep:test_vs2.py:weights \
+  --scope build:vs2.py:compile_entry --scope build:vs2.py:build_layout --scope build:vs2.py:make_plan \
+  --scope 'build:engine.py:<module>' --scope transport:vs2.py:dense_job \
+  test_vs2.py real151936_L28 1
+# (nofla_launch.py only sets sys.modules['fla']=None, then runs audit/run_audit.py unchanged)
+# positive control (CPU, CUDA_VISIBLE_DEVICES=): python3 audit/nofla_launch.py --mode log --fast --out control_demo_cheat.json audit/demo_cheat_driver.py

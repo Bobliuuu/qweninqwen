@@ -1,0 +1,110 @@
+{
+ "name": "demo_good_driver.py",
+ "mode": "log",
+ "PASS": true,
+ "outer_rounds(forward calls)": 3,
+ "outer_steps(positions)": 12,
+ "bytes_streamed_total": 1536,
+ "bytes_streamed_by_arg": {
+  "inputs_embeds": 1536
+ },
+ "ops_inside_outer_forward": 1101,
+ "outer_op_histogram": {
+  "view": 141,
+  "mul": 123,
+  "add": 81,
+  "_unsafe_view": 69,
+  "slice": 66,
+  "detach": 60,
+  "t": 48,
+  "mm": 48,
+  "select": 45,
+  "transpose": 45,
+  "expand": 42,
+  "unsqueeze": 39,
+  "rsqrt": 30,
+  "cat": 24,
+  "pow": 24,
+  "mean": 24,
+  "copy": 21,
+  "exp": 18,
+  "bmm": 18,
+  "constant_pad_nd": 15,
+  "silu": 12,
+  "neg": 9,
+  "sub": 9,
+  "_to_copy": 6,
+  "zeros": 6
+ },
+ "host_ops_allowed": {
+  "move:zeros": 3,
+  "move:lift_fresh": 3,
+  "move:select": 6,
+  "move:fill": 3,
+  "move:detach": 6,
+  "move:view": 6,
+  "argmax(outer-logits)": 3,
+  "move:_local_scalar_dense": 1
+ },
+ "exempt_ops": {
+  "auto-construction:empty": 20,
+  "auto-construction:normal": 19,
+  "auto-construction:uniform": 19,
+  "auto-construction:ones": 2,
+  "auto-construction:log": 2,
+  "auto-construction:zeros": 7,
+  "auto-construction:arange": 2,
+  "auto-construction:div": 2,
+  "auto-construction:pow": 2,
+  "auto-construction:reciprocal": 2,
+  "auto-construction:mul": 2,
+  "auto-construction:detach": 2,
+  "auto-construction:clone": 1,
+  "auto-construction:lift_fresh": 2,
+  "auto-construction:fill": 9,
+  "auto-construction:copy": 3,
+  "auto-construction:zero": 35
+ },
+ "exempt_scopes": [],
+ "host_readbacks": [],
+ "n_host_readbacks": 0,
+ "non_outer_hf_forwards_on_host": {},
+ "round_digests": [
+  {
+   "inputs_embeds": [
+    "880d8e19d4",
+    "880d8e19d4",
+    "880d8e19d4",
+    "880d8e19d4"
+   ]
+  },
+  {
+   "inputs_embeds": [
+    "880d8e19d4",
+    "880d8e19d4",
+    "880d8e19d4",
+    "880d8e19d4"
+   ]
+  },
+  {
+   "inputs_embeds": [
+    "880d8e19d4",
+    "880d8e19d4",
+    "880d8e19d4",
+    "880d8e19d4"
+   ]
+  }
+ ],
+ "entry_calls": {},
+ "declared_frame_scopes": [],
+ "violation_counts": {},
+ "violations": [],
+ "violation_groups": [],
+ "driver_error": null,
+ "source_sha256": {
+  "audit/run_audit.py": "3fe7abcd83f2017e",
+  "audit/hostguard.py": "0f9d9557fe6919d7",
+  "audit/../qweninqwen/machine.py": "91c92704bcd1749c",
+  "audit/demo_good_driver.py": "6cc699257922ce39"
+ }
+}

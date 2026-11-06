@@ -1,0 +1,490 @@
+{
+ "name": "test_vs2.py",
+ "mode": "log",
+ "PASS": false,
+ "outer_rounds(forward calls)": 17444,
+ "outer_steps(positions)": 27590982,
+ "bytes_streamed_total": 4503007824701,
+ "bytes_streamed_by_arg": {
+  "0": 4500089164200,
+  "1": 331091784,
+  "position_ids": 110363928,
+  "cache_position": 110363928,
+  "attention_mask": 2366840861
+ },
+ "ops_inside_outer_forward": 9641017,
+ "outer_op_histogram": {
+  "view": 1928669,
+  "expand": 1772968,
+  "select": 1573684,
+  "_unsafe_view": 968608,
+  "bmm": 881920,
+  "add": 520067,
+  "mul": 424432,
+  "transpose": 302324,
+  "copy": 268045,
+  "sub": 233157,
+  "slice": 112933,
+  "unsqueeze": 94724,
+  "t": 69573,
+  "mm": 69573,
+  "exp": 51114,
+  "constant_pad_nd": 43572,
+  "rsqrt": 43407,
+  "pow": 26369,
+  "mean": 26369,
+  "cat": 26204,
+  "silu": 25760,
+  "clone": 17289,
+  "sum": 17038,
+  "linalg_solve_triangular": 17038,
+  "zeros_like": 9496
+ },
+ "host_ops_allowed": {
+  "move:lift_fresh": 1155833,
+  "move:_local_scalar_dense": 414,
+  "move:cat": 36465,
+  "move:unsqueeze": 53708,
+  "move:clone": 118,
+  "move:detach": 56,
+  "move:slice": 52446,
+  "move:zeros": 39462,
+  "move:select": 1648922,
+  "move:copy": 986883,
+  "move:stack": 7,
+  "move:_to_copy": 70830,
+  "move:zero": 101129,
+  "move:fill": 68519,
+  "move:arange": 34224,
+  "move:index": 417208,
+  "move:index_put": 363506,
+  "move:expand": 8722,
+  "move:view": 41574,
+  "move:permute": 13644,
+  "move:full_like": 27288,
+  "forbidden!:mv": 6,
+  "forbidden!:max": 6,
+  "argmax!:argmax": 14
+ },
+ "exempt_ops": {
+  "build:neg": 400,
+  "build:exp": 1,
+  "build:add": 826204,
+  "build:div": 1199,
+  "reference:lift_fresh": 343,
+  "reference:empty": 198,
+  "auto-construction:normal": 1,
+  "auto-construction:uniform": 63169,
+  "reference:ones": 113,
+  "reference:arange": 7,
+  "reference:div": 7,
+  "reference:pow": 679,
+  "reference:reciprocal": 1,
+  "reference:mul": 2215,
+  "reference:detach": 624,
+  "reference:clone": 1,
+  "reference:empty_like": 2,
+  "auto-construction:arange": 1,
+  "auto-construction:div": 1,
+  "auto-construction:pow": 1,
+  "auto-construction:reciprocal": 1,
+  "auto-construction:mul": 1,
+  "auto-construction:copy": 2,
+  "reference:equal": 1,
+  "weight_prep:mul": 409377,
+  "build:arange": 1,
+  "build:pow": 799,
+  "build:reciprocal": 1,
+  "build:mul": 799,
+  "build:detach": 2,
+  "build:clone": 1,
+  "build:_to_copy": 2,
+  "build:empty": 69811,
+  "build:ones": 13678,
+  "build:uniform": 6839,
+  "build:log": 6839,
+  "build:zeros": 14490,
+  "build:lt": 65912,
+  "build:sub": 67508,
+  "transport:arange": 412,
+  "transport:unsqueeze": 812,
+  "transport:add": 13847,
+  "transport:le": 203,
+  "reference:embedding": 6,
+  "reference:add": 1356,
+  "reference:unsqueeze": 348,
+  "reference:_to_copy": 6,
+  "reference:cat": 678,
+  "reference:cos": 6,
+  "reference:sin": 6,
+  "reference:mean": 678,
+  "reference:rsqrt": 678,
+  "reference:t": 1182,
+  "reference:view": 1854,
+  "reference:mm": 1182,
+  "reference:_unsafe_view": 1182,
+  "reference:transpose": 672,
+  "reference:slice": 4248,
+  "reference:neg": 336,
+  "reference:_scaled_dot_product_flash_attention_for_cpu": 168,
+  "reference:silu": 168,
+  "reference:alias": 6,
+  "reference:select": 60,
+  "weight_prep:neg": 395676,
+  "weight_prep:min": 13644,
+  "weight_prep:rsub": 150084,
+  "weight_prep:clamp": 40932,
+  "weight_prep:add": 968724,
+  "weight_prep:div": 927792,
+  "weight_prep:exp": 382032,
+  "weight_prep:gt": 382032,
+  "weight_prep:where": 764064,
+  "weight_prep:sigmoid": 136440,
+  "weight_prep:sub": 272880,
+  "reference:max": 3576,
+  "reference:stack": 6,
+  "reference:sub": 12,
+  "reference:abs": 18,
+  "reference:_local_scalar_dense": 126,
+  "reference:sort": 6,
+  "reference:unbind": 6,
+  "transport:zeros": 6,
+  "transport:remainder": 48,
+  "transport:__rshift__": 108,
+  "transport:bitwise_and": 108,
+  "transport:select": 216,
+  "transport:copy": 216,
+  "transport:rsub": 108,
+  "transport:floor_divide": 60,
+  "validation:_local_scalar_dense": 6
+ },
+ "exempt_scopes": [
+  {
+   "kind": "reference",
+   "reason": "load the real HF Qwen3-0.6B inner weights (weights + reference model)",
+   "entries": 1,
+   "ops": 945
+  },
+  {
+   "kind": "build",
+   "reason": "construct stock Qwen3_5TextRotaryEmbedding (inv_freq from rope_theta config constant)",
+   "entries": 1,
+   "ops": 10
+  },
+  {
+   "kind": "build",
+   "reason": "construct a stock Qwen3_5DecoderLayer (random init, all params zeroed by compile_entry)",
+   "entries": 7042,
+   "ops": 111657
+  },
+  {
+   "kind": "transport",
+   "reason": "causal mask from position indices (token-independent addresses)",
+   "entries": 203,
+   "ops": 1624
+  },
+  {
+   "kind": "reference",
+   "reason": "HF inner Qwen3 forward on host: reference logits for the error metric only; never fed back",
+   "entries": 6,
+   "ops": 14442
+  },
+  {
+   "kind": "reference",
+   "reason": "error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)",
+   "entries": 6,
+   "ops": 7374
+  },
+  {
+   "kind": "transport",
+   "reason": "host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)",
+   "entries": 6,
+   "ops": 876
+  },
+  {
+   "kind": "validation",
+   "reason": "print first 8 rails + top code score (display only; the decode above is host-side, see audit report)",
+   "entries": 6,
+   "ops": 6
+  }
+ ],
+ "host_readbacks": [],
+ "n_host_readbacks": 0,
+ "non_outer_hf_forwards_on_host": {
+  "Qwen3ForCausalLM": 6,
+  "Qwen3Model": 6
+ },
+ "round_digests": [],
+ "entry_calls": {
+  "Qwen3_5TextRotaryEmbedding": 8722,
+  "Qwen3_5DecoderLayer": 8722
+ },
+ "declared_frame_scopes": [
+  {
+   "kind": "build",
+   "frame": "engine.py:<module>",
+   "ops": 4
+  },
+  {
+   "kind": "weight_prep",
+   "frame": "test_vs2.py:weights",
+   "ops": 57
+  },
+  {
+   "kind": "build",
+   "frame": "vs2.py:compile_entry",
+   "ops": 962815
+  },
+  {
+   "kind": "weight_prep",
+   "frame": "vs2.py:tile_payload",
+   "ops": 4843620
+  },
+  {
+   "kind": "transport",
+   "frame": "vs2.py:dense_job",
+   "ops": 13644
+  }
+ ],
+ "violation_counts": {
+  "host-math-on-outer-output": 6,
+  "host-math": 12,
+  "argmax-on-non-logits": 14
+ },
+ "violations": [
+  {
+   "kind": "host-math-on-outer-output",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": "host computes on a tensor derived from outer activations (not allowed even in transport/weight_prep)"
+  },
+  {
+   "kind": "host-math",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": ""
+  },
+  {
+   "kind": "host-math",
+   "op": "max",
+   "site": "test_vs2.py:85 in run",
+   "detail": ""
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "host-math-on-outer-output",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": "host computes on a tensor derived from outer activations (not allowed even in transport/weight_prep)"
+  },
+  {
+   "kind": "host-math",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": ""
+  },
+  {
+   "kind": "host-math",
+   "op": "max",
+   "site": "test_vs2.py:85 in run",
+   "detail": ""
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "host-math-on-outer-output",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": "host computes on a tensor derived from outer activations (not allowed even in transport/weight_prep)"
+  },
+  {
+   "kind": "host-math",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": ""
+  },
+  {
+   "kind": "host-math",
+   "op": "max",
+   "site": "test_vs2.py:85 in run",
+   "detail": ""
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "host-math-on-outer-output",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": "host computes on a tensor derived from outer activations (not allowed even in transport/weight_prep)"
+  },
+  {
+   "kind": "host-math",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": ""
+  },
+  {
+   "kind": "host-math",
+   "op": "max",
+   "site": "test_vs2.py:85 in run",
+   "detail": ""
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "host-math-on-outer-output",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": "host computes on a tensor derived from outer activations (not allowed even in transport/weight_prep)"
+  },
+  {
+   "kind": "host-math",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": ""
+  },
+  {
+   "kind": "host-math",
+   "op": "max",
+   "site": "test_vs2.py:85 in run",
+   "detail": ""
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:86 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "host-math-on-outer-output",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": "host computes on a tensor derived from outer activations (not allowed even in transport/weight_prep)"
+  },
+  {
+   "kind": "host-math",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "detail": ""
+  },
+  {
+   "kind": "host-math",
+   "op": "max",
+   "site": "test_vs2.py:85 in run",
+   "detail": ""
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:86 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "detail": "host argmax of a tensor not derived from outer logits"
+  }
+ ],
+ "violation_groups": [
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:88 in run",
+   "count": 12
+  },
+  {
+   "kind": "host-math-on-outer-output",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "count": 6
+  },
+  {
+   "kind": "host-math",
+   "op": "mv",
+   "site": "test_vs2.py:83 in run",
+   "count": 6
+  },
+  {
+   "kind": "host-math",
+   "op": "max",
+   "site": "test_vs2.py:85 in run",
+   "count": 6
+  },
+  {
+   "kind": "argmax-on-non-logits",
+   "op": "argmax",
+   "site": "test_vs2.py:86 in run",
+   "count": 2
+  }
+ ],
+ "driver_error": null,
+ "source_sha256": {
+  "audit/run_audit.py": "3fe7abcd83f2017e",
+  "audit/hostguard.py": "0f9d9557fe6919d7",
+  "experiments/vslice/../../qweninqwen/machine.py": "91c92704bcd1749c",
+  "experiments/vslice/../state/engine.py": "a175746db3f4e1f1",
+  "experiments/vslice/../ops/ops.py": "6d10fd2c5fabe3b6",
+  "experiments/vslice/vs2.py": "a777577255ad301a",
+  "experiments/vslice/test_vs2.py": "02a4642cd81677fb"
+ }
+}
