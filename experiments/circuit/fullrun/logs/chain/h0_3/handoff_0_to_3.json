@@ -1,0 +1,194 @@
+{
+ "mode": "handoff",
+ "chunks": [
+  0,
+  1,
+  2,
+  3
+ ],
+ "steps": 8388607,
+ "steps_run": 8388608,
+ "seconds": 1517.8244314193726,
+ "tok_per_s": 5526.731432018874,
+ "free_tokens": 8374655,
+ "free_mismatches": 0,
+ "first_free_mismatch": null,
+ "forced_tokens": 13952,
+ "forced_raw_disagreements": 13887,
+ "diverged": false,
+ "boundaries": [
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1626,
+    1626
+   ],
+   "n": [
+    11,
+    11
+   ],
+   "wb15": [
+    10049,
+    10049
+   ],
+   "wb_ref_full27": 829249,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 4898,
+    "sb_sh": 224,
+    "sw": 3070
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": true,
+   "boundary_after_chunk": 0,
+   "step": 2097151
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1626,
+    1626
+   ],
+   "n": [
+    11,
+    11
+   ],
+   "wb15": [
+    385,
+    385
+   ],
+   "wb_ref_full27": 1802625,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 6832,
+    "sb_sh": 304,
+    "sw": 1056
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": true,
+   "boundary_after_chunk": 1,
+   "step": 4194303
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1595,
+    1595
+   ],
+   "n": [
+    60,
+    60
+   ],
+   "wb15": [
+    6561,
+    6561
+   ],
+   "wb_ref_full27": 2693537,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 7038,
+    "sb_sh": 96,
+    "sw": 1058
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": true,
+   "boundary_after_chunk": 2,
+   "step": 6291455
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1626,
+    1626
+   ],
+   "n": [
+    6,
+    6
+   ],
+   "wb15": [
+    31745,
+    31745
+   ],
+   "wb_ref_full27": 3570689,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 6448,
+    "sb_sh": 688,
+    "sw": 1056
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": true,
+   "boundary_after_chunk": 3,
+   "step": 8388607
+  }
+ ],
+ "gpu": "NVIDIA A100-SXM4-40GB"
+}
