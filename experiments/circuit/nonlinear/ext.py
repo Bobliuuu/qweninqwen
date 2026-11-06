@@ -1,7 +1,7 @@
 """Reference semantics (exact integer, bit-for-bit definition) of the proposed custom-1 ISA extensions for the Qwenputer RV32 core.
 Each op is one instruction (custom-1, opcode 0x2b, funct3 below); tables are ROM constants held in DeltaNet key heads like the DROM.
   f3=0 EXP2  rd = 2^(rs1/2^16) * 2^24   rs1 signed Q16 (|x|<8 useful), result uint32 Q24 (saturates), 256-entry table + linear interp
-  f3=1 RSQ   rd = (m/2^16)^-1/2 * 2^24  rs1 = m uint32 > 0 (Q16 mean-square + eps), priority-encoder + parity shift + 512-entry table + interp
+  f3=1 RSQ   rd = (m/2^16)^-1/2 * 2^24  rs1 = m uint32 > 0 (Q16 mean-square + eps), priority-encoder + parity shift + 2x513-entry table (parity x mantissa) + interp
   f3=2 SIGM  rd = sigmoid(rs1/2^16)*2^16  rs1 signed Q16, clamped to [-12,12), 768-entry table + interp, Q16 result
   f3=3 AMX   (rs1 = value int32, rs2 = index): if rs1 > MAXV: MAXV=rs1, MAXI=rs2        (hidden 2-register state, no rd)
   f3=4 AMXR  rd = MAXI; if rs1 != 0: MAXV = -2^31, MAXI = 0                              (read / reset)
@@ -13,7 +13,7 @@ def s32(v): v &= M32; return v - (1 << 32) if v >> 31 else v
 
 EXP_T = [int(round(2.0 ** (i / 256) * (1 << 30))) for i in range(257)]
 SIG_T = [int(round((1 / (1 + np.exp(-(-12 + i / 32)))) * (1 << 16))) for i in range(769)]
-RSQ_T = [int(round((1 + 3 * i / 512) ** -0.5 * (1 << 30))) for i in range(513)]     # x in [1,4)
+RSQ_T = [int(round(((1 + i / 512) * (1 << p)) ** -0.5 * (1 << 30))) for p in (0, 1) for i in range(513)]   # [parity][mantissa idx], 2 x 513 entries
 
 def exp2q(x):
     x = s32(x); xi = x >> 16; f = x & 0xFFFF; i = f >> 8; fr = f & 255
@@ -28,11 +28,10 @@ def rsqq(m):
     m &= M32
     if m == 0: return M32
     e = m.bit_length() - 1; E = e - 16; par = E & 1; Ee = E - par
-    Mp = ((m << 30) >> e) << par                                   # M' in [1,4) as Q30
-    u = Mp - (1 << 30); idx = min((u * 512) // (3 << 30), 511)
-    fr = u - ((3 << 30) * idx) // 512                              # offset inside the segment, Q30
-    t0, t1 = RSQ_T[idx], RSQ_T[idx + 1]
-    y = t0 + (((t1 - t0) * fr * 512) // (3 << 30))                 # Q30 of M'^-1/2
+    M = (m << 30) >> e                                             # mantissa in [1,2) as Q30
+    u = M - (1 << 30); idx = u >> 21; fr = u & ((1 << 21) - 1)     # 512 segments, shift-friendly
+    t0, t1 = RSQ_T[par * 513 + idx], RSQ_T[par * 513 + idx + 1]
+    y = t0 + (((t1 - t0) * fr) >> 21)                              # arithmetic shift (floor)
     sh = 24 - 30 - Ee // 2
     v = (y << sh) if sh >= 0 else (y >> -sh)
     return min(v, M32)

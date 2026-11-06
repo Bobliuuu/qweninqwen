@@ -2,6 +2,9 @@
 for plain RV32IM firmware vs RV32IM + the proposed extensions, from the measured slopes in res_kernels.json.  Also matvec cost for context."""
 import json, sys
 R = json.load(open("res_kernels.json"))
+H = json.load(open("res_header.json"))                 # nl_fixed.h kernels (the merged/canonical ones) override the legacy kernels.c numbers
+for k, v in H.items():
+    if not k.startswith("k_argmax"): R[k] = v
 L, d, nq, nkv, hd, I, V = 28, 1024, 16, 8, 128, 3072, 151936
 def cost(k, n, fixed_calls=0):
     r = R[k]; return dict(instr=n * r["instr_per_elem"] + fixed_calls * r.get("fixed_instr", 0), tokens=n * r["tokens_per_elem"] + fixed_calls * r.get("fixed_instr", 0) * (r["tokens_per_elem"] / r["instr_per_elem"]))

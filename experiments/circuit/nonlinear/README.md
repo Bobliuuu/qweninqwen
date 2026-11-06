@@ -1,3 +1,20 @@
+## Drop-in header for the firmware (`nl_fixed.h`) and verification on real activations
+`nl_fixed.h` (single source of truth, `static inline`, no libc/relocations) = every kernel below in three build modes: default plain RV32IM, `-DNL_EXT` (custom-1 instructions via `.insn`, works in gcc >= 10 binutils and clang),
+`-DNL_EXT_EMU` (the same instruction semantics in C, `nl_ext_ref.h`, for host tests). Formats are documented at the top of the header; entry points: `nl_rms_inv_q24`, `nl_rms_scale`, `nl_softmax_q16`,
+`nl_swiglu_q16`, `nl_rope_pairs`, `nl_sincos_q15`, `nl_argmax_begin/feed/end`, `nl_requant_i8`, `nl_add`. An emulator that wants the instructions includes `nl_ext_ref.h` (opcode 0x2b, f3 = 0 EXP2, 1 RSQ, 2 SIGM, 3 AMX, 4 AMXR, 5 ROT16).
+Checks: `test_ext_c.c` (C reference vs `ext.py`, 20,000 vectors, 0 mismatches), `test_emu_vs_sim.py` (header built for host with EXT_EMU vs RV32 EXT in the interpreter: 200 kernel calls, 0 mismatches),
+`test_real.py` (below).
+**Real-activation error vs HF fp32** (`capture_acts.py` on the A10G box: Qwen3-0.6B, 64-token prompt, layers 0,1,7,14,21,27; `res_real.json`, `test_real.log`; worst over layers; soft and EXT builds agree except where noted):
+| op | max abs err / max abs ref | rel L2 | note |
+|---|---|---|---|
+| RMSNorm d=1024 (in/post norm, with gain) | 1.1e-4 .. 5.0e-3 (layer 0: 5e-3) | 5e-4 .. 5.6e-3 | layer 0 activations have rms 0.027, so Q12 (2.4e-4) is too coarse there: use a per-layer input scale (Q16) for layers 0-1 |
+| q/k RMSNorm d=128 | 2.7e-4 .. 1.6e-3 | 3.4e-4 .. 1.2e-3 | |
+| softmax (rows of 10, 32, 64 scores, 16 heads) | 1.6e-5 .. 3.1e-5 abs prob | 1.9e-4 .. 4.3e-4 | needed a Newton step on the 1/sum reciprocal (1e-3 error before) |
+| SwiGLU d=3072 | 1.1e-5 .. 2.5e-4 | 1.8e-5 .. 2.5e-3 | 64-bit-safe products: gate/up reach hundreds (massive activations) |
+| RoPE (pairs, int16 with per-layer power-of-two scale) | 1.7e-4 .. 6.0e-4 | 3.8e-4 .. 1.4e-3 | |
+Real-model findings that changed the kernels: the residual stream has massive activations (|x| up to 6.5e3, rms 26 from layer 7 on), which overflowed the first 32-bit sum-of-squares and `x<<8` products; the header now accumulates mean-square in 64 bits (mul/mulh) and
+multiplies with mul/mulh (+~40-60% instructions on RMSNorm/SwiGLU vs the first version). Not yet validated: an all-fixed-point end-to-end forward (error compounding over 28 layers), long contexts (T > 64), the 4 final-layer logits.
+
 # Nonlinear ops and ISA extensions on the Qwenputer RV32 core (Qwen3-0.6B as firmware)
 
 Target machine: the Qwenputer RV32IM+Zba core compiled into stock Qwen3.5 layers (`~/qwenos-work/qwenputer`, docs `experimental/riscv/docs/rv32.md`),
@@ -18,7 +35,7 @@ instructions and trace tokens, and designs/verifies cheap custom instructions fo
 | op | semantics | verified (interpreter vs float) |
 |---|---|---|
 | `EXP2 rd,rs1` | 2^(rs1/2^16) in Q24, 256-entry table + linear interp, saturating | max rel err 5.1e-6 (soft deg-4 polynomial: 8.3e-6) |
-| `RSQ rd,rs1` | (rs1/2^16)^-1/2 in Q24; priority encoder + parity shift + 512-entry table + interp | max rel err 5.6e-6 over ms in [2^-8,2^14] (soft 3-Newton: 3.7e-5) |
+| `RSQ rd,rs1` | (rs1/2^16)^-1/2 in Q24; priority encoder + parity shift + 2x513-entry table (parity x mantissa) + shift-friendly interp | max rel err 7.4e-6 over ms in [2^-8,2^14] (soft 3-Newton: 3.7e-5) |
 | `SIGM rd,rs1` | sigmoid(x) Q16, 768-entry table over [-12,12) + interp | max abs err 2.6e-5 (1.7 LSB) |
 | `AMX rs1,rs2` / `AMXR rd,rs1` | running (max,argmax) in 2 hidden registers; first max wins; AMXR reads index and optionally resets | argmax == numpy.argmax in 15 random trials |
 | `ROT16 rd,rs1,rs2` | RoPE pair rotate: packed int16 (x1,x2) x packed Q15 (cos,sin) -> packed int16 | max abs err 1.3 LSB of int16 (identical to the soft kernel) |
@@ -29,10 +46,10 @@ Scores/log2e: the 1/sqrt(hd)*log2(e) factor is folded into the q weights (free),
 |---|---|---|---|
 | rsqrt scalar (RMSNorm) | 68.7 / 110 | 3 / 4 (incl. ret) | 23x |
 | exp2 scalar | 38 / 73 | 3 / 4 | 13x |
-| softmax element (exp+sum+scale passes) | 50.5 / 93 | 14.4 / 22.5 | 3.5x |
-| SwiGLU element (silu(g)*u) | 61.0 / 119 | 10.6 / 18.3 | 5.7x |
-| RoPE pair | 23 / 42 | 8 / 16 | 2.9x (3 ld/st dominate) |
-| RMSNorm sumsq / scale*gain per element | 4.4 / 6.4 and 7.6 / 10.3 | unchanged | - |
+| softmax element (exp+sum+scale passes) | 50.5 / 92.5 | 14.3 / 22.8 | 3.5x |
+| SwiGLU element (silu(g)*u, 64-bit-safe products) | 65.2 / 126 | 14.6 / 25.2 | 4.5x |
+| RoPE pair | 22.6 / 48 | 4.6 / 10.2 | 4.9x |
+| RMSNorm mean-square (exact 64-bit accumulation) / scale*gain per element | 7.4 / 14.2 and 13.6 / 24.3 | unchanged | - |
 | argmax element, logits in RAM | 4.1 / 4.3 | 3.25 / 3.4 | 1.3x |
 | argmax element fused into the lm_head epilogue | ~2.5 (estimate) | 1.0 (estimate) | 2.5x |
 | residual add / requant to int8 | 4.6 / 8.7 | unchanged | - |
@@ -50,14 +67,14 @@ matvec: 595,984,384 MACs/token (440.4M layers + 155.6M lm_head). Elements/token:
 | matvec, SMAQA int8 | 5.2e8 | 5.7e8 |
 | matvec, VDOT int4 (1 row) | 2.5e8 | 2.6e8 |
 | matvec, VDOT int4 (8 rows share activations) | 9.7e7 | 9.9e7 |
-| all nonlinear + glue, plain, T=1 / T=512 | 1.13e7 / 2.28e7 | 1.95e7 / 4.08e7 |
-| all nonlinear + glue, with extensions, T=1 / T=512 | 6.1e6 / 9.4e6 | 9.6e6 / 1.47e7 |
-So with a fast matvec (VDOT x8, 9.7e7) the plain nonlinear part is 10-19% of the instructions (and 16-29% of the tokens because those values are wide) and the
-extensions bring it to 6-9% (T=512). Dominant leftovers after the extensions: RMSNorm sumsq+scale (1.7e6), requant+dequant glue (2.8e6), softmax at long T, residual (2.7e5).
+| all nonlinear + glue, plain, T=1 / T=512 | 1.32e7 / 2.47e7 | 2.40e7 / 4.52e7 |
+| all nonlinear + glue, with extensions, T=1 / T=512 | 7.7e6 / 1.10e7 | 1.33e7 / 1.86e7 |
+So with a fast matvec (VDOT x8, 9.7e7) the plain nonlinear part is 12-20% of the instructions (and 20-32% of the tokens, wide values cost 2-3 tokens) and the
+extensions bring it to 7-10% (T=512). Dominant leftovers after the extensions: RMSNorm mean-square+scale (3.0e6), requant+dequant glue (2.8e6), softmax at long T (3.3e6 at T=512), residual (2.7e5).
 At the executor's measured ~3.7k instr/s (L4, rv32.md) one token of this program is still ~7 h of stream time at 1e8 instructions: matvec dominates until it gets another ~100x.
 
 ## State / layer budget of the extensions (ESTIMATES from rv32.md; not built in the IR)
-* Tables are ROM (like the DROM): EXP2 257x4 B = 1 KB, SIGM 769x4 B = 3 KB, RSQ 513x4 B = 2 KB = ~6 KB = about one DeltaNet key head (the 128 KB DROM uses 16 heads, 8 KB each).
+* Tables are ROM (like the DROM): EXP2 257x4 B = 1 KB, SIGM 769x4 B = 3 KB, RSQ 2x513x4 B = 4 KB = ~8 KB = about one DeltaNet key head (the 128 KB DROM uses 16 heads, 8 KB each).
   They must be read by a dedicated head keyed on a one-hot of the top index bits (not by a load instruction, which would cost instructions).
 * Datapath: index one-hot decode (1 MLP stage, ~256-768 units), table read (1 head, 2-hot query {i,i+1}), interpolation = a small multiply (diff x 8-bit fraction;
   nibble-product columns like the existing multiplier stages s1..s3), result mux. Rough size 1.5-2.5k MLP units per table op; critical path starts after the regfile read (L5):

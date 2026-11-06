@@ -1,0 +1,68 @@
+{
+ "k_sumsq": {
+  "instr_per_elem": 7.375,
+  "tokens_per_elem": 14.2265625,
+  "fixed_instr": 26.0
+ },
+ "k_rms_scale": {
+  "instr_per_elem": 13.625,
+  "tokens_per_elem": 24.3125,
+  "fixed_instr": 15.0
+ },
+ "k_softmax_base": {
+  "instr_per_elem": 50.5,
+  "tokens_per_elem": 92.515625,
+  "fixed_instr": 141.0
+ },
+ "k_silu_base": {
+  "instr_per_elem": 65.15625,
+  "tokens_per_elem": 125.859375,
+  "fixed_instr": 83.0
+ },
+ "k_rope_base": {
+  "instr_per_elem": 22.625,
+  "tokens_per_elem": 47.9921875,
+  "fixed_instr": 30.0
+ },
+ "k_argmax_base": {
+  "instr_per_elem": 10.9912109375,
+  "tokens_per_elem": 17.6640625,
+  "fixed_instr": 4.0
+ },
+ "k_rsqrt_base": {
+  "instr": 68.5,
+  "tokens": 109.75
+ },
+ "k_exp2_base": {
+  "instr": 38.0,
+  "tokens": 64.33333333333333
+ },
+ "k_softmax_ext": {
+  "instr_per_elem": 14.328125,
+  "tokens_per_elem": 22.8203125,
+  "fixed_instr": 101.0
+ },
+ "k_silu_ext": {
+  "instr_per_elem": 14.625,
+  "tokens_per_elem": 25.1875,
+  "fixed_instr": 16.0
+ },
+ "k_rope_ext": {
+  "instr_per_elem": 4.625,
+  "tokens_per_elem": 10.2421875,
+  "fixed_instr": 15.0
+ },
+ "k_argmax_ext": {
+  "instr_per_elem": 5.0,
+  "tokens_per_elem": 7.55859375,
+  "fixed_instr": 7.0
+ },
+ "k_rsqrt_ext": {
+  "instr": 3.0,
+  "tokens": 4.0
+ },
+ "k_exp2_ext": {
+  "instr": 3.0,
+  "tokens": 4.0
+ }
+}

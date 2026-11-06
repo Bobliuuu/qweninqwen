@@ -31,37 +31,37 @@
   {
    "op": "RMSNorm (sumsq + scale*gain)",
    "elements": 144384,
-   "base_instr": 1782679.365,
-   "base_tokens": 2502564.5325,
-   "ext_instr": 1734795.0,
-   "ext_tokens": 2425296.0,
-   "note": "729 rsqrt scalars/token (RSQ replaces 69 instr by 3)"
+   "base_instr": 3082000.5,
+   "base_tokens": 5644431.75,
+   "ext_instr": 3034251.0,
+   "ext_tokens": 5567340.0,
+   "note": "729 rsqrt scalars/token (RSQ replaces 68 instr by 3)"
   },
   {
    "op": "SwiGLU silu(g)*u",
    "elements": 86016,
-   "base_instr": 5251008.0,
-   "base_tokens": 10235904.0,
-   "ext_instr": 913920.0,
-   "ext_tokens": 1569792.0,
+   "base_instr": 5604480.0,
+   "base_tokens": 10825920.0,
+   "ext_instr": 1257984.0,
+   "ext_tokens": 2166528.0,
    "note": "SIGM instruction"
   },
   {
    "op": "softmax over T=1 (448 rows)",
    "elements": 448,
-   "base_instr": 80416.0,
-   "base_tokens": 148142.59405940594,
-   "ext_instr": 41394.5,
-   "ext_tokens": 64596.08355941399,
+   "base_instr": 85792.0,
+   "base_tokens": 157170.30693069307,
+   "ext_instr": 51667.0,
+   "ext_tokens": 82289.69847328243,
    "note": "EXP2 instruction; log2e/sqrt(hd) folded into q weights"
   },
   {
    "op": "RoPE rotate (pairs)",
    "elements": 43008,
-   "base_instr": 732992.0,
-   "base_tokens": 1330364.16,
+   "base_instr": 974912.0,
+   "base_tokens": 2067548.16,
    "ext_instr": 200768.0,
-   "ext_tokens": 441812.16,
+   "ext_tokens": 443996.16,
    "note": "ROT16; includes 64 sincos table lookups/token (software in both)"
   },
   {
@@ -111,46 +111,46 @@
   }
  ],
  "T=1_total_nonlinear": {
-  "base_instr": 11278431.365,
-  "ext_instr": 6094309.5,
-  "base_tokens": 19531845.686559405,
-  "ext_tokens": 9573269.043559413
+  "base_instr": 13178520.5,
+  "ext_instr": 7748102.0,
+  "base_tokens": 24009940.616930693,
+  "ext_tokens": 13331926.658473283
  },
  "T=64": [
   {
    "op": "RMSNorm (sumsq + scale*gain)",
    "elements": 144384,
-   "base_instr": 1782679.365,
-   "base_tokens": 2502564.5325,
-   "ext_instr": 1734795.0,
-   "ext_tokens": 2425296.0,
-   "note": "729 rsqrt scalars/token (RSQ replaces 69 instr by 3)"
+   "base_instr": 3082000.5,
+   "base_tokens": 5644431.75,
+   "ext_instr": 3034251.0,
+   "ext_tokens": 5567340.0,
+   "note": "729 rsqrt scalars/token (RSQ replaces 68 instr by 3)"
   },
   {
    "op": "SwiGLU silu(g)*u",
    "elements": 86016,
-   "base_instr": 5251008.0,
-   "base_tokens": 10235904.0,
-   "ext_instr": 913920.0,
-   "ext_tokens": 1569792.0,
+   "base_instr": 5604480.0,
+   "base_tokens": 10825920.0,
+   "ext_instr": 1257984.0,
+   "ext_tokens": 2166528.0,
    "note": "SIGM instruction"
   },
   {
    "op": "softmax over T=64 (448 rows)",
    "elements": 28672,
-   "base_instr": 1505728.0,
-   "base_tokens": 2773856.594059406,
-   "ext_instr": 447776.0,
-   "ext_tokens": 698754.083559414,
+   "base_instr": 1511104.0,
+   "base_tokens": 2768331.306930693,
+   "ext_instr": 456064.0,
+   "ext_tokens": 726370.1984732824,
    "note": "EXP2 instruction; log2e/sqrt(hd) folded into q weights"
   },
   {
    "op": "RoPE rotate (pairs)",
    "elements": 43008,
-   "base_instr": 732992.0,
-   "base_tokens": 1330364.16,
+   "base_instr": 974912.0,
+   "base_tokens": 2067548.16,
    "ext_instr": 200768.0,
-   "ext_tokens": 441812.16,
+   "ext_tokens": 443996.16,
    "note": "ROT16; includes 64 sincos table lookups/token (software in both)"
   },
   {
@@ -200,46 +200,46 @@
   }
  ],
  "T=64_total_nonlinear": {
-  "base_instr": 12703743.365,
-  "ext_instr": 6500691.0,
-  "base_tokens": 22157559.686559405,
-  "ext_tokens": 10207427.043559413
+  "base_instr": 14603832.5,
+  "ext_instr": 8152499.0,
+  "base_tokens": 26621101.616930693,
+  "ext_tokens": 13976007.158473283
  },
  "T=512": [
   {
    "op": "RMSNorm (sumsq + scale*gain)",
    "elements": 144384,
-   "base_instr": 1782679.365,
-   "base_tokens": 2502564.5325,
-   "ext_instr": 1734795.0,
-   "ext_tokens": 2425296.0,
-   "note": "729 rsqrt scalars/token (RSQ replaces 69 instr by 3)"
+   "base_instr": 3082000.5,
+   "base_tokens": 5644431.75,
+   "ext_instr": 3034251.0,
+   "ext_tokens": 5567340.0,
+   "note": "729 rsqrt scalars/token (RSQ replaces 68 instr by 3)"
   },
   {
    "op": "SwiGLU silu(g)*u",
    "elements": 86016,
-   "base_instr": 5251008.0,
-   "base_tokens": 10235904.0,
-   "ext_instr": 913920.0,
-   "ext_tokens": 1569792.0,
+   "base_instr": 5604480.0,
+   "base_tokens": 10825920.0,
+   "ext_instr": 1257984.0,
+   "ext_tokens": 2166528.0,
    "note": "SIGM instruction"
   },
   {
    "op": "softmax over T=512 (448 rows)",
    "elements": 229376,
-   "base_instr": 11641280.0,
-   "base_tokens": 21445600.594059408,
-   "ext_instr": 3337600.0,
-   "ext_tokens": 5208322.083559414,
+   "base_instr": 11646656.0,
+   "base_tokens": 21336587.306930695,
+   "ext_instr": 3331776.0,
+   "ext_tokens": 5306498.198473282,
    "note": "EXP2 instruction; log2e/sqrt(hd) folded into q weights"
   },
   {
    "op": "RoPE rotate (pairs)",
    "elements": 43008,
-   "base_instr": 732992.0,
-   "base_tokens": 1330364.16,
+   "base_instr": 974912.0,
+   "base_tokens": 2067548.16,
    "ext_instr": 200768.0,
-   "ext_tokens": 441812.16,
+   "ext_tokens": 443996.16,
    "note": "ROT16; includes 64 sincos table lookups/token (software in both)"
   },
   {
@@ -289,46 +289,46 @@
   }
  ],
  "T=512_total_nonlinear": {
-  "base_instr": 22839295.365,
-  "ext_instr": 9390515.0,
-  "base_tokens": 40829303.68655941,
-  "ext_tokens": 14716995.043559415
+  "base_instr": 24739384.5,
+  "ext_instr": 11028211.0,
+  "base_tokens": 45189357.61693069,
+  "ext_tokens": 18556135.158473283
  },
  "T=2048": [
   {
    "op": "RMSNorm (sumsq + scale*gain)",
    "elements": 144384,
-   "base_instr": 1782679.365,
-   "base_tokens": 2502564.5325,
-   "ext_instr": 1734795.0,
-   "ext_tokens": 2425296.0,
-   "note": "729 rsqrt scalars/token (RSQ replaces 69 instr by 3)"
+   "base_instr": 3082000.5,
+   "base_tokens": 5644431.75,
+   "ext_instr": 3034251.0,
+   "ext_tokens": 5567340.0,
+   "note": "729 rsqrt scalars/token (RSQ replaces 68 instr by 3)"
   },
   {
    "op": "SwiGLU silu(g)*u",
    "elements": 86016,
-   "base_instr": 5251008.0,
-   "base_tokens": 10235904.0,
-   "ext_instr": 913920.0,
-   "ext_tokens": 1569792.0,
+   "base_instr": 5604480.0,
+   "base_tokens": 10825920.0,
+   "ext_instr": 1257984.0,
+   "ext_tokens": 2166528.0,
    "note": "SIGM instruction"
   },
   {
    "op": "softmax over T=2048 (448 rows)",
    "elements": 917504,
-   "base_instr": 46391744.0,
-   "base_tokens": 85463008.59405941,
-   "ext_instr": 13245568.0,
-   "ext_tokens": 20669698.083559413,
+   "base_instr": 46397120.0,
+   "base_tokens": 84999179.30693069,
+   "ext_instr": 13191360.0,
+   "ext_tokens": 21009794.198473282,
    "note": "EXP2 instruction; log2e/sqrt(hd) folded into q weights"
   },
   {
    "op": "RoPE rotate (pairs)",
    "elements": 43008,
-   "base_instr": 732992.0,
-   "base_tokens": 1330364.16,
+   "base_instr": 974912.0,
+   "base_tokens": 2067548.16,
    "ext_instr": 200768.0,
-   "ext_tokens": 441812.16,
+   "ext_tokens": 443996.16,
    "note": "ROT16; includes 64 sincos table lookups/token (software in both)"
   },
   {
@@ -378,9 +378,9 @@
   }
  ],
  "T=2048_total_nonlinear": {
-  "base_instr": 57589759.365,
-  "ext_instr": 19298483.0,
-  "base_tokens": 104846711.68655941,
-  "ext_tokens": 30178371.043559413
+  "base_instr": 59489848.5,
+  "ext_instr": 20887795.0,
+  "base_tokens": 108851949.6169307,
+  "ext_tokens": 34259431.15847328
  }
 }
