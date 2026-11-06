@@ -1,0 +1,2 @@
+{"K": 230, "H": 2560, "I": 9216, "positions": 64, "dims_used": 2549, "stage_units": [["ROM", 9216], ["PRODUCT", 1840], ["DIGITIZE", 5152], ["LOSUM", 368]], "layers": 4, "rom_exact": true, "dot_exact": true, "max_digit_frac_err": 0.0, "max_digit": 105.0, "dot_range": 513495}
+{"K": 86, "H": 1024, "I": 3584, "positions": 64, "dims_used": 979, "stage_units": [["ROM", 3584], ["PRODUCT", 688], ["DIGITIZE", 2016], ["LOSUM", 144]], "layers": 4, "rom_exact": true, "dot_exact": true, "max_digit_frac_err": 0.0, "max_digit": 101.0, "dot_range": 193701}
