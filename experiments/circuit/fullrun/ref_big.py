@@ -18,7 +18,7 @@ KIND = dict(other=0, load=1, vdot=2, store=3, wb=4, ecall=5, branch=6, alu=7, di
 
 class Big(ref.Machine):
     def setup(self):
-        self.wbset = set(); self.kind = [0] * len(self.rom); self.dec = [None] * len(self.rom); self.inj = []; self.nbuf = lambda: 0
+        self.wbset = set(); self.kind = [0] * len(self.rom); self.dec = [None] * len(self.rom); self.inj = []; self.touch = {}; self.nbuf = lambda: 0
         for i, w in enumerate(self.rom):
             if w == 0: continue
             self.dec[i] = ref.decode(w); op = self.dec[i].op
@@ -32,13 +32,15 @@ class Big(ref.Machine):
             d = self.dec[i]
             if d is not None:
                 op = d.op
-                if op in MEMLOAD or op in ('SB', 'SH'):   # host-served memory word (aligned), circuit RAM slot = word index mod 8192
+                if op in MEMLOAD or op in ('SB', 'SH', 'SW'):   # host-served memory word (aligned), circuit RAM slot = word index mod 8192
                     ea = (self.x[d.rs1] + d.imm) & 0xFFFFFFFF
-                    ri = self.ram_index(ea)
-                    if ri is not None: w = self.ram[ri]
-                    else:
-                        w = self.drom_word(ea); w = 0 if w is None else w
-                    self.inj.append((self.nbuf(), 1, (ea >> 2) & 0x1FFF, w))
+                    self.touch[(ea >> 2) & 0x1FFF] = ea & ~3   # last-touched word address per circuit RAM slot (loads, stores): chained-run RAM readback check
+                    if op != 'SW':
+                        ri = self.ram_index(ea)
+                        if ri is not None: w = self.ram[ri]
+                        else:
+                            w = self.drom_word(ea); w = 0 if w is None else w
+                        self.inj.append((self.nbuf(), 1, (ea >> 2) & 0x1FFF, w))
                 elif op == 'VDOT':
                     self.inj.append((self.nbuf(), 2, (self.wb + i) & M27, 0))
         if self.n != S.N_MAX and i in self.wbset:
@@ -61,7 +63,11 @@ else:
     first = np.array([S.tok('GO')], dtype=np.uint32); ntok = 1
 def dump_state():
     # machine state at this record boundary (= the start of chunk `chunk`): enough to snapshot the circuit (no RAM: loads are host-served)
-    pickle.dump(dict(x=list(m.x), anchor=m.anchor, n=m.n, wb=m.wb, steps=m.steps, tok_start=ntok, halted=m.halted), open(f'{out}/state_{chunk:04d}.pkl', 'wb'))
+    tea = np.full(8192, -1, np.int64); tval = np.zeros(8192, np.int64)
+    for sl, ea in m.touch.items():
+        ri = m.ram_index(ea); w = m.ram[ri] if ri is not None else m.drom_word(ea)
+        tea[sl] = ea; tval[sl] = 0 if w is None else w
+    pickle.dump(dict(x=list(m.x), anchor=m.anchor, n=m.n, wb=m.wb, steps=m.steps, tok_start=ntok, halted=m.halted, bn=[list(r) for r in m.bn], touch_ea=tea, touch_val=tval), open(f'{out}/state_{chunk:04d}.pkl', 'wb'))
 CH = 1 << 21; buf = []; kbuf = []; nb = 0
 def flush():
     global chunk, buf, kbuf, nb
@@ -69,7 +75,7 @@ def flush():
     np.save(f'{out}/inj_{chunk:04d}.npy', np.array(m.inj, dtype=np.int64).reshape(-1, 4)); m.inj = []
     chunk += 1; buf = []; kbuf = []; nb = 0
     dump_state()
-    st = {k: getattr(m, k) for k in ('x', 'ram', 'bn', 'anchor', 'n', 'halted', 'steps', 'wb', 'out', 'fault', 'exit_code')}
+    st = {k: getattr(m, k) for k in ('x', 'ram', 'bn', 'anchor', 'n', 'halted', 'steps', 'wb', 'out', 'fault', 'exit_code', 'touch')}
     st.update(chunk=chunk, ntok=ntok, fam=fam); pickle.dump(st, open(ckp + '.tmp', 'wb')); os.replace(ckp + '.tmp', ckp)
 if chunk == 0 and not buf: buf.append(S.tok('GO')); kbuf.append(0); nb = 1; ntok = 1
 if chunk == 0: dump_state()
