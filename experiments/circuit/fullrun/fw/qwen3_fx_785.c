@@ -118,8 +118,13 @@ NOINL void mv(int32_t *out, uint32_t soff, int wb, int P, int R, int C, int32_t 
         int wbp = wb + p * (C / 64) * R * 8;
         for (int c = 0; c < C / 64; c++) {
             vk_x = xq + 64 * c;
-#ifdef WF   // weight fetch: weights come from the outer model's embedding rows (WROW), not the WROM. g = global VDOT word index; row = g / 480, slot = g % 480 (a1 = slot, a4 = row)
-            { int g = wbp + c * R * 8; if (c == 0) vk_init_raw(accs[p], g % 480, R, 0, g / 480); else vk_acc_raw(accs[p], g % 480, R, 0, g / 480); }
+#ifdef WF
+#ifndef ROWW
+#define ROWW 480
+#endif
+#endif
+#ifdef WF   // weight fetch: weights come from the outer model's embedding rows (WROW), not the WROM. g = global VDOT word index; row = g / ROWW, slot = g % ROWW (a1 = slot, a4 = row)
+            { int g = wbp + c * R * 8; if (c == 0) vk_init_raw(accs[p], g % ROWW, R, 0, g / ROWW); else vk_acc_raw(accs[p], g % ROWW, R, 0, g / ROWW); }
 #else
             if (c == 0) vk_init_raw(accs[p], wbp, R, 0, 0); else vk_acc_raw(accs[p], wbp + c * R * 8, R, 0, 0);
 #endif
