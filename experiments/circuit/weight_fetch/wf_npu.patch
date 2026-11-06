@@ -1,0 +1,293 @@
+--- a/chipformer/rv/core.py
++++ b/chipformer/rv/core.py
+@@ -54,7 +54,7 @@
+ OUT_NAMES = list(S.FAMILIES) + S.CONTROL_NAMES + ["Q"]
+ FAM_ID = {n: i for i, n in enumerate(OUT_NAMES)}
+ NFAM = (len(OUT_NAMES) - 1).bit_length()  # family id bits in the output code
+-NPAY = 16  # payload bits in the output code
++NPAY = 18  # payload bits in the output code (ROW needs 18)
+ OUT_W = 2.0**7  # head output weight of a one-hot read (as thead)
+ JMAX = 66  # longest record: a digit-file row op (63 digits, then its value)
+ CODE_AMP = 128  # a token's code in its (tied) embedding row: CODE_AMP * (2 * bit - 1)
+@@ -344,11 +344,68 @@
+     return 16, wp >> 6 & 1, wp & 63, wp >> 7 & 15
+ 
+ 
+-def build(target: Target | None = None, text=None) -> RvCore:
++def weight_fetch(c, W: int, wp, isROW) -> list:
++    """(weight fetch) The VDOT's 8 weight cells from the outer model's own parameters.
++
++    ROW(r)'s embedding is table row r: ROW_CELLS int4 cells as token features (no host data).
++    At the ROW position (the WROW record's last token) the next instruction's WP = D + w names
++    a window of W words (WP[7:logW] picks the window, ROW_CELLS / 8 / W windows):
++      select   MLP: cell c of the window = sum over windows of AND(window bits) x feature
++      unpack   MLP: the 4 bits of each selected int4 cell (thresholds)
++      latch    one DeltaNet head: the bits are written (beta = ROW) and read back, each word's
++               columns gated by WP[logW-1:0]; later VDOTs of the window read the same state
++    Returns the 8 weights w = u - 8 as linear forms (bits 2^b) for the VDOT multiplier."""
++    one = c.one
++    logW = W.bit_length() - 1
++    assert W == 1 << logW and 1 <= W <= 64
++    nwin = S.ROW_CELLS // S.WROM_CELLS // W
++    wbits_ = [lits_of(wp[logW:8], win) for win in range(nwin)]
++    wsel = []
++    for ci in range(S.WROM_CELLS * W):
++        terms = [t for win in range(nwin)
++                 for t in c.t_and(wbits_[win], 1, a=c.rowcell[win * S.WROM_CELLS * W + ci])]
++        wsel.append(c.node(terms, f"wf.sel{ci}"))
++    bits = [c.int_bits(wsel[ci], 15, f"wf.u{ci}", 4) for ci in range(S.WROM_CELLS * W)]
++    rb = [[c.token_feature(f"wf.rb{k}.{b}", lambda t: 0, full=True) for b in range(4)]
++          for k in range(S.WROM_CELLS)]  # the latch's output bits (heads add onto them)
++    nv = -(-W // 3)  # 3 words (96 data columns) per value head, 2 value heads per key head
++    for h in range(-(-nv // 2)):
++        vhs = []
++        for x in range(2 * h, min(nv, 2 * h + 2)):
++            v, z, outs, into = {}, {}, [], []
++            for col in REF_COLS:
++                v[col] = chan(one, A_REF)
++            for ii in range(3):
++                i = 3 * x + ii
++                if i >= W:
++                    break
++                ze = K * andpre(lits_of(wp[0:logW], i))
++                for k in range(S.WROM_CELLS):
++                    for b in range(4):
++                        col = 2 + 32 * ii + 4 * k + b
++                        v[col] = chan(bits[S.WROM_CELLS * i + k][b], A_BIT)
++                        z[col] = ze
++                        outs.append((col, OUT_W))
++                        into.append(rb[k][b])
++            vhs.append({"v": v, "z": z, "outs": outs, "into": into, "beta": isROW})
++        c.table(f"wlatch{h}", {0: one}, {0: one}, vhs, levels="bit")
++    return [sum((2**b * rb[k][b] for b in range(4)), Expr()) - 8 for k in range(S.WROM_CELLS)]
++
++
++def build(target: Target | None = None, text=None, wrow: int = 0) -> RvCore:
+     """The circuit; with ``text`` (P3) also the bridge to Qwen's text: a tool call's text goes
+     into a buffer the program reads (TEXT_ADDR), ``</tool_call>`` starts a run (GO), putchar
+     output is echoed as Qwen tokens, and the circuit owns the positions of a run."""
+     c = RvCore(target, text)
++    if wrow:  # (weight fetch) the table rows' cells ride in the ROW tokens' embeddings
++        def cell_fn(j):
++            def fn(t):
++                nm, p = famof(t)
++                tab = S.ROW_TABLE
++                return int(tab[p][j]) if nm == "ROW" and tab is not None and p < len(tab) else 0
++            return fn
++
++        c.rowcell = [c.token_feature(f"row.c{j}", cell_fn(j), full=True) for j in range(S.ROW_CELLS)]
+     no_text = c.is_text if text else 0  # text tokens do not count as tokens of a record
+     one, fam, pay, kk = c.one, c.fam, c.pay, c.kk
+     isV, isJR = fam["V"], fam["J"] + fam["R"]
+@@ -427,6 +484,7 @@
+     w1 = add_small(anchor, 1, 17, "w+1")  # the link: PC + 4 = ROM_BASE + 4 * (w + 1)
+     # VDOT's WROM word WP = D + w mod 2^15 (L3-4)
+     wp = add_nibbles(c, wbd + [Expr()], w[:16], 4, [], "wp")[:S.WP_BITS]
++    wf_cells = weight_fetch(c, wrow, wp, fam["ROW"]) if wrow else None  # (weight fetch) early: first pick of the free units / heads
+     assert S.ROM_BASE == 1 << 18 and S.ROM_WORDS == 1 << 16
+     pc_bits = [Expr(), Expr()] + w + [one] + [Expr()] * 13  # PC = 0x40000 + 4 w
+     link = [Expr()] * 2 + w1[:16] + [one - w1[16], w1[16]] + [Expr()] * 12
+@@ -1029,31 +1087,34 @@
+     # slot WP[10:7] when WP[14:11] = 15 in head 16. Created after the other heads so that it takes
+     # the free key heads of L5-6.
+     vd = uops["VDOT"]
+-    wdims = c.zeros(S.WROM_CELLS, "wrom.c")
+-    for h in range(17):
+-        hl = lits_of(wp[7:11], h) if h < 16 else []
+-        q = {}
+-        for p in range(64):
+-            e = andpre(lits_of(wp[0:6], p) + hl)
+-            q[p], q[p + 64] = e, e
+-        vhs = []
+-        for x in range(2):
+-            z, outs, into = {}, [], []
+-            for slot in range(15):
+-                sl = (lits_of(wp[11:15], slot) if h < 16
+-                      else lits_of(wp[11:15], 15) + lits_of(wp[7:11], slot))
+-                ze = K * andpre(sl + lits_of([wp[6]], x))
+-                for k in range(S.WROM_CELLS):
+-                    col = 2 + S.WROM_CELLS * slot + k
+-                    z[col] = ze
+-                    outs.append((col, OUT_W))
+-                    into.append(wdims[k])
+-            vhs.append({"v": {}, "z": z, "outs": outs, "into": into})
+-        c.table(f"wrom{h}", q, {}, vhs, levels="byte")
++    if wrow:
++        wdims = wf_cells
++    else:
++        wdims = c.zeros(S.WROM_CELLS, "wrom.c")
++        for h in range(17):
++            hl = lits_of(wp[7:11], h) if h < 16 else []
++            q = {}
++            for p in range(64):
++                e = andpre(lits_of(wp[0:6], p) + hl)
++                q[p], q[p + 64] = e, e
++            vhs = []
++            for x in range(2):
++                z, outs, into = {}, [], []
++                for slot in range(15):
++                    sl = (lits_of(wp[11:15], slot) if h < 16
++                          else lits_of(wp[11:15], 15) + lits_of(wp[7:11], slot))
++                    ze = K * andpre(sl + lits_of([wp[6]], x))
++                    for k in range(S.WROM_CELLS):
++                        col = 2 + S.WROM_CELLS * slot + k
++                        z[col] = ze
++                        outs.append((col, OUT_W))
++                        into.append(wdims[k])
++                vhs.append({"v": {}, "z": z, "outs": outs, "into": into})
++            c.table(f"wrom{h}", q, {}, vhs, levels="byte")
+     # L6: signed products of each lane's byte nibbles with its weight w = u - 8: a = lo + 16 hi
+     # (lo unsigned, hi signed), q0 = lo * w in [-120, 105], q1 = hi * w in [-56, 64]
+     acts = [A[8 * k:8 * k + 8] for k in range(4)] + [B[8 * k:8 * k + 8] for k in range(4)]
+-    wts = [256 * wdims[k] - 8 for k in range(S.WROM_CELLS)]
++    wts = [256 * wdims[k] - 8 for k in range(S.WROM_CELLS)] if not wrow else wdims
+ 
+     def sv(v):
+         return v - 16 if v >= 8 else v
+@@ -1281,6 +1342,8 @@
+     case([j2, ok, dotop, rdw_any], "F2", vres[30:32])
+     case(nr + [dotop, 1 - rdw_any], "NT")
+     case(nr + [wbop], "WB", wbd_out)
++    if wrow:
++        case(nr + [uops["WROW"]], "ROW", A[:S.ROW_BITS])
+     # a fault: FLT(cause), the PC's 8 hex digits (most significant first), HALT
+     case([j0, one - at_max, any_fault], "FLT", cause)
+     for k in range(8):
+@@ -1442,7 +1505,22 @@
+     for h, vh in enumerate(_ROM_CACHE["drom"]):
+         c.tables[f"drom{h}"].init = vh
+     for h, vh in enumerate(_ROM_CACHE["wrom"]):
+-        c.tables[f"wrom{h}"].init = vh
++        if f"wrom{h}" in c.tables:
++            c.tables[f"wrom{h}"].init = vh
++    if "wlatch0" in c.tables:  # (weight fetch) the latched window
++        W = max(len(m.latch), 1)
++        for h in range(-(-(-(-W // 3)) // 2)):
++            vhs = []
++            for x in range(2 * h, min(-(-W // 3), 2 * h + 2)):
++                row = np.zeros(HD)
++                row[list(REF_COLS)] = A_REF
++                for ii in range(3):
++                    i = 3 * x + ii
++                    for k in range(S.WROM_CELLS if i < len(m.latch) else 0):
++                        for b in range(4):
++                            row[2 + 32 * ii + 4 * k + b] = A_BIT * (m.latch[i][k] >> b & 1)
++                vhs.append({0: row})
++            c.tables[f"wlatch{h}"].init = vhs if m.latch else None
+     for port in (1, 2):
+         for h in range(4):
+             vh = []
+--- a/chipformer/rv/ref.py
++++ b/chipformer/rv/ref.py
+@@ -68,7 +68,7 @@
+         "MUL", "MULH", "MULHSU", "MULHU", "DIV", "DIVU", "REM", "REMU",
+         "SH1ADD", "SH2ADD", "SH3ADD"]
+ CUSTOM = {"BMAC": 64, "BMSB": 65, "BLD": 66, "BGET": 67, "BPRD": 68,
+-          "BSCAN": 69, "VDOT": 70, "WB": 71, "SMAQA": 72}  # uops 64..127: custom
++          "BSCAN": 69, "VDOT": 70, "WB": 71, "SMAQA": 72, "WROW": 73}  # uops 64..127: custom
+ CSR_STUBS = {0xC00: 0, 0xC01: 0, 0xC02: 0, 0xC80: 0, 0xC81: 0, 0xC82: 0, 0xF14: 0,
+              0x301: S.MISA}  # cycle, time, instret (+h), mhartid, misa
+ U = {n: i for i, n in enumerate(UOPS)} | CUSTOM
+@@ -149,6 +149,8 @@
+         return Inst("VDOT", rd, rs1, rs2)
+     if opc == 0x0B and f3 == 6 and f7 == 0 and rd == 0 and rs2 == 0:
+         return Inst("WB", 0, rs1)
++    if opc == 0x0B and f3 == 6 and f7 == 1 and rd == 0 and rs2 == 0:
++        return Inst("WROW", 0, rs1)
+     if opc == 0x0B and f3 == 7 and f7 == 0:
+         return Inst("SMAQA", rd, rs1, rs2)
+     if opc == 0x2B and f3 == 0:
+@@ -417,6 +419,12 @@
+     bn: list = field(default_factory=lambda: [[0] * 128 for _ in range(8)])  # the digit file
+     wrom: bytes = b""  # the weight memory, one cell (u = w + 8, low nibble) per byte
+     wb: int = 0  # the weight base D
++    # (weight fetch) rowtab: uint8 [rows, ROW_CELLS] table in the outer model's parameters, or None
++    # (then VDOT reads the WROM). wrow_w: words kept by one WROW (the latch window); latch: the
++    # window's words, 8 cells each (as the circuit's DeltaNet latch holds them)
++    rowtab: object = None
++    wrow_w: int = 1
++    latch: list = field(default_factory=list)
+ 
+     @classmethod
+     def from_program(cls, prog, entry: int | None = None) -> "Machine":
+@@ -559,7 +567,14 @@
+         if op == "ILLEGAL":
+             return fault("illegal")
+         if op == "VDOT":
+-            return commit_rd(x[ins.rd] + vdot(a, b, self.wrom_cells(self.wb + self.anchor + self.n)))
++            return commit_rd(x[ins.rd] + vdot(a, b, self.vdot_cells(self.wb + self.anchor + self.n)))
++        if op == "WROW":
++            self.n += 1
++            r = a & ((1 << S.ROW_BITS) - 1)
++            wp = (self.wb + self.anchor + self.n) & ((1 << S.WP_BITS) - 1)  # the next word's WP
++            win = (wp & (S.ROW_CELLS // S.WROM_CELLS - 1)) // self.wrow_w
++            self.latch = [self.row_cells(r, win * self.wrow_w + i) for i in range(self.wrow_w)]
++            return [S.tok("ROW", r)]
+         if op == "SMAQA":
+             return commit_rd(x[ins.rd] + sum(sx(a >> 8 * k, 8) * sx(b >> 8 * k, 8) for k in range(4)))
+         if op == "WB":
+@@ -578,6 +593,20 @@
+             return commit_rd(alu(op, a, ins.imm & M32))
+         return commit_rd(alu(op, a, b))
+ 
++    def row_cells(self, r: int, slot: int) -> list[int]:
++        """The 8 cells of slot (word) of row r of the outer weight table (0 past the table)."""
++        t = self.rowtab
++        if t is None or r >= len(t):
++            return [0] * S.WROM_CELLS
++        return [int(t[r][S.WROM_CELLS * slot + k]) & 15 for k in range(S.WROM_CELLS)]
++
++    def vdot_cells(self, wp: int) -> list[int]:
++        """VDOT's 8 cells: the WROM word wp, or (weight fetch) the latched word wp mod window."""
++        if self.rowtab is None:
++            return self.wrom_cells(wp)
++        i = wp & (self.wrow_w - 1)
++        return self.latch[i] if i < len(self.latch) else [0] * S.WROM_CELLS
++
+     def wrom_cells(self, wp: int) -> list[int]:
+         """The 8 cells (0..15) of WROM word wp mod 2^15 (0 past the data)."""
+         o = S.WROM_CELLS * (wp & ((1 << S.WP_BITS) - 1))
+--- a/chipformer/rv/asm.py
++++ b/chipformer/rv/asm.py
+@@ -187,6 +187,8 @@
+                 emit(enc_r(0, reg(a[2]), reg(a[1]), 7, reg(a[0]), 0x0B))
+             elif op == "wb":  # rs1
+                 emit(enc_r(0, 0, reg(a[0]), 6, 0, 0x0B))
++            elif op == "wrow":  # rs1: fetch weight-table row x[rs1] (ROW token)
++                emit(enc_r(1, 0, reg(a[0]), 6, 0, 0x0B))
+             elif op == "bprd":  # dD, k
+                 emit(enc_i(val(a[1]), 0, 0, val(a[0]), 0x2B))
+             elif op in I_OPS:
+--- a/chipformer/rv/spec.py
++++ b/chipformer/rv/spec.py
+@@ -63,7 +63,7 @@
+ 
+ FAMILY_SIZES = [("V", 1 << 15), ("F0", 1 << 15), ("F1", 1 << 15), ("F2", 4), ("J", 1 << 16),
+                 ("R", 1 << 16), ("BYTE", 512), ("FLT", 8), ("HEX", 16), ("QS", 16), ("QD", 128),
+-                ("BD", 256), ("WB", 1 << 15)]
++                ("BD", 256), ("WB", 1 << 15), ("ROW", 1 << 18)]
+ FAMILIES = {}
+ _base = 0
+ for _n, _s in FAMILY_SIZES:
+@@ -73,7 +73,7 @@
+ CONTROL_NAMES = ["NT", "ST0", "ST1", "SS0", "SS1", "HALT", "GO", "SC"]
+ CONTROLS = {n: CTRL + i for i, n in enumerate(CONTROL_NAMES)}
+ VOCAB = CTRL + len(CONTROL_NAMES)
+-FINAL = {"F0", "F1", "F2", "J", "R", "BYTE", "NT", "ST0", "ST1", "SS0", "SS1", "HALT", "WB"}
++FINAL = {"F0", "F1", "F2", "J", "R", "BYTE", "NT", "ST0", "ST1", "SS0", "SS1", "HALT", "WB", "ROW"}
+ PAYLOAD_BITS = {n: (s - 1).bit_length() for n, s in FAMILY_SIZES}
+ 
+ FAULTS = ["illegal", "ebreak", "misaligned load", "misaligned store", "load out of range",
+@@ -87,6 +87,12 @@
+ # head 16 with slot WP[10:7] (< 15)
+ WROM_BASE, WROM_WORDS, WROM_CELLS = 0x100000, 15 * 2048 + 15 * 128, 8
+ WP_BITS = 15
++# (weight fetch) ROW(r): the CPU asks for row r of the outer model's weight table (an appended
++# block of embedding rows); the row's ROW_CELLS int4 cells ride in the token's embedding. ROW_TABLE
++# is the table (uint8 [rows, ROW_CELLS], u = w + 8), set by the host harness for the reference
++# and for the circuit's embedding features; rows beyond it read as zeros.
++ROW_BITS, ROW_CELLS = 18, 2048  # row id bits (<= 262,144 rows), cells per row = 256 words of 8
++ROW_TABLE = None
+ DATA_BASE = 0x100  # .data starts here (address 0 stays a null pointer)
+ SP_INIT = RAM_BASE + 4 * RAM_WORDS
+ N_MAX = 63  # the R refresh comes before the instruction when n == N_MAX
