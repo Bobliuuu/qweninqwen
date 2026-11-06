@@ -33,7 +33,7 @@ def mk(I, H, rows):               # rows: list of (gate{dim:coef}, up{dim:coef},
 
 def run(K, H=2560, I=9216, P=64, m=5):
     R = Res(H); n = math.ceil(math.log2(I))
-    ab = R.new('addr', 2 * n); car = R.new('car'); R.new('cst', 10)
+    ab = R.new('addr', 2 * n); car = R.new('car'); R.new('cst', H // 256)
     W = R.new('W', K); A = R.new('A', 8 * K)
     G = math.ceil(K / m); C = R.new('C', G * 8)
     chH = 18; nH = math.ceil(G / chH); HS = R.new('HS', 8 * nH)
@@ -44,7 +44,7 @@ def run(K, H=2560, I=9216, P=64, m=5):
     X = torch.zeros(P, H)
     for b in range(n):
         X[:, ab + b] = (addr >> b) & 1; X[:, ab + n + b] = 1 - ((addr >> b) & 1)
-    X[:, car] = SC; X[:, R.d['cst']:R.d['cst'] + 10] = 2.0 ** 18
+    X[:, car] = SC; X[:, R.d['cst']:R.d['cst'] + H // 256] = 2.0 ** 18
     for p in range(8): X[:, A + p * K:A + (p + 1) * K] = ((a_int >> p) & 1).float()
     X = X.to(DEV, DT); stats = []
     # --- stage 0: ROM  (gate z = G*(match) ; match => +16, else <= -16)

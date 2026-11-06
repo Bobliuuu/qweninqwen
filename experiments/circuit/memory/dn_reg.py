@@ -33,7 +33,7 @@ def dn_layer(X, Wqkv, Wz, Wb, Wa, Wo, normw, dk=128, dv=128, a_bias=-40.0):
 
 def run(H=2560, I=9216, P=64, K=32, nrows=64):
     n = math.ceil(math.log2(I)); dk = dv = 128
-    R = Res(H); ab = R.new('addr', 2 * n); car = R.new('car'); R.new('cst', 10)
+    R = Res(H); ab = R.new('addr', 2 * n); car = R.new('car'); R.new('cst', H // 256)
     fw = R.new('flag_w'); fr = R.new('flag_r'); rowc = R.new('rowc', nrows); W = R.new('W', K)
     V = 16.0
     # v layout: 2n rails (value V) + filler so that sum v^2 = dv * V^2 * 4 ... pick sumsq = 128*V^2
@@ -58,7 +58,7 @@ def run(H=2560, I=9216, P=64, K=32, nrows=64):
     # NOTE: q and k share the row-select dims; read vs write is set by flag_w/flag_r gating the row dims
     rows = torch.randint(0, nrows, (P,)); addr = torch.randint(0, I, (P,)); table = torch.randint(0, 16, (I, K))
     X = torch.zeros(P, 2, H)
-    X[:, :, car] = SC; X[:, :, R.d['cst']:R.d['cst'] + 10] = 2.0 ** 18
+    X[:, :, car] = SC; X[:, :, R.d['cst']:R.d['cst'] + H // 256] = 2.0 ** 18
     for b in range(n):
         X[:, 0, ab + b] = (addr >> b) & 1; X[:, 0, ab + n + b] = 1 - ((addr >> b) & 1)   # only at t0 (the write)
     X[:, 0, fw] = SC; X[:, 1, fr] = SC
