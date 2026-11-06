@@ -1,0 +1,65 @@
+{
+ "gpu": "NVIDIA A100-SXM4-40GB",
+ "runs": [
+  {
+   "name": "baseline11_wrom_chunk_N300",
+   "layers": 11,
+   "dims": 2957,
+   "trace_tokens": 449,
+   "steps_timed": 3000,
+   "ms_per_step": 0.2423284848531087,
+   "tok_per_s": 4126.630018778708,
+   "free_run_exact_over_trace": true
+  },
+  {
+   "name": "wf_W1_chunk_N300",
+   "layers": 12,
+   "dims": 6865,
+   "trace_tokens": 785,
+   "steps_timed": 3000,
+   "ms_per_step": 0.27756031354268396,
+   "tok_per_s": 3602.8205446100906,
+   "free_run_exact_over_trace": true
+  },
+  {
+   "name": "baseline11_wrom_chunk_N300",
+   "layers": 11,
+   "dims": 2957,
+   "trace_tokens": 454,
+   "steps_timed": 3000,
+   "ms_per_step": 0.2425374984741211,
+   "tok_per_s": 4123.07377742127,
+   "free_run_exact_over_trace": true
+  },
+  {
+   "name": "wf_W8_chunk_N300",
+   "layers": 12,
+   "dims": 7145,
+   "trace_tokens": 492,
+   "steps_timed": 3000,
+   "ms_per_step": 0.26467061042785645,
+   "tok_per_s": 3778.281231842999,
+   "free_run_exact_over_trace": true
+  },
+  {
+   "name": "baseline11_wrom_chunk_N600",
+   "layers": 11,
+   "dims": 2957,
+   "trace_tokens": 775,
+   "steps_timed": 3000,
+   "ms_per_step": 0.2430408000946045,
+   "tok_per_s": 4114.535500256527,
+   "free_run_exact_over_trace": true
+  },
+  {
+   "name": "wf_W16_chunk_N600",
+   "layers": 13,
+   "dims": 7465,
+   "trace_tokens": 833,
+   "steps_timed": 3000,
+   "ms_per_step": 0.27343861262003577,
+   "tok_per_s": 3657.1279762510267,
+   "free_run_exact_over_trace": true
+  }
+ ]
+}
