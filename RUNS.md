@@ -26,8 +26,8 @@
 | 2026-11-06 | Lambda A100 CPU | `gen_q3.py --hf` (HF Qwen3ForCausalLM fp64 with the dequantized weights vs numpy ref) | tokens equal (15/15 generated), teacher-forced logit max err 7.7e-7; logs/gen_q3_hf.log |
 | 2026-11-06 | Mac (CPU only, tiny) | `cd experiments/circuit/kernels && python run_all.py && python project.py` (Qwenputer npu-branch reference Machine, 22 bit-exact matvec kernels, 220x1024) | done: plain 8.0 tok/MAC -> VDOT blocked 0.163 (existing compiler kernel 0.180); proposed VDOT16 0.082, VDOTA16 0.071; results in experiments/circuit/kernels/README.md, res_kernels.json, res_projection.json |
 | 2026-11-06 | Modal CPU (ap-wZF3oE2b3muOu5Q2WOOC4a) | `modal_algo.py::main --job iss` (RV32IM+SMAQA/VDOT ISS matvec kernels, 192x1024) | done: 8.01 -> 0.159 instr/MAC, all bit-exact; experiments/circuit/algo/results/iss.json |
-| 2026-11-06 | Modal A100 (ap-nocBpoCBdmvy7IQRidec90) | `--job lmhead` exact lm-head pruning | queued |
-| 2026-11-06 | Modal A100 (ap-u3WtFSMu77qbOZDCuR8HED) | `--job quant` quantisation + block-zero study | queued |
+| 2026-11-06 | Modal A100 (ap-nocBpoCBdmvy7IQRidec90) | `--job lmhead` exact lm-head pruning | done: no MAC saving (fraction 1.000) |
+| 2026-11-06 | Modal A100 (ap-u3WtFSMu77qbOZDCuR8HED) | `--job quant` quantisation grid 1 | done: W8A8 per-token only 81% argmax agree; logs/ |
 | 2026-11-06 07:34-08:13 | AWS g5 A10G (gpuA) | same as the variant 1 audit with `--variant 0` | done: same 26 violations; driver maxrel bit-identical to variant 1 at all 6 steps; files in audit/results/variant0_gpuA |
 | 2026-11-06 08:17 | AWS g5 A10G (gpuA) | `experiments/circuit/nonlinear/capture_acts.py` then `test_real.py` (HF activations, 6 layers; kernels in RV32 interpreter) | done: per-op errors in nonlinear/README.md, res_real.json |
 | 2026-11-06 08:30-09:20 UTC | gpuB (A10G) | `bench_exec.py --wf 4 --wh 32 --batch 1..64`, `tune_warps.py`, `prof_steps.py` | B=1 4,350 tok/s with head 32 warps (+30%, exact); aggregate 21.5k tok/s at B=64 default warps; see experiments/circuit/engine/README.md |
@@ -40,3 +40,5 @@
 | 2026-11-06 10:20 UTC | gpuB (A10G) | bench_exec.py --wf 4 --wh 8 --batch 4,16,64 | exact; aggregate 11.9k / 19.0k / 21.95k tok/s |
 | 2026-11-06 11:00 UTC | gpuB (A10G) | `run_tuned.py q3.elf` (e2e firmware, 16 tokens, per-sublayer tuned fused executor) | exact, 708,920 steps, 141.9 s = 4,995 tok/s |
 | 2026-11-06 11:30 UTC | gpuB (A10G) | `capture_layers.py` + `bench_corrected.py` (corrected ROM+SELECT+MAC+acc, MEMORY_DESIGN s.10) | k=14 (110 layers): 1.078 ms/step on ROM_DOT tokens (928 tok/s), predicate skip 0.897 on others, graph-level skip 0.200; skip bit-exact for all 17 layers with P=2^ceil(log2(2 zmax+128)) |
+| 2026-11-06 | Modal A100 (ap-fBThed1pYehleksI46QqqO) | `--job lmshort` SVD shortlist head | done: no saving |
+| 2026-11-06 | Modal A100 (ap-tHRNr6w2lbtiE9EimUFLVs) | `--job quant` grid 2 (weight-only, per-group acts, mixed) | queued behind workspace GPU limit at handback |
