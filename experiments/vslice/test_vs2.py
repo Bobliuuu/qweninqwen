@@ -45,7 +45,9 @@ def run(c, prompt, ngen, dev, tag, toy=None):
     pr = Prog(S, c, plan, dev); init_steps(pr); rn.run(pr)
     seq = list(prompt); out = dict(tag=tag, d=c.d, D=S.D, layers=len(plan), steps=[])
     t00 = time.time()
-    for step in range(int(os.environ.get('NSTEPS', len(prompt) + ngen))):
+    free = os.environ.get('FREE') == '1'   # free-running: prompt prefill, then each next input is the outer model's own argmax
+    nsteps = len(prompt) + ngen - 1 if free else len(prompt) + ngen
+    for step in range(int(os.environ.get('NSTEPS', nsteps))):
         pr = Prog(S, c, plan, dev); token_program(pr, seq[step], step, Wd, emb)
         t0 = time.time()
         rn.stats.update(rows=0, build_s=0.0, run_s=0.0)
@@ -75,10 +77,17 @@ def run(c, prompt, ngen, dev, tag, toy=None):
         rec = dict(step=step, frames=pr.total, sec=time.time() - t0, build_s=rn.stats['build_s'], run_s=rn.stats['run_s'],
                    maxrel=err, outer_argmax=int(lg.argmax()), hf_argmax=int(rr.argmax()))
         out['steps'].append(rec); print(rec, flush=True)
+    if free:
+        with torch.no_grad():
+            hf = toy.generate(torch.tensor([list(prompt)]), max_new_tokens=ngen, do_sample=False)[0].tolist()
+        gen_outer = seq[len(prompt):len(prompt) + ngen]; gen_hf = hf[len(prompt):]
+        first_div = next((i for i, (a, b) in enumerate(zip(gen_outer, gen_hf)) if a != b), None)
+        out.update(free_running=True, gen_outer=gen_outer, gen_hf=gen_hf, first_divergence=first_div, match=(gen_outer == gen_hf))
+        print('FREE-RUNNING outer', gen_outer, 'HF greedy', gen_hf, 'match', gen_outer == gen_hf, 'first_divergence', first_div, flush=True)
     out['tokens'] = seq; out['maxrel_worst'] = max(s['maxrel'] for s in out['steps'])
     out['params_per_layer_M'] = None
     print(json.dumps({k: v for k, v in out.items() if k != 'steps'}), flush=True)
-    json.dump(out, open(f'res_vs2_{tag}.json', 'w'), indent=1)
+    json.dump(out, open(f'res_vs2_{tag}' + ('_free' if free else '') + '.json', 'w'), indent=1)
 
 if __name__ == '__main__':
     scale = sys.argv[1]; ngen = int(sys.argv[2]) if len(sys.argv) > 2 else 2
