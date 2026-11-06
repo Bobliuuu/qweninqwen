@@ -26,7 +26,9 @@ from tune_warps import W
 
 ap = argparse.ArgumentParser(); ap.add_argument('elf'); ap.add_argument('refdir'); ap.add_argument('out'); ap.add_argument('--chunks', required=True)
 ap.add_argument('--steps', type=int, default=0); ap.add_argument('--block', type=int, default=50000); ap.add_argument('--kinds', default=''); ap.add_argument('--tuned', default='autotune.json'); ap.add_argument('--forcewin', default=''); ap.add_argument('--wrom', default='')
-a = ap.parse_args(); os.makedirs(a.out, exist_ok=True)
+ap.add_argument('--chain', action='store_true', help='ONE continuous circuit run over consecutive chunks (no snapshot restore between chunks); compare circuit state to the reference snapshot at every chunk boundary')
+ap.add_argument('--handoff', action='store_true', help='like --chain, but at each boundary READ the circuit state back (regs, pc, n, wb, bn, 32KB RAM) and re-snapshot the circuit from that read-back state (hidden lag history reset, as a chunk restart)')
+a = ap.parse_args(); os.makedirs(a.out, exist_ok=True); CHAIN = a.chain or a.handoff
 chunks = [int(x) for x in a.chunks.split(',')]; B = len(chunks); forced_kinds = [int(x) for x in a.kinds.split(',') if x]
 
 @triton.jit
@@ -82,6 +84,17 @@ for ch in chunks:
     if a.steps: t, k = t[:a.steps], k[:a.steps]
     toks.append(t.astype(np.int64)); kinds.append(k); states.append(pickle.load(open(f'{a.refdir}/state_{ch:04d}.pkl', 'rb')))
 N = max(len(t) for t in toks)
+if CHAIN:
+    chunk_list, chunk_lens = list(chunks), [len(t) for t in toks]; assert chunk_list == list(range(chunk_list[0], chunk_list[0] + len(chunk_list))), 'chain needs consecutive chunks'
+    INJ, off = [], 0
+    for ci, ch in enumerate(chunk_list):
+        inj_ = np.load(f'{a.refdir}/inj_{ch:04d}.npy'); sh_ = 1 if ch == 0 else 0
+        inj_ = inj_[inj_[:, 0] - sh_ < chunk_lens[ci]].copy(); inj_[:, 0] = inj_[:, 0] - sh_ + off; INJ.append(inj_); off += chunk_lens[ci]
+    INJ = np.concatenate(INJ); bounds = np.cumsum(chunk_lens).tolist()
+    nxt_states = []
+    for ch in chunk_list:   # reference snapshot at the END of each chunk = start of chunk ch+1
+        p_ = f'{a.refdir}/state_{ch + 1:04d}.pkl'; nxt_states.append(pickle.load(open(p_, 'rb')) if os.path.exists(p_) else None)
+    toks, kinds, states, chunks = [np.concatenate(toks)], [np.concatenate(kinds)], [states[0]], [chunk_list[0]]; B = 1; N = len(toks[0]) + 1   # +1: the step that feeds the chunk's last token
 c = core.build()
 entry, segs = elf.segments(a.elf)
 text = [s for s in segs if s[0] == S.ROM_BASE][0][1]
@@ -125,8 +138,10 @@ for wi in range(8192):
     h = (wi & 15) | ((wi >> 12) << 4); x = wi >> 4 & 1; si, j = loc[f'ram{h}']; lut_ram[wi] = (sidx[si], j + x, wi >> 5 & 127)
 n_inj = np.zeros(B, np.int64); n_zone = np.zeros(B, np.int64)
 for r in range(B):
-    inj = np.load(f'{a.refdir}/inj_{chunks[r]:04d}.npy'); sh = 1 if chunks[r] == 0 else 0
-    inj = inj[inj[:, 0] - sh < len(toks[r])]; to = inj[:, 0] - sh
+    if CHAIN: inj = INJ; to = inj[:, 0]
+    else:
+        inj = np.load(f'{a.refdir}/inj_{chunks[r]:04d}.npy'); sh = 1 if chunks[r] == 0 else 0
+        inj = inj[inj[:, 0] - sh < len(toks[r])]; to = inj[:, 0] - sh
     m1 = inj[:, 1] == 1; q = inj[m1]; i1 = to[m1]; sl = lut_ram[q[:, 2]]
     I_kind[r, i1] = (1 << 3) | sl[:, 0]; I_base[r, i1] = sl[:, 1] * 16384 + sl[:, 2] * 128; I_dat[r, i1] = q[:, 3].astype(np.uint32).view(np.int32)
     m2 = inj[:, 1] == 2; q = inj[m2]; i2 = to[m2]; wp27 = q[:, 2]; wp = wp27 & 0x7FFF
@@ -177,6 +192,85 @@ if os.environ.get('DBG'):
     print('DBG step0 inject', dict(kind=kd, base=b0, cc=cc, data=hex(dt & 0xFFFFFFFF)), 'loc', loc.get('wrom0'), 'used', used, flush=True)
     Sx = Ss[sid]; print('S shape', tuple(Sx.shape), 'row dims', Sx[0].reshape(-1)[b0 + 0: b0 + 128].tolist()[:20], 'row+64', Sx[0].reshape(-1)[b0 + 8192: b0 + 8192 + 8].tolist(), flush=True)
     print('raw step0', int(RAW[0, 0]), S.name(int(RAW[0, 0])), 'ref', S.name(int(TREF[0, 0])), flush=True); sys.exit()
+
+if CHAIN:
+    # ================= chained run: one continuous circuit run over consecutive chunks; circuit state compared with the reference snapshot at each boundary =================
+    from chipformer.q35.ir import A_BIT, A_REF, HD, REF_COLS
+    THR = A_BIT / 2; idname = {id(v): k for k, v in c.tables.items()}; locall = {}
+    for si, st in enumerate(fr.ex.steps):
+        if st['kind'] != 'head': continue
+        j = 0
+        for nd in st['heads']:
+            nv = len(nd.vheads())
+            if id(nd) in idname: locall[idname[id(nd)]] = (si, j, nv)
+            j += nv
+    grab = lambda name: fr.ex.steps[locall[name][0]]['S'][0, locall[name][1]:locall[name][1] + locall[name][2]].float().cpu().numpy()
+    bit = lambda row, cols: sum(int(row[cc] > THR) << i for i, cc in enumerate(cols))
+    def extract():
+        """Everything the circuit itself holds at a record boundary, read back from its head states (no host involvement)."""
+        o = {}
+        o['anchor'] = bit(grab('pc')[0, 0], [2 + i for i in range(16)]); o['wb'] = bit(grab('wbase')[0, 0], [2 + i for i in range(S.WP_BITS)])
+        cnt = grab('count')[0, 0, 2]; o['n'] = int(round(-np.log2(cnt / A_BIT))) if cnt > 0 else None
+        o['j'] = float(grab('j')[0, 0, 2]); o['vcnt'] = float(grab('vcnt')[0, 0, 2])
+        for p in ('rs1', 'rs2', 'rd'):
+            R = grab(f'regs.{p}')[0]; o['x_' + p] = [0] + [bit(R[r], [c.reg_cols[i][0] for i in range(32)]) for r in range(1, 32)]
+        o['bn'] = []
+        for h in range(4):
+            for x in range(2): R = grab(f'bn1.{h}')[x]; o['bn'].append([bit(R[r], [2, 3, 4, 5]) for r in range(128)])
+        cache = {}; ram = np.zeros(S.RAM_WORDS, np.int64)
+        for wi in range(S.RAM_WORDS):
+            sd, jx, rw = (int(v) for v in lut_ram[wi])
+            if sd not in cache: cache[sd] = Ss[sd][0].float().cpu().numpy()
+            ram[wi] = bit(cache[sd][jx, rw], [2 + i for i in range(32)])
+        o['ram'] = ram
+        return o
+    def compare(o, rs):
+        d = {}
+        d['regs_rd_bad'] = [(r, o['x_rd'][r], rs['x'][r] & 0xFFFFFFFF) for r in range(1, 32) if o['x_rd'][r] != rs['x'][r] & 0xFFFFFFFF]
+        d['regs_rs1_bad'] = sum(o['x_rs1'][r] != rs['x'][r] & 0xFFFFFFFF for r in range(1, 32)); d['regs_rs2_bad'] = sum(o['x_rs2'][r] != rs['x'][r] & 0xFFFFFFFF for r in range(1, 32))
+        d['anchor'] = (o['anchor'], rs['anchor']); d['n'] = (o['n'], rs['n']); d['wb15'] = (o['wb'], rs['wb'] & 0x7FFF); d['wb_ref_full27'] = rs['wb']
+        d['wb_high12_lost'] = bool(rs['wb'] >> 15); d['pc_ok'] = o['anchor'] == rs['anchor'] and o['n'] == rs['n']; d['wb15_ok'] = o['wb'] == rs['wb'] & 0x7FFF
+        d['j_vcnt'] = (o['j'], o['vcnt'])
+        if 'bn' in rs: d['bn_bad'] = sum(o['bn'][k][r] != rs['bn'][k][r] for k in range(8) for r in range(128))
+        if 'touch_ea' in rs:
+            te, tv = rs['touch_ea'], rs['touch_val']; m_ = te >= 0; bad = np.nonzero(m_ & (o['ram'] != tv))[0]
+            d['ram_slots_touched'] = int(m_.sum()); d['ram_bad'] = int(len(bad)); d['ram_bad_first'] = [(int(i), hex(int(o['ram'][i])), hex(int(tv[i])), hex(int(te[i]))) for i in bad[:6]]
+            d['ram_untouched_nonzero'] = int(((~m_) & (o['ram'] != 0)).sum())
+        d['ok'] = (not d['regs_rd_bad']) and d['pc_ok'] and d['wb15_ok'] and d.get('ram_bad', 0) == 0
+        return d
+    bl = []; done = 0; cmp_ = 0; t0 = time.time(); log = open(a.out + '/chain_progress.log', 'a'); diverged = False
+    n_free0 = n_forced0 = nbad_free0 = nbad_forced0 = 0; first_bad0 = None
+    TT = len(toks[0])
+    def cmp_slice(lo, hi):
+        global n_free0, n_forced0, nbad_free0, nbad_forced0, first_bad0
+        if hi <= lo: return
+        m = MASK[0, lo:hi] != 0; neq = RAW[0, lo:hi] != TREF[0, lo:hi]; bf = neq & ~m
+        n_free0 += int((~m).sum()); n_forced0 += int(m.sum()); nbad_free0 += int(bf.sum()); nbad_forced0 += int((neq & m).sum())
+        if first_bad0 is None and bf.any(): first_bad0 = lo + int(bf.nonzero()[0, 0])
+    for bi, bnd in enumerate(bounds):
+        tgt = bnd + 1
+        while done < tgt:
+            k = min(a.block, tgt - done)
+            for _ in range(k): fr.graph.replay()
+            torch.cuda.synchronize(); done += k; cmp_slice(cmp_, min(done, bnd)); cmp_ = max(cmp_, min(done, bnd)); el = time.time() - t0
+            msg = f'[{"handoff" if a.handoff else "chain"}] step {done:,}/{tgt:,} (boundary {bi + 1}/{len(bounds)}, chunk {chunk_list[bi]}) {el:.0f}s {done/el:,.0f} tok/s; free {n_free0:,} mismatches {nbad_free0}, forced {n_forced0:,} raw-disagree {nbad_forced0:,}'
+            print(msg, flush=True); log.write(msg + '\n'); log.flush()
+            if first_bad0 is not None: break
+        if first_bad0 is not None:
+            fb = first_bad0; print(f'FIRST FREE-TOKEN MISMATCH at step {fb} (chunk {chunk_list[min(np.searchsorted(bounds, fb, side="right"), len(bounds) - 1)]}): ' + ' | '.join(f'{j}:{S.name(int(TREF[0,j]))}/{S.name(int(RAW[0,j]))}/f{int(MASK[0,j])}' for j in range(max(0, fb - 16), fb + 2)), flush=True); diverged = True; break
+        o = extract(); rstate = nxt_states[bi]
+        if rstate is None: print(f'boundary {bi + 1}: no reference snapshot (end of trace), circuit state: anchor {o["anchor"]} n {o["n"]} wb {o["wb"]}', flush=True); continue
+        d = compare(o, rstate); d['boundary_after_chunk'] = chunk_list[bi]; d['step'] = bnd; bl.append(d)
+        msg = f'BOUNDARY after chunk {chunk_list[bi]} (step {bnd:,}): ok={d["ok"]} regs_rd_bad={len(d["regs_rd_bad"])} (rs1 {d["regs_rs1_bad"]}, rs2 {d["regs_rs2_bad"]}) anchor/n {d["anchor"]}/{d["n"]} wb15 {d["wb15"]} ref_wb27 {d["wb_ref_full27"]} high12_lost={d["wb_high12_lost"]} j,vcnt {d["j_vcnt"]} bn_bad {d.get("bn_bad")} ram touched {d.get("ram_slots_touched")} bad {d.get("ram_bad")} untouched-nonzero {d.get("ram_untouched_nonzero")}'
+        print(msg, flush=True); log.write(msg + '\n'); log.flush()
+        if d['regs_rd_bad']: print('  rd mismatches (reg, circuit, ref):', d['regs_rd_bad'][:8], flush=True)
+        if d.get('ram_bad'): print('  ram mismatches (slot, circuit, ref, ref_ea):', d['ram_bad_first'], flush=True)
+        if a.handoff and bi + 1 < len(bounds):   # re-snapshot the circuit FROM ITS OWN READ-BACK STATE (rd copy of the regfile) and restart the chunk
+            mm = machine(dict(x=o['x_rd'], anchor=o['anchor'], n=o['n'] or 0, wb=o['wb'])); mm.ram = [int(v) for v in o['ram']]; mm.bn = [list(r) for r in o['bn']]
+            core.snapshot(c, mm); fr.load(0, S.tok('GO')); CTR.fill_(bnd); ICTR.fill_(bnd); done = bnd; torch.cuda.synchronize()
+    res = dict(mode='handoff' if a.handoff else 'chain', chunks=chunk_list, steps=TT, steps_run=done, seconds=time.time() - t0, tok_per_s=done / (time.time() - t0), free_tokens=n_free0, free_mismatches=nbad_free0,
+               first_free_mismatch=first_bad0, forced_tokens=n_forced0, forced_raw_disagreements=nbad_forced0, diverged=diverged, boundaries=bl, gpu=torch.cuda.get_device_name())
+    json.dump(res, open(a.out + f'/{res["mode"]}_{chunk_list[0]}_to_{chunk_list[-1]}.json', 'w'), indent=1, default=str); print(json.dumps(res, default=str), flush=True); sys.exit(0)
 while done < N:
     k = min(a.block, N - done)
     for _ in range(k): fr.graph.replay()
