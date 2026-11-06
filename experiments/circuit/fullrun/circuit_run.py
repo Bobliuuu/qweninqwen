@@ -251,7 +251,7 @@ if CHAIN:
         for wi in range(S.RAM_WORDS):
             sd, jx, rw = (int(v) for v in lut_ram[wi])
             if sd not in cache: cache[sd] = Ss[sd][0].float().cpu().numpy()
-            ram[wi] = bit(cache[sd][jx, rw], [2 + i for i in range(32)])
+            rowv = cache[sd][jx, rw]; ram[wi] = sum(int(rowv[2 + i] + rowv[34 + i] > THR) << i for i in range(32))   # word = block A (SW data, cols 2..33) + block B (SB/SH merged word, cols 34..65)
         o['ram'] = ram
         return o
     def compare(o, rs):
