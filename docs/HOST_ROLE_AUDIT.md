@@ -1,5 +1,7 @@
 # Host-role audit of `circuit_run.py`, and the cheapest honest home for the 0.6B weights
 
+**UPDATE 2026-11-06 (section 5 at the end): the RAM half of the LOAD/SB/SH host role has been removed on the remapped firmware, and the section 2 attribution of the injections was wrong. Read section 5 first; sections 1-4 are kept as the baseline they describe.**
+
 Tags: **[M]** measured (file cited), **[R]** read from code, **[E]** estimate. Written to be read by a strict reviewer. This is not the compiled route and the run below is not a completed circuit-route run.
 
 ## 1. What `circuit_run.py` is
@@ -17,7 +19,7 @@ Evidence: `logs/cr_out/result_*.json`, `logs/waves_cr_out.log`, code lines cited
 | Item | Who produces it | Strict-reviewer label |
 |---|---|---|
 | Next-token argmax, embedding of the circuit's own token, all register/ALU/MUL/DIV/branch/jump/PC/WB logic, load merge and sign-extension, VDOT arithmetic on its WROM cells, register write-back | the circuit (every token not masked is the circuit's argmax fed back) [R] | computed in the forward pass |
-| **Every LOAD/SB/SH result word** (about 1.0-1.2 M injections per 2.1 M-step segment, i.e. roughly one step in two; `waves_*.log` "injections per row") | host: `ref.Machine`'s memory word, written into the 32 KB RAM head state (slot = word index mod 8192) before the step [R: `_inject`, `ty==1`] | **HOST DECODE (oracle memory read).** Includes all inner activations, KV, accumulators spilled to RAM, and the weight/table blob in DROM. Anything the circuit stored earlier is never read back; the reference's value is. So an error cannot propagate through memory. |
+| **Every LOAD/SB/SH result word AND every VDOT weight word** ("injections per row" in `waves_*.log`, about 1.0-1.2 M per 2.1 M-step segment, is the SUM of both; section 5 shows 13 % of it is LOAD/SB/SH and 87 % is VDOT weights) | host: `ref.Machine`'s memory word, written into the 32 KB RAM head state (slot = word index mod 8192) before the step [R: `_inject`, `ty==1`] | **HOST DECODE (oracle memory read).** Includes all inner activations, KV, accumulators spilled to RAM, and the weight/table blob in DROM. Anything the circuit stored earlier is never read back; the reference's value is. So an error cannot propagate through memory. |
 | **Every VDOT weight operand** (8 int4 cells from the 596 MB `wrom.bin`) | host, written into WROM head state at WP mod 2^15 [R: `ty==2`] | **HOST DECODE (weights supplied from outside the model).** The WROM state holds 32,640 words = 261,120 nibbles, 0.044 % of 595,984,384. |
 | VDOT records whose WP mod 2^15 falls in the 128 unaddressable words | host: the **whole record's tokens (including the dot result) are replaced by reference tokens** (`MASK`) [R]. 3,200-4,096 steps per 2.1 M-step row, about 0.17 % [M] | **HOST DECODE (output forced).** Raw circuit prediction disagrees with the reference on 205-4,067 of ~3,500 forced tokens per row. |
 | **Injection schedule** (which step, which slot, which value) | host, precomputed from the reference trace (`inj_*.npy`) by step index, not derived from the circuit's own addresses [R] | **HOST DECODE (look-ahead).** The host knows the future and the circuit's own address computation is not what selects the data. |
@@ -60,3 +62,61 @@ What this does and does not show:
 1. Adopt the embedding-row ROM as the weight home (1.33 GB, 0.88 GB with a 6-bit unpack), outer = 4B, untied head. Next experiment: row fetch from a CPU register (print the row id), then one MAC pipeline on a fetched row, then VDOT-from-ROM replacing the injection of `ty==2`. That removes the weight host-role; the memory (LOAD) host-role remains and is the larger gap (about half of all steps).
 2. Until (1) and the RAM spill exist, label every `circuit_run.py` number "oracle-memory lock-step verification of the CPU datapath", never "Qwen3-0.6B on Qwenputer".
 3. Ruling needed from the owner: is an outer checkpoint whose parameters include a 0.9-1.3 GB weight table acceptable? If not, no stock-size option exists (state is 24x short).
+
+
+## 5. Update: the RAM role is removed from the host (remapped firmware), measured 2026-11-06
+
+Tags as above. Code: `experiments/circuit/ramown/ref_ram.py` (reference run that also models the circuit's own 8192-slot RAM and writes per-policy injection files), `experiments/circuit/fullrun/circuit_run.py` (`--ramimg`, `--inj`, `REALMAP=1`), firmware `ramown/fw_qwen3_ram.c` + `fw_rom.ld` (other agent; working set 18.2 KB peak live, `ramown/logs/addr_ramfw_ctx1.txt`). Logs: `ramown/logs/` (stats per chunk, circuit results).
+
+### 5.1 Correction to section 2
+
+The "about 1.0-1.2 M injections per 2.1 M-step segment" are LOAD/SB/SH **plus** VDOT. Counted separately on chunk 1 of the legacy (4 MB-map) firmware [M, `ramown/logs/ref0/stats_0001.json`]: 146,998 RAM-type (LOAD/SB/SH, 13 %) and 973,376 VDOT weight injections (87 %). The statement "roughly one step in two is a LOAD injection" was wrong; the dominant host role is the VDOT weight operand, not memory.
+
+### 5.2 The five gaps and what was done
+
+| Gap | Fix | Status |
+|---|---|---|
+| (b) chunk starts with empty circuit RAM | `ref_ram.py` dumps the RAM image at each chunk start (`ramimg_NNNN.npy`, the 4 MB image folded into 8192 slots); `circuit_run.py --ramimg` passes it to `core.snapshot` via `m.ram` | done; restored words are really used on the remapped firmware (chunk 1: 7,212 loads answered by the restored image) |
+| (c) SB/SH merge needs the old word | same restore + the circuit's own slot; the simulation injects the old word only if the circuit's slot differs from the true word | done; on the remapped firmware 4,096 / 6,144 / 1,024 SB/SH per chunk, 0 old-word injections |
+| (d) schedule injects loads the circuit already answers | `ref_ram.py` simulates the circuit's RAM slot array (SW writes, SB/SH merge, injection overwrites) and keeps only loads whose slot would hold the wrong word | done (policy F) |
+| (a) `in_ram := 1` aliases 4 MB into 8192 slots | not fixable by harness changes on the legacy firmware (14,306 of 14,307 remaining injections on chunk 1 are aliasing). Fixed by the remapped firmware: with the real 32 KB map `in_ram` is **not patched**; `REALMAP=1` only widens `in_drom` (see 5.4) | done for the remapped firmware |
+| firmware working set > 32 KB | other agent's `fw_qwen3_ram.c` (tiled matvec, streaming LM-head argmax, ctx-1 attention without KV) | landed, bit-exact vs the original on rvemu |
+
+### 5.3 Measured injection counts (chunks 0, 1, 2 of the 785-prompt trace; per 2.1 M-step chunk)
+
+Legacy firmware, 4 MB map, `in_ram := 1` (simulation of the circuit RAM; policy F = filtered; the circuit run of F on chunk 1 is in 5.5):
+
+| Chunk | LOAD/SB/SH injected, old schedule | filtered (F) | drop | of the remaining: blob / RAM-region | cause of every remaining one |
+|---|---|---|---|---|---|
+| 0 | 165,777 | 17,336 | 89.5 % | 8,510 / 8,826 | aliasing (15,144), cold (2,192) |
+| 1 | 146,998 | 14,307 | 90.3 % | 6,144 / 8,163 | aliasing (14,306), cold (1) |
+| 2 | 169,501 | 17,754 | 89.5 % | 6,464 / 11,290 | aliasing (17,754) |
+
+Remapped firmware, real 32 KB map, **no `in_ram` patch** (simulation `ramown/logs/refR2/`, circuit run in 5.5):
+
+| Chunk | LOAD/SB/SH old schedule | RAM-region injections now | loads served by circuit's own RAM | loads served from the restored image | blob (DROM-class) words injected | VDOT weight injections |
+|---|---|---|---|---|---|---|
+| 0 | 159,229 | **0** | 155,133 loads + 4,096 SB/SH | 0 | 8,700 | 879,204 |
+| 1 | 170,588 | **0** | 164,444 + 6,144 | 7,212 (+287 zero-init) | 6,093 | 955,804 |
+| 2 | 147,487 | **0** | 146,463 + 1,024 | 2,659 | 7,218 | 877,702 |
+
+Per-chunk host-served total on the remapped firmware (chunk 1): 955,804 VDOT weight cells + 6,093 blob words = 961,897, against 1,120,374 before (the old LOAD/SB/SH 146,998 plus VDOT 973,376). Real-DROM rodata loads (59-70 per chunk) are answered by the circuit's own DROM table.
+
+### 5.4 What the circuit run is (and the one core patch left)
+
+- RAM: `in_ram` is the shipped expression (EA[15:32] == 0), no aliasing, no fault masking; loads/stores in 0x100-0x8000 are the circuit's own.
+- The firmware also reads constants from a 624 MB blob at `0x10000000` (embedding row, norm weights, matvec scales, final norm). A real core faults on that address. For the run, `in_drom := not in_ram`, so those loads go to the circuit's DROM table (slot = word index mod 32768) and the host writes the blob word into the DROM head state before the load (injection type 3, `circuit_run.py`). That is a **constants/weight-memory host role, same class as the VDOT weight injection**, not a RAM role. The simulation checks that these injections never overwrite a real-DROM rodata word that is later read (0 `drom_need_real`).
+
+### 5.5 Circuit results (A100, `ssh lambda-final`)
+
+RESULTS_PLACEHOLDER
+
+### 5.6 What remains host-served after this change
+
+1. **VDOT weight operands**, 0.88-0.96 M injections per chunk (about 99 % of all remaining injections), plus 128 unaddressable WROM words (forced tokens, 0.17 %). Unchanged. Weight home = embedding-row ROM (section 3), prototype only.
+2. **DROM-class constants** (the blob: embedding row, norms, scales), 6-9 k words per chunk, injected into the circuit's DROM head state. Needs a ROM home (same decision as 1).
+3. **Chunk-start state**: registers, pc, `n`, `wb` (and now the RAM image) are restored from the reference machine at each chunk boundary; chunks are still independent, not chained circuit to circuit.
+4. **Look-ahead**: the injection schedule (which VDOT / blob word at which step) is still precomputed from the reference trace. The RAM schedule is now empty on the remapped firmware, so for RAM the question is moot.
+5. Unaddressable-WROM VDOT forcing (290,944 tokens over the full run).
+
+Removed: the LOAD/SB/SH host role for RAM (stack, activations, accumulators, SB/SH merge words) on the remapped firmware, in the measured chunks. Not shown: that the other 75 chunks behave the same (only chunks 0-2 were simulated/run), that the remapped firmware's full-run answer equals the legacy one is the other agent's claim (argmax 13 in `ramown` reference run), and the patched `in_drom` is still a bring-up patch.
