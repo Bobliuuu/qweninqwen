@@ -36,7 +36,10 @@ static inline uint32_t x_amxr(uint32_t rst) { uint32_t r; __asm__ volatile(".ins
 
 static int32_t x[DIM], xb[DIM], q32[QD], k32[KVD], v32[KVD], ao[QD], hg[HID], hu[HID], tmp[MAXN > VOCAB ? MAXN : VOCAB];
 static int16_t qh[QD] __attribute__((aligned(4))), kh[KVD] __attribute__((aligned(4)));
-static int8_t xq[MAXN + 64] __attribute__((aligned(4)));
+static int8_t xq[MAXN + 64] __attribute__((aligned(4))), xql[MAXN + 64] __attribute__((aligned(4)));
+#ifndef APL
+#define APL 1
+#endif
 static int32_t acc1[VOCAB > HID ? VOCAB : HID], acc2[VOCAB > HID ? VOCAB : HID];
 static int8_t kq[NL][MAXPOS][KVD] __attribute__((aligned(4)));
 static int32_t kmx[NL][MAXPOS][NKV], vmx[NL][MAXPOS][NKV];
@@ -105,31 +108,42 @@ NOINL void rms(int32_t *o, const int32_t *in, const int32_t *g, int n, int log2n
 // ---------------- dynamic int8 activation quantisation ----------------
 NOINL int32_t quantize(const int32_t *v, int n) {
     int32_t amax = 1; for (int i = 0; i < n; i++) { int32_t a = v[i] < 0 ? -v[i] : v[i]; if (a > amax) amax = a; }
+#if APL == 1
     uint32_t r = 0x7F000000u / (uint32_t)amax;
     for (int i = 0; i < n; i++) xq[i] = (int8_t)(((i64)v[i] * r + (1 << 23)) >> 24);
+#else   // 16-bit activations as two signed base-256 digit planes: q = hi*256 + lo, lo in [-128,127]
+    uint32_t r = 0x7F7F0000u / (uint32_t)amax;
+    for (int i = 0; i < n; i++) { int32_t q = (int32_t)(((i64)v[i] * r + (1 << 15)) >> 16); int32_t lo = ((q + 128) & 255) - 128; xql[i] = (int8_t)lo; xq[i] = (int8_t)((q - lo) >> 8); }
+#endif
     return amax;
 }
 
 // ---------------- matvec: out[r] = W_r . x  (Qin -> OQ), W = int4 planes via VDOT ----------------
-static int32_t acc3[VOCAB > HID ? VOCAB : HID];
+static int32_t accs_[6][VOCAB > HID ? VOCAB : HID];
 NOINL void mv(int32_t *out, uint32_t soff, int wb, int P, int R, int C, int32_t amax, int Qin, int OQ) {
-    int32_t *accs[3] = {acc1, acc2, acc3};
-    for (int p = 0; p < P; p++) {
-        int wbp = wb + p * (C / 64) * R * 8;
+    for (int ap = 0; ap < APL; ap++) for (int p = 0; p < P; p++) {
+        int wbp = wb + p * (C / 64) * R * 8; int32_t *ac = accs_[ap * 3 + p];
+        const int8_t *xs = ap == 0 ? xq : xql;
         for (int c = 0; c < C / 64; c++) {
-            vk_x = xq + 64 * c;
-            if (c == 0) vk_init_raw(accs[p], wbp, R, 0, 0); else vk_acc_raw(accs[p], wbp + c * R * 8, R, 0, 0);
+            vk_x = xs + 64 * c;
+            if (c == 0) vk_init_raw(ac, wbp, R, 0, 0); else vk_acc_raw(ac, wbp + c * R * 8, R, 0, 0);
         }
     }
-    i64 F = OQ >= Qin ? ((i64)amax << (OQ - Qin)) / 127 : ((i64)amax >> (Qin - OQ)) / 127;
+    int sh = 4 * P + 8 * APL + 10 - 31; if (sh < 0) sh = 0;
+    const int FB = 16, dv = (APL == 1 ? 127 : 32639);     // F carries FB extra fractional bits
+    i64 F = OQ + FB >= Qin ? ((i64)amax << (OQ + FB - Qin)) / dv : ((i64)amax >> (Qin - OQ - FB)) / dv;
+    F <<= sh;
     int kk = 0; while ((F >> kk) >= (1 << 30)) kk++;
     int32_t Fm = (int32_t)(F >> kk);
     const int32_t *s = BI(soff);
     for (int r = 0; r < R; r++) {
-        int32_t a = P == 1 ? acc1[r] : P == 2 ? (acc1[r] << 4) + acc2[r] : (acc1[r] << 8) + (acc2[r] << 4) + acc3[r];
+        i64 a64 = 0;
+        for (int ap = 0; ap < APL; ap++) for (int p = 0; p < P; p++) a64 += (i64)accs_[ap * 3 + p][r] << (4 * (P - 1 - p) + 8 * (APL - 1 - ap));
+        int32_t a = (int32_t)(a64 >> sh);
         int32_t sv = s[r], m = sv & ~31, e = sv & 31;
         int32_t t = (int32_t)(((i64)a * m) >> 31);
-        out[r] = (int32_t)((((i64)t * Fm) << kk) >> e);
+        i64 v = (i64)t * Fm; int sf = e + FB - kk;
+        out[r] = (int32_t)(sf >= 0 ? v >> sf : v << -sf);
     }
 }
 #define MVL(out, l, m, R, C, am, Qin, OQ) mv(out, SOFF[l][m], WBW[l][m], PLN[l][m], R, C, am, Qin, OQ)

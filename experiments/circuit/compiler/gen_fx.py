@@ -30,7 +30,7 @@ class Blob:
     def add(self, a, dt=np.int32):
         a = np.ascontiguousarray(a, dtype=dt); off = len(self.b); self.b += a.tobytes(); return off
 
-def gen(sd, cfg, prompt, outdir, wbits=4, ext=False, maxpos=None, dump=False, boost=None):
+def gen(sd, cfg, prompt, outdir, wbits=4, ext=False, maxpos=None, dump=False, boost=None, apl=1):
     """wbits: default weight bits (4/8/12); boost: {(layer, matname-substring): bits} overrides, e.g. {(27,'mlp'):12}"""
     boost = boost or {}
     D, NL, NH, NKV, HD, HID, V = (cfg[k] for k in ('hidden_size', 'num_hidden_layers', 'num_attention_heads', 'num_key_value_heads', 'head_dim', 'intermediate_size', 'vocab_size'))
@@ -64,6 +64,7 @@ def gen(sd, cfg, prompt, outdir, wbits=4, ext=False, maxpos=None, dump=False, bo
     h = f"""#pragma once
 {'#define EXT 1' if ext else ''}
 {'#define DUMP 1' if dump else ''}
+#define APL {apl}
 #define LM_PL {wbits // 4}
 #define DIM {D}
 #define NL {NL}
