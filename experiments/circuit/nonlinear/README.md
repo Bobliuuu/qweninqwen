@@ -78,3 +78,10 @@ At the executor's measured ~3.7k instr/s (L4, rv32.md) one token of this program
 * The WROM holds 32,640 words x 8 int4 = 261k weights; Qwen3-0.6B has 596M. Weight storage/streaming (the other agents' work) is the real blocker, not the nonlinears.
 * Sizing flag for the outer model: rv32.md says the Qwenputer P3 merge has hidden size 3968 and the standalone P2 core needs 2,816 dims (2,679 IR dims, overlayable only in part); this is wider than a stock small
   Qwen3.5 (the 0.8B has 1 value head per key head and the core needs 2 - rv32.md "Not done in P3"). "Stock size 0.8B/4B" and "exactly like Qwenputer" are not the same thing: needs a decision.
+
+## Cross-check against the compiler agent's measured full-model run (`experiments/circuit/compiler/res_full_q4v.json`)
+Their firmware (`fw/qwen3.c`, int4 VDOT matvec, glue in picolibc soft-float) executed Qwen3-0.6B for 4 positions in 2.60e9 instructions (6.5e8 per position). Their per-function
+breakdown shows the glue is almost all soft-float: `__mulsf3` 1.25e9, `__addsf3` 2.5e8, `__subsf3` 2.5e8, `__divsf3` 7.2e7, `expf` 3.8e7, compares/conversions ~1.4e8 (matvec itself 5.8e7 = 2%).
+So ~85-90% of their current instruction count is exactly the nonlinear/glue work priced here: replacing it with the fixed-point kernels of this directory is 1.1e7 (T=1) to 2.3e7 (T=512) instructions
+per token without extensions and 6e6 to 9e6 with them, i.e. ~30-60x fewer than their ~4.6e8 soft-float glue instructions per position (my T=1..512 vs their prompt positions 0..3). That swap has NOT been run end to end
+(accuracy of an all-fixed-point forward vs HF is untested; their run's position-0 argmax already differs from HF in q4v mode).
