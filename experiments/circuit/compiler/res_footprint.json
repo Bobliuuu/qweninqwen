@@ -1,0 +1,38 @@
+{
+ "need": {
+  "projection_weights": 440401920,
+  "embedding_lm_head_tied": 155582464,
+  "total_weights": 595984384,
+  "norm_floats": 65536,
+  "kv_values_per_position": 57344,
+  "scratch_floats": 14336
+ },
+ "qwenputer_wrom_int4_weights": 261120,
+ "ratio_need_over_have": 2282.41568627451,
+ "int4_bytes": 297992192,
+ "kv_int8_bytes_per_position": 57344,
+ "qwenputer_ram_bytes": 32768,
+ "capacity": {
+  "Qwen3.5-0.8B": {
+   "gdn_layers": 18,
+   "state_cells": 4718592,
+   "int4_weights_at_1bit_per_cell": 1179648,
+   "int4_weights_at_8bit_per_cell": 9437184,
+   "int4_weights_at_24bit_per_cell": 28311552,
+   "shortfall_vs_total_weights_best_case": 21.050925925925927,
+   "shortfall_vs_total_weights_8bit": 63.15277777777778,
+   "shortfall_vs_total_weights_1bit": 505.22222222222223
+  },
+  "Qwen3.5-4B": {
+   "gdn_layers": 24,
+   "state_cells": 12582912,
+   "int4_weights_at_1bit_per_cell": 3145728,
+   "int4_weights_at_8bit_per_cell": 25165824,
+   "int4_weights_at_24bit_per_cell": 75497472,
+   "shortfall_vs_total_weights_best_case": 7.894097222222222,
+   "shortfall_vs_total_weights_8bit": 23.682291666666668,
+   "shortfall_vs_total_weights_1bit": 189.45833333333334
+  }
+ },
+ "note": "state_cells = value_heads*128*128 per GDN layer; best case stores 24 exact bits per fp32 state cell (delta-rule overwrite); Qwenputer today uses 1 bit per cell, 12.5% of a chip layer's rows"
+}
