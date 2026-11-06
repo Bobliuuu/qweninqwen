@@ -16,6 +16,8 @@ A homage to [Qwenputer](https://github.com/divagr18/qwenputer), in which a CPU l
 
 </div>
 
+> **Scope (read before the numbers).** This repo has TWO routes to "Qwen inside Qwen". The **circuit route** (every inner operation, bit by bit, inside the outer model's weights and DeltaNet state, as in Qwenputer; the actual goal) is estimated at about **3.4e7 s (about 1.1 years) per token** and has **not been run end to end**; only its pieces were benchmarked (14.7 MAC/s on a real 896-element row, [`experiments/bench`](experiments/bench/RESULTS.md)). Everything measured below, including the 268.6 s token, is the faster **compiled route** (each inner op gets outer layers doing real fp32 matvecs; the host streams the inner weights in). It is a verified stepping stone, not the circuit-level result.
+
 > **Read this first.** One full token of the **real, unscaled Qwen3-0.6B** (28 layers, real weights, the full 151,936-token LM head, argmax computed in-model) runs inside a stock `Qwen3_5ForCausalLM` (1006 outer layers, D=40775, 293,068 frames) and matches Hugging Face. A 6-position run matches at every position. **Those are teacher-forced positions of one prompt, not free-running generation, and the host still does embedding lookup, flags, one-hot addresses, position ids, weight payloads, KV scratch truncation and the lm_head evaluation through 36 columns.** Free-running generation and the audit of the real driver are not done yet (status table below). The whole thing is ~4.5 minutes per token.
 
 ## Status board

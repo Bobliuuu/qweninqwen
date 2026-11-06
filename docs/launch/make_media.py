@@ -63,6 +63,24 @@ class Canvas:
         k = s.k; s.d.rounded_rectangle([x * k, y * k, (x + w) * k, (y + h) * k], radius=r * k, fill=fill, outline=line, width=max(1, int(lw * k)) if line else 0)
     def text(s, x, y, t, sz=20, fill=FG, bold=False, mono=False, anchor='la'):
         s.d.text((x * s.k, y * s.k), t, font=font(sz * s.k, bold, mono), fill=fill, anchor=anchor)
+    def boxtext(s, x, y, t, maxw, sz=16, fill=FG, bold=True, mono=False, minsz=9):
+        # centered text that must fit inside maxw: try one line, then two lines split at a space, shrinking the font as needed
+        def w_(tt, z): return s.d.textlength(tt, font=font(z * s.k, bold, mono)) / s.k
+        z = sz
+        while z >= minsz:
+            if w_(t, z) <= maxw: return s.text(x, y, t, z, fill, bold, mono, anchor='mm')
+            z -= 1
+        words = t.split(' ')
+        best = None
+        for z in range(int(sz), int(minsz) - 1, -1):
+            for i in range(1, len(words)):
+                a, b = ' '.join(words[:i]), ' '.join(words[i:])
+                if max(w_(a, z), w_(b, z)) <= maxw and (best is None or z > best[0] or (z == best[0] and abs(w_(a, z) - w_(b, z)) < best[3])):
+                    best = (z, a, b, abs(w_(a, z) - w_(b, z)))
+            if best and best[0] == z: break
+        if best:
+            z, a, b, _ = best; s.text(x, y - z * .62, a, z, fill, bold, mono, anchor='mm'); s.text(x, y + z * .62, b, z, fill, bold, mono, anchor='mm')
+        else: s.text(x, y, t, minsz, fill, bold, mono, anchor='mm')
     def line(s, pts, fill=MUT, w=2):
         s.d.line([(x * s.k, y * s.k) for x, y in pts], fill=fill, width=max(1, int(w * s.k)), joint='curve')
     def arrow(s, pts, fill=MUT, w=2.5, head=11):
@@ -89,7 +107,7 @@ def sc_title(c, p):
     a = ease(seg(p, 0, .25)); b = ease(seg(p, .2, .5)); d = ease(seg(p, .45, .8))
     c.text(640, 250, 'Qwen inside Qwen', 84, fade(FG, a), True, anchor='mm')
     c.text(640, 330, 'a real Qwen3-0.6B token, executed by the weights', 28, fade(MUT, b), anchor='mm')
-    c.text(640, 366, 'and recurrent state of a stock Qwen3.5 model', 28, fade(MUT, b), anchor='mm')
+    c.text(640, 366, 'and recurrent state of an unmodified Qwen3.5-architecture model', 28, fade(MUT, b), anchor='mm')
     c.text(640, 470, f'{LAYERS} outer layers  |  full {151936:,}-token head  |  argmax computed in-model', 22, fade(BLUE, d), anchor='mm')
     foot(c, 'explainer  |  mechanism panels are illustrations; numbers come from the repo logs')
 
@@ -99,11 +117,11 @@ def sc_idea(c, p):
     c.rect(60, 140, 420, 330, fade(PANEL, a * 1), fade(YEL, a), lw=3)
     c.text(270, 168, 'INNER  (the program)', 24, fade(YEL, a), True, anchor='mm')
     for i, t in enumerate(['real Qwen3-0.6B weights', '28 layers, d = 1024', 'vocab 151,936', 'RMSNorm, RoPE, GQA, SwiGLU']):
-        c.text(270, 225 + i * 44, t, 21, fade(FG, a), anchor='mm')
+        c.boxtext(270, 225 + i * 44, t, 390, 21, fade(FG, a), False)
     c.rect(800, 140, 420, 330, fade(PANEL, b), fade(BLUE, b), lw=3)
     c.text(1010, 168, 'OUTER  (the machine)', 24, fade(BLUE, b), True, anchor='mm')
-    for i, t in enumerate(['stock Qwen3_5ForCausalLM', f'fp32, {LAYERS} layers, D = {DDIM:,}', 'DeltaNet + MLP + attention', 'code unpatched, only weights written']):
-        c.text(1010, 225 + i * 44, t, 21, fade(FG, b), anchor='mm')
+    for i, t in enumerate(['stock Qwen3_5 class, custom size', f'fp32, {LAYERS} layers, D = {DDIM:,}', 'DeltaNet + MLP + attention', 'code unpatched; every weight written']):
+        c.boxtext(1010, 225 + i * 44, t, 390, 21, fade(FG, b), False)
     if m > 0:
         x1 = 490 + (790 - 490) * ease(m)
         c.arrow([(490, 305), (x1, 305)], fade(GRN, 1), 4)
@@ -155,7 +173,7 @@ def sc_pipeline(c, p):
         on = clamp(1 - abs(pos - i - .5) / 1.2)
         x = x0 + i * (bw + gap)
         c.rect(x, y0, bw, 92, mix(PANEL, col, .12 + .5 * on), mix(LINE, col, .4 + .6 * on), lw=2)
-        c.text(x + bw / 2, y0 + 46, t, 16, FG, True, anchor='mm')
+        c.boxtext(x + bw / 2, y0 + 46, t, bw - 14, 16)
         if i < len(BLOCKS) - 1: c.arrow([(x + bw, y0 + 46), (x + bw + gap, y0 + 46)], MUT, 2, 6)
     # overall chain
     chain = [('embed (host row)', MUT), ('inner layers x28', YEL), ('final norm', YEL), ('LM head: 594 blocks', BLUE), ('block + cross-block argmax', GRN), ('outer lm_head', MUT), ('token (host append)', MUT)]
@@ -164,7 +182,7 @@ def sc_pipeline(c, p):
     for i, (t, col) in enumerate(chain):
         x = 48 + i * (cw + 6 * 1.2) ; on = ease(seg(p, i / 7., (i + 1) / 7.))
         c.rect(x, cy, cw, 90, mix(PANEL, col, .1 + .5 * on), mix(LINE, col, .3 + .7 * on))
-        c.text(x + cw / 2, cy + 45, t, 15, FG, True, anchor='mm')
+        c.boxtext(x + cw / 2, cy + 45, t, cw - 14, 15)
         if i < len(chain) - 1: c.arrow([(x + cw, cy + 45), (x + cw + 7, cy + 45)], MUT, 2, 6)
     n = int(LAYERS * p) if p < 1 else LAYERS
     c.rect(48, 500, 1184, 14, PANEL, LINE, r=7, lw=1); c.rect(48, 500, max(14, 1184 * p), 14, BLUE, None, r=7)
@@ -244,7 +262,7 @@ def sc_tiers(c, p, title=True):
 
 # result / caveats ----------------------------------------------------------------------------------------
 def sc_result(c, p):
-    head(c, 'What is verified today', 'real Qwen3-0.6B, real weights, full 151,936 vocab head, in-model argmax, stock Qwen3_5ForCausalLM')
+    head(c, 'What is verified today', 'real Qwen3-0.6B, real weights, full 151,936 vocab head, in-model argmax, unmodified Qwen3_5ForCausalLM')
     cards = [(f'{HEAD["outer_argmax"]} == {HEAD["hf_argmax"]}', 'outer argmax equals\nHugging Face', GRN), (sci(HEAD['maxrel']), 'max relative logit error\n(position 0)', BLUE), (f'{HEAD["sec"]:.1f} s', 'per token, shared A100\nfp32, untuned', YEL)]
     for i, (big, small, col) in enumerate(cards):
         a = ease(seg(p, i * .18, i * .18 + .25)); x = 60 + i * 392
@@ -290,7 +308,7 @@ def sc_cost(c, p=1.0):
 # hero ---------------------------------------------------------------------------------------------------
 def sc_hero(c, p):
     c.text(640, 110, 'Qwen inside Qwen', 88, FG, True, anchor='mm')
-    c.text(640, 190, 'a real Qwen3-0.6B token, executed by the weights of a stock Qwen3.5 model', 26, MUT, anchor='mm')
+    c.text(640, 190, 'a real Qwen3-0.6B token, executed by the weights of an unmodified Qwen3.5-architecture model', 26, MUT, anchor='mm')
     n = 70; sweep = seg(p, .05, .72); y0, h = 250, 150
     cols = [YEL, BLUE, PUR, GRN, BLUE, YEL, BLUE, YEL, BLUE]
     for i in range(n):
@@ -318,7 +336,7 @@ def sc_demo_intro(c, p):
         x = 60 + i * 225; q = ease(seg(p, i * .08, i * .08 + .3))
         c.rect(x, 170, 205, 100, fade(PANEL, q), fade(YEL, q), lw=2); c.text(x + 102, 205, w.strip(), 28, fade(FG, q), True, anchor='mm'); c.text(x + 102, 245, f'id {t}', 18, fade(MUT, q), mono=True, anchor='mm')
     b = ease(seg(p, .5, .9))
-    for i, t in enumerate([f'inner: real Qwen3-0.6B (28 layers, d=1024, vocab 151,936)', f'outer: stock Qwen3_5ForCausalLM, fp32, {LAYERS} layers, D = {DDIM:,}', 'hardware: one shared A100; torch reference GDN; layer-major executor',
+    for i, t in enumerate([f'inner: real Qwen3-0.6B (28 layers, d=1024, vocab 151,936)', f'outer: unmodified Qwen3_5ForCausalLM (custom size), fp32, {LAYERS} layers, D = {DDIM:,}', 'hardware: one shared A100; torch reference GDN; layer-major executor',
                            f'per position: {FRAMES:,} frames. Each position takes ~4.5 minutes, so the demo is a time-lapse of the recorded run.']):
         c.text(60, 340 + i * 44, t, 22, fade(FG if i < 3 else YEL, b))
     foot(c, 'Replay of recorded results: experiments/vslice/logs/real_L28_gen.log and res_vs2_real151936_L28.json')
@@ -354,7 +372,7 @@ def sc_demo_final(c, p):
     foot(c, 'Replay of recorded results (experiments/vslice/logs/real_L28_gen.log). Not a live run.')
 
 # ----------------------------------------------------------------------------------------------------------
-EXPLAINER = [(sc_title, 4), (sc_idea, 9), (sc_memory, 12), (sc_pipeline, 11), (sc_tournament, 12), (lambda c, p: sc_tiers(c, p), 9), (sc_result, 9)]
+EXPLAINER = [(sc_hero, 7), (sc_title, 4), (sc_idea, 9), (sc_memory, 12), (sc_pipeline, 11), (sc_tournament, 12), (lambda c, p: sc_tiers(c, p), 9), (sc_result, 9)]
 DEMO = [(sc_demo_intro, 6)] + [((lambda i: lambda c, p: sc_demo_run(c, p, i))(i), 5) for i in range(6)] + [(sc_demo_final, 8)]
 FPS = 15
 
@@ -364,7 +382,7 @@ def frames(scenes, fps=FPS):
         for k in range(n):
             c = Canvas(); fn(c, k / (n - 1)); yield c.out((1280, 720))
 
-def square(im, headline='Qwen inside Qwen', sub='a real Qwen3-0.6B token executed by a stock Qwen3.5 model'):
+def square(im, headline='Qwen inside Qwen', sub='a real Qwen3-0.6B token executed by an unmodified Qwen3.5-architecture model'):
     c = Canvas(1080, 1080, 1.0); c.text(540, 70, headline, 54, FG, True, anchor='mm'); c.text(540, 125, sub, 22, MUT, anchor='mm')
     im2 = im.resize((1080, 607), Image.LANCZOS); c.im.paste(im2, (0, 236))
     c.text(540, 920, 'illustrations + replay of recorded logs | numbers from repo logs', 22, MUT, anchor='mm')
