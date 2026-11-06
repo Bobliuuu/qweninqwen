@@ -212,7 +212,7 @@ Reported in a findings file but without a result file in the repository (treat a
 
 ## Status by tier (detail)
 
-Circuit-route speed tiers (S0 naive to S6 multi-GPU) and verification ladder (C0 to C4): see [`docs/CIRCUIT_ROUTE_PLAN.md`](docs/CIRCUIT_ROUTE_PLAN.md).
+Circuit-route plan (Qwen3-0.6B as a program on the RV32IM CPU inside a real Qwen3.5-0.8B/4B, as in Qwenputer; tiers T0 literal to T6 scale-out): [`docs/CIRCUIT_ROUTE_PLAN.md`](docs/CIRCUIT_ROUTE_PLAN.md). This is a different thing from the compiled route measured above (a custom giant outer with real fp32 matvecs).
 
 | Tier | What runs inside the outer Qwen's weights | Status |
 |---|---|---|
