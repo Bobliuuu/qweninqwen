@@ -18,7 +18,12 @@ from chipformer.rv import core as _core0, elf, ref, fusedexec
 # BRING-UP circuit variant: the RAM address-range check is removed (in_ram := 1) so that loads/stores at the full model's addresses do not fault and still
 # commit (the circuit's 32 KB RAM cannot hold the model's data; host-served values are forced in). Nothing else in the compiled core changes.
 _src = open(_core0.__file__).read(); _old = 'in_ram = c.and_([1 - b for b in EA[15:32]], "in_ram")'
-assert _old in _src; _src = _src.replace(_old, 'in_ram = one')
+REALMAP = bool(os.environ.get('REALMAP'))   # REALMAP=1: firmware linked for the real 32 KB RAM map (ramown/fw_rom.ld). in_ram stays REAL (no aliasing, no fault-masking); only in_drom is widened so that
+# DROM-class loads (real 128 KB DROM, plus the 0x10000000 weight/table blob) are answered by the circuit's DROM table, whose slot (EA[16:2]) the host fills for blob words (constants, not RAM).
+if REALMAP:
+    _old2 = 'in_drom = c.and_([1 - b for b in EA[18:32]] + [EA[17]], "in_drom")'; assert _old2 in _src; _src = _src.replace(_old2, 'in_drom = 1 - in_ram')
+else:
+    assert _old in _src; _src = _src.replace(_old, 'in_ram = one')
 core = types.ModuleType('chipformer.rv.core_bringup'); core.__file__ = _core0.__file__; exec(compile(_src, 'core_bringup.py', 'exec'), core.__dict__)
 from chipformer.rv import spec as S
 import autotune_layers as AL
@@ -53,6 +58,9 @@ def _put(S, SV: tl.constexpr, bat, ty, b0, cc0, d):
         bit = ((d >> tl.maximum(dim - 2, 0)) & 1).to(tl.float32) * 128.0
         val = tl.where(dim < 2, 16777216.0, tl.where(dim < 34, bit, 0.0))
         tl.store(base + b0 + dim, val)
+    elif ty == 3:    # DROM word: 4 byte values in dims cc0..cc0+3 (cc0 = 2 + 32*half + 4*k)
+        lane = tl.arange(0, 4)
+        tl.store(base + b0 + cc0 + lane, ((d >> (8 * lane)) & 255).to(tl.float32))
     else:            # WROM word: 8 cells u in dims 2+cc (cc >= 63 in the row 64 below)
         lane = tl.arange(0, 8); cc = cc0 + lane
         off = b0 + tl.where(cc >= 63, 8192, 0) + 2 + cc
@@ -101,7 +109,7 @@ c = core.build()
 entry, segs = elf.segments(a.elf)
 text = [s for s in segs if s[0] == S.ROM_BASE][0][1]
 from chipformer.rv.asm import Program
-prog = Program([int.from_bytes(text[i:i + 4], 'little') for i in range(0, len(text), 4)], b'', {'_start': entry}, data_base=S.RAM_BASE, rodata=b'', wrom=b'')
+prog = elf.program(a.elf) if REALMAP else Program([int.from_bytes(text[i:i + 4], 'little') for i in range(0, len(text), 4)], b'', {'_start': entry}, data_base=S.RAM_BASE, rodata=b'', wrom=b'')
 def machine(stt, ch=None):
     m = ref.Machine.from_program(prog);
     if a.ramimg: m.ram = [int(v) for v in np.load(f'{a.refdir}/ramimg_{ch:04d}.npy')]
@@ -120,7 +128,7 @@ for r in range(B):
     F_fid[r, :len(t)] = torch.from_numpy(fid.astype(np.int32)); F_p[r, :len(t)] = torch.from_numpy(p.astype(np.int32)); TREF[r, :len(t)] = torch.from_numpy(t.astype(np.int32))
     MASK[r, :len(t)] = torch.from_numpy(np.isin(kinds[r], forced_kinds).astype(np.uint8))
 # ---- injection tables ----
-tabid = {id(v): k for k, v in c.tables.items() if k.startswith('ram') or k.startswith('wrom')}
+tabid = {id(v): k for k, v in c.tables.items() if k.startswith('ram') or k.startswith('wrom') or (REALMAP and k.startswith('drom'))}
 loc = {}                                                  # table name -> (sublayer step idx, first value-head index j)
 for si, st in enumerate(fr.ex.steps):
     if st['kind'] != 'head': continue
@@ -140,6 +148,11 @@ rl = lambda name, h, x: loc[f'{name}{h}'][1] + x
 lut_ram = np.zeros((8192, 3), np.int64)                   # slot -> (sublayer id, j, row)
 for wi in range(8192):
     h = (wi & 15) | ((wi >> 12) << 4); x = wi >> 4 & 1; si, j = loc[f'ram{h}']; lut_ram[wi] = (sidx[si], j + x, wi >> 5 & 127)
+lut_drom = np.zeros((32768, 4), np.int64)                 # DROM slot -> (sublayer id, base offset, row, dim offset)
+if REALMAP:
+    for ds in range(32768):
+        h = ds >> 11; x = (ds & 2047) >> 10; wl = ds & 1023; pp = wl >> 4; half = wl >> 3 & 1; kk = wl & 7
+        si, j = loc[f'drom{h}']; lut_drom[ds] = (sidx[si], (j + x) * 16384 + (pp + 64 * half) * 128, 0, 2 + 32 * half + 4 * kk)
 n_ramin = np.zeros(B, np.int64); n_inj = np.zeros(B, np.int64); n_zone = np.zeros(B, np.int64)
 for r in range(B):
     if CHAIN: inj = INJ; to = inj[:, 0]
@@ -148,6 +161,9 @@ for r in range(B):
         inj = inj[inj[:, 0] - sh < len(toks[r])]; to = inj[:, 0] - sh
     m1 = inj[:, 1] == 1; q = inj[m1]; i1 = to[m1]; sl = lut_ram[q[:, 2]]
     I_kind[r, i1] = (1 << 3) | sl[:, 0]; I_base[r, i1] = sl[:, 1] * 16384 + sl[:, 2] * 128; I_dat[r, i1] = q[:, 3].astype(np.uint32).view(np.int32)
+    m3 = inj[:, 1] == 3; q = inj[m3]; i3 = to[m3]
+    if len(q):
+        sl = lut_drom[q[:, 2]]; I_kind[r, i3] = (3 << 3) | sl[:, 0]; I_base[r, i3] = sl[:, 1]; I_cc[r, i3] = sl[:, 3]; I_dat[r, i3] = q[:, 3].astype(np.uint32).view(np.int32)
     m2 = inj[:, 1] == 2; q = inj[m2]; i2 = to[m2]; wp27 = q[:, 2]; wp = wp27 & 0x7FFF
     cells = wromf[(wp27[:, None] * 8 + np.arange(8)[None, :])].astype(np.uint32)
     packed = (cells << (4 * np.arange(8, dtype=np.uint32))[None, :]).sum(1).astype(np.uint32).view(np.int32)
