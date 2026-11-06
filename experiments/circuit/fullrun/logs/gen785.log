@@ -1,0 +1,2 @@
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]Loading weights:  44%|████▎     | 136/311 [00:00<00:00, 1344.13it/s]Loading weights:  88%|████████▊ | 275/311 [00:00<00:00, 1370.44it/s]Loading weights: 100%|██████████| 311/311 [00:00<00:00, 1391.15it/s]
+{"prompt": [785], "wbits": 4, "ext": false, "hf_argmax": [15846], "hf_gap": [0.13597679138183594], "blob_bytes": 624576256, "wrom_words": 74498048, "wrom_weights": 595984384}

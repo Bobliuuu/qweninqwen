@@ -1,0 +1,10 @@
+16,777,217 tokens 14,083,086 instr 177s (79,615 instr/s)
+33,554,433 tokens 28,141,574 instr 351s (80,146 instr/s)
+50,331,651 tokens 42,259,186 instr 525s (80,509 instr/s)
+67,108,868 tokens 56,342,981 instr 699s (80,591 instr/s)
+83,886,087 tokens 70,452,187 instr 873s (80,657 instr/s)
+100,663,303 tokens 84,509,550 instr 1047s (80,727 instr/s)
+117,440,525 tokens 98,518,031 instr 1220s (80,733 instr/s)
+134,217,742 tokens 113,279,747 instr 1411s (80,306 instr/s)
+150,994,958 tokens 128,693,369 instr 1621s (79,369 instr/s)
+{"trace_tokens": 162682048, "instructions_machine": 136877011, "instructions_by_final_tokens": 139205075, "refreshes": 4537, "families": {"V": 22930775, "F0": 101388469, "F1": 15821057, "F2": 2949195, "J": 5471901, "R": 4537, "BYTE": 4, "FLT": 0, "HEX": 0, "QS": 91376, "QD": 450284, "BD": 0, "WB": 2328064, "NT": 615016, "ST0": 5127500, "ST1": 5100092, "SS0": 202560, "SS1": 201216, "HALT": 1, "GO": 1, "SC": 0}, "out_hex": "0d000000", "argmax": 13, "fault": null, "exit_code": 0, "chunks": 78, "wall_s": 1718.553411245346}
