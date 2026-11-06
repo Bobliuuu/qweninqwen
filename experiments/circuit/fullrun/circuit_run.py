@@ -28,6 +28,13 @@ if REALMAP:
     _old2 = 'in_drom = c.and_([1 - b for b in EA[18:32]] + [EA[17]], "in_drom")'; assert _old2 in _src; _src = _src.replace(_old2, 'in_drom = 1 - in_ram')
 else:
     assert _old in _src; _src = _src.replace(_old, 'in_ram = one')
+# >>> WB27 (ramown/wb27/wb27.py, WB27=1): the circuit holds the 27-bit weight pointer itself (7-nibble WB adder + wbase_hi latch head); WB token, WROM path unchanged;
+# the --chain boundary readback then compares the circuit's wbase|wbase_hi<<15 with the reference's full 27-bit wb.
+WB27 = bool(os.environ.get('WB27'))
+if WB27:
+    for _p in (os.path.dirname(os.path.abspath(__file__)), os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'ramown', 'wb27')): sys.path.insert(0, _p)
+    import wb27 as _wb27; _src = _wb27.patch_core_src(_src)
+# <<< WB27
 core = types.ModuleType('chipformer.rv.core_bringup'); core.__file__ = _core0.__file__; exec(compile(_src, 'core_bringup.py', 'exec'), core.__dict__)
 from chipformer.rv import spec as S
 import autotune_layers as AL
@@ -150,7 +157,7 @@ def machine(stt, ch=None):
         if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
         return m
     if WF: m.wrow_w = 8; m.latch = [list(w) for w in stt.get('latch', [])]   # chunk-start snapshot of the latched 8-word window (host-seeded here; a chained run carries it itself)
-    m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF
+    m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF; m.wb27 = stt.get('wb27', stt['wb'])   # wb27: only read by the WB27 snapshot (wbase_hi init)
     if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
     return m
 core.snapshot(c, machine(states[0], chunks[0]))
@@ -287,6 +294,7 @@ if CHAIN:
             if sd not in cache: cache[sd] = Ss[sd][0].float().cpu().numpy()
             rowv = cache[sd][jx, rw]; ram[wi] = sum(int(rowv[2 + i] + rowv[34 + i] > THR) << i for i in range(32))   # word = block A (SW data, cols 2..33) + block B (SB/SH merged word, cols 34..65)
         o['ram'] = ram
+        if WB27: _wb27.extract_hi(o, grab, bit)   # WB27
         return o
     def compare(o, rs):
         d = {}
@@ -304,6 +312,7 @@ if CHAIN:
                 d['ram_bad_by_op'] = {k: int(len(bad[to_[bad] == v])) for k, v in (('load', 0), ('sb_sh', 1), ('sw', 2))}
             d['ram_untouched_nonzero'] = int(((~m_) & (o['ram'] != 0)).sum())
         d['ok'] = (not d['regs_rd_bad']) and d['pc_ok'] and d['wb15_ok'] and d.get('ram_bad', 0) == 0
+        if WB27: _wb27.compare_hi(o, rs, d); d['ok'] = d['ok'] and d['wb27_ok']   # WB27
         return d
     bl = []; done = 0; cmp_ = 0; t0 = time.time(); log = open(a.out + '/chain_progress.log', 'a'); diverged = False
     n_free0 = n_forced0 = nbad_free0 = nbad_forced0 = 0; first_bad0 = None
@@ -330,10 +339,11 @@ if CHAIN:
         d = compare(o, rstate); d['boundary_after_chunk'] = chunk_list[bi]; d['step'] = bnd; bl.append(d)
         msg = f'BOUNDARY after chunk {chunk_list[bi]} (step {bnd:,}): ok={d["ok"]} regs_rd_bad={len(d["regs_rd_bad"])} (rs1 {d["regs_rs1_bad"]}, rs2 {d["regs_rs2_bad"]}) anchor/n {d["anchor"]}/{d["n"]} wb15 {d["wb15"]} ref_wb27 {d["wb_ref_full27"]} high12_lost={d["wb_high12_lost"]} j,vcnt {d["j_vcnt"]} bn_bad {d.get("bn_bad")} ram touched {d.get("ram_slots_touched")} bad {d.get("ram_bad")} untouched-nonzero {d.get("ram_untouched_nonzero")} touched-by-op {d.get("ram_touched_by_op")} bad-by-op {d.get("ram_bad_by_op")}'
         print(msg, flush=True); log.write(msg + '\n'); log.flush(); json.dump(dict(boundaries=bl, free_tokens=n_free0, free_mismatches=nbad_free0, forced_tokens=n_forced0, step=done, seconds=time.time() - t0), open(a.out + '/chain_partial.json', 'w'), default=str)
+        if WB27: m_ = f'  WB27 boundary after chunk {chunk_list[bi]}: circuit wb27 {d["wb27"][0]} (wbase {o["wb"]}, wbase_hi {o["wb_hi"]}) ref wb {d["wb27"][1]} wb27_ok={d["wb27_ok"]}'; print(m_, flush=True); log.write(m_ + '\n'); log.flush()   # WB27
         if d['regs_rd_bad']: print('  rd mismatches (reg, circuit, ref):', d['regs_rd_bad'][:8], flush=True)
         if d.get('ram_bad'): print('  ram mismatches (slot, circuit, ref, ref_ea):', d['ram_bad_first'], flush=True)
         if a.handoff and bi + 1 < len(bounds):   # re-snapshot the circuit FROM ITS OWN READ-BACK STATE (rd copy of the regfile) and restart the chunk
-            mm = machine(dict(x=o['x_rd'], anchor=o['anchor'], n=o['n'] or 0, wb=o['wb'])); mm.ram = [int(v) for v in o['ram']]; mm.bn = [list(r) for r in o['bn']]
+            mm = machine(dict(x=o['x_rd'], anchor=o['anchor'], n=o['n'] or 0, wb=o['wb'], wb27=o.get('wb27', o['wb']))); mm.ram = [int(v) for v in o['ram']]; mm.bn = [list(r) for r in o['bn']]
             core.snapshot(c, mm); fr.load(0, S.tok('GO')); CTR.fill_(bnd); ICTR.fill_(bnd); done = bnd; torch.cuda.synchronize()
     res = dict(mode='handoff' if a.handoff else 'chain', chunks=chunk_list, steps=TT, steps_run=done, seconds=time.time() - t0, tok_per_s=done / (time.time() - t0), free_tokens=n_free0, free_mismatches=nbad_free0,
                first_free_mismatch=first_bad0, forced_tokens=n_forced0, forced_raw_disagreements=nbad_forced0, diverged=diverged, boundaries=bl, gpu=torch.cuda.get_device_name())
