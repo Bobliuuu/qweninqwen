@@ -1,0 +1,55 @@
+{
+ "model": "Qwen/Qwen3-0.6B",
+ "mode": "f32",
+ "prompt": [
+  785,
+  6722,
+  315
+ ],
+ "argmax_fw": [
+  15846,
+  315,
+  279
+ ],
+ "argmax_hf": [
+  15846,
+  315,
+  279
+ ],
+ "instr_per_pos": [
+  109707136804,
+  109994862759,
+  110004439408
+ ],
+ "instr_total": 329706439041,
+ "classes": "exit=0 instr=329706439041 alu=227043546233 mul=7171985974 div=2092596 load=23381055634 store=19729852038 branch=41356908565 jump=11020998001 custom=0",
+ "by_symbol": {
+  "matvec": 19676430993,
+  "rope": 3677184,
+  "argmax": 4102334,
+  "attn": 7022508,
+  "swiglu": 3614856,
+  "rmsnorm": 8321742,
+  "exit": 2,
+  "main": 1252846,
+  "sqrtf": 485199,
+  "expf": 28501898,
+  "__math_uflowf": 91,
+  "__math_oflowf": 13,
+  "memcpy": 4129272,
+  "memset": 2756544,
+  "__addsf3": 119709437635,
+  "__divsf3": 53817461,
+  "__gesf2": 9050844,
+  "__mulsf3": 188902591367,
+  "__subsf3": 156867290,
+  "__fixsfsi": 1828525,
+  "__floatsisf": 3023213,
+  "__clzsi2": 1129527220
+ },
+ "blob": {
+  "blob_bytes": 2384201216,
+  "wrom_words": 0,
+  "wrom_weights": 0
+ }
+}
