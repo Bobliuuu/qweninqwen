@@ -51,8 +51,8 @@ Details: `qweninqwen/merge.py`.
 | Check | Result |
 |---|---|
 | Checkpoint save / load roundtrip | 15 GB `model.safetensors`, `from_pretrained` then generate works in both modes |
-| fp32 exactness, inner vs standalone Qwen3-0.6B | max abs logit diff ~1e-4 (std ~1e-5), argmax identical |
-| fp32 exactness, outer vs untouched Qwen3.5-0.8B | max abs logit diff ~6e-5, argmax identical |
+| fp32 exactness, inner vs standalone Qwen3-0.6B | max abs logit diff 6.7e-5, argmax identical at all 147 positions, 32-token greedy text identical on 10/10 prompts |
+| fp32 exactness, outer vs untouched Qwen3.5-0.8B | max abs logit diff 6.1e-5, argmax identical at all 150 positions, 32-token greedy text identical on 10/10 prompts |
 | bf16 (A100), 10 prompts, top-1 where reference has a clear margin | 147/147 inner, 150/150 outer positions agree (`tests/test_merged.py`) |
 | Mutation: zero 12 inner MLPs | output collapses to `........`, so the inner weights do the work |
 | Speed (A100, HF eager, no fused kernels) | 11.4 tok/s nested vs 27.7 tok/s plain Qwen3-0.6B (v1 numbers) |
