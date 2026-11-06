@@ -26,7 +26,6 @@ Usage:
     print(g.report_text())
 Drivers may `from hostguard import reference, build, weight_prep, transport, validation_read` (no-ops when no guard is active).
 """
-import os
 import collections, contextlib, math, os, sys, json, traceback, threading
 import numpy as np
 import torch
@@ -179,7 +178,7 @@ def _is_lib(fn):
 
 
 class HostGuard(TorchDispatchMode):
-    def __init__(self, outer=None, mode="raise", stack_check=True, patch_numpy=True, name="run", exempt_frames=(), taint=True):
+    def __init__(self, outer=None, mode="raise", stack_check=True, patch_numpy=True, name="run", exempt_frames=(), taint=True, entry="model", digest=True):
         """outer: a specific outer model instance (else: any exact Qwen3_5ForCausalLM instance).
         mode: 'raise' (fail at first violation) or 'log' (collect all)."""
         super().__init__()
@@ -188,6 +187,11 @@ class HostGuard(TorchDispatchMode):
         from transformers.models.qwen3_5.modeling_qwen3_5 import Qwen3_5TextModel
         self.OuterCls = Qwen3_5ForCausalLM
         self.EntryCls = (Qwen3_5ForCausalLM, Qwen3_5TextModel)   # drivers call m(...) or m.model(...): both are outer forwards
+        self.entry, self.digest = entry, digest
+        if entry == "layer":      # layer-major executors drive individually built stock Qwen3_5DecoderLayer objects
+            from transformers.models.qwen3_5.modeling_qwen3_5 import Qwen3_5DecoderLayer, Qwen3_5TextRotaryEmbedding
+            self.EntryCls = self.EntryCls + (Qwen3_5DecoderLayer, Qwen3_5TextRotaryEmbedding)   # rotary: stock module fed position ids only
+            self.entry_calls = collections.Counter()
         self.outer = outer
         self.mode, self.stack_check, self.patch_numpy, self.name = mode, stack_check, patch_numpy, name
         self.taint = taint
@@ -244,6 +248,7 @@ class HostGuard(TorchDispatchMode):
 
     def _pre_hook(self, module, args):
         if self._is_outer(module):
+            if self.entry == "layer": self.entry_calls[type(module).__name__] += 1
             if self.depth == 0:
                 self.rounds += 1
                 kw = {}
@@ -252,12 +257,12 @@ class HostGuard(TorchDispatchMode):
                 except Exception:
                     pass
                 rb = collections.Counter(); n_pos = 0
-                if self.taint:
+                if self.taint and self.entry != "layer":
                     for k, v in list(enumerate(args)) + list(kw.items()):
                         if isinstance(v, torch.Tensor) and _is_tainted(v) and not (self._in_scope("validation")):
                             self._violate("outer-output-fed-back", f"forward arg {k}", self._user_caller(3)[0],
                                           "a tensor derived from outer activations is streamed as an outer input")
-                self._digest_round(args, kw)
+                if self.digest and self.entry != "layer": self._digest_round(args, kw)
                 for k, v in list(enumerate(args)) + list(kw.items()):
                     if isinstance(v, torch.Tensor):
                         rb[str(k)] += v.numel() * v.element_size()
@@ -551,7 +556,7 @@ class HostGuard(TorchDispatchMode):
                               for (k, r), d in self.scope_log.items()],
             "host_readbacks": [r for r in self.readbacks][:50], "n_host_readbacks": len(self.readbacks),
             "non_outer_hf_forwards_on_host": dict(self.other_hf_forward),
-            "round_digests": self.round_digests,
+            "round_digests": self.round_digests, "entry_calls": dict(getattr(self, "entry_calls", {})),
             "declared_frame_scopes": [{"kind": k, "frame": f, "ops": n} for (k, f), n in self.frame_scope_ops.items()],
             "violation_counts": dict(viol), "violations": self.violations[:100],
             "violation_groups": [{"kind": k[0], "op": k[1], "site": k[2], "count": n} for k, n in
@@ -563,6 +568,7 @@ class HostGuard(TorchDispatchMode):
         L = [f"=== HostGuard report [{r['name']}] mode={r['mode']} -> {'PASS' if r['PASS'] else 'FAIL'} ==="]
         L.append(f"outer rounds={r['outer_rounds(forward calls)']} steps={r['outer_steps(positions)']} "
                  f"bytes streamed={r['bytes_streamed_total']:,} {r['bytes_streamed_by_arg']}")
+        if r["entry_calls"]: L.append(f"stock-module calls driven by host: {r['entry_calls']}")
         L.append(f"ATen ops INSIDE outer forward: {r['ops_inside_outer_forward']:,} (top: "
                  + ", ".join(f"{k}:{v}" for k, v in list(r['outer_op_histogram'].items())[:8]) + ")")
         L.append(f"host ops allowed: {r['host_ops_allowed']}")

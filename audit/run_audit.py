@@ -2,7 +2,6 @@
   python run_audit.py [--mode raise|log] [--fast] [--out report.json] [--check-outer] driver.py [driver args...]
 The driver runs as __main__ (runpy).  Any exact transformers Qwen3_5ForCausalLM it calls is the 'outer'.
 Exit code 0 only if there were no violations (and, with --check-outer, the outer-is-real check passed)."""
-import os
 import sys, os, json, runpy, argparse, traceback
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hostguard import HostGuard, HostViolation
@@ -17,6 +16,7 @@ def main():
         "(kinds: weight_prep|transport|build|reference|validation). Declares that python function as an exempt scope without editing the agent's code; listed in report.")
     ap.add_argument("--variant", type=int, default=0, help="offset added to every torch/numpy/random seed (+env QIQ_VARIANT) so a "
         "second run draws different host data; use with compare_runs.py to detect host-injected data in the stream")
+    ap.add_argument("--entry", default="model", choices=["model", "layer"], help="layer: also treat stock Qwen3_5DecoderLayer calls as outer forwards (layer-major executors); layer->layer host moves are then allowed, host MATH on outer outputs still is not")
     ap.add_argument("driver"); ap.add_argument("rest", nargs=argparse.REMAINDER)
     a = ap.parse_args()
     if a.variant:
@@ -30,13 +30,13 @@ def main():
     drv = os.path.abspath(a.driver)
     sys.argv = [drv] + a.rest
     sys.path.insert(0, os.path.dirname(drv))
-    g = HostGuard(outer=None, exempt_frames=[tuple(x.split(":", 2)) for x in a.scope], mode=a.mode, stack_check=not a.fast, patch_numpy=not a.no_numpy_patch, name=os.path.basename(drv))
+    g = HostGuard(outer=None, entry=a.entry, exempt_frames=[tuple(x.split(":", 2)) for x in a.scope], mode=a.mode, stack_check=not a.fast, patch_numpy=not a.no_numpy_patch, name=os.path.basename(drv))
     seen = []
     import torch.nn.modules.module as tm
     import gc
     from transformers import Qwen3_5ForCausalLM
     def _see(m, args):
-        if g._is_outer(m) and all(m is not s for s in seen):
+        if a.entry == "model" and g._is_outer(m) and all(m is not s for s in seen):
             seen.append(m)
             if type(m) is not Qwen3_5ForCausalLM:      # keep the wrapping CausalLM alive (driver may drop it) for outer_check
                 for p in gc.get_objects():
