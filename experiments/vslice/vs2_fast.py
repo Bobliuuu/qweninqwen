@@ -36,22 +36,22 @@ SUBMODS = ['input_layernorm', 'post_attention_layernorm', 'mlp', 'mlp.gate_proj'
            'self_attn']
 
 
-def sparsify(layer):
+def sparsify(layer, fmt='coo'):
     """dense nn.Linear weights -> COO sparse weights (exact: only structural zeros are dropped)."""
     with torch.no_grad():
         for m in layer.modules():
             if isinstance(m, nn.Linear):
                 w = m.weight.data
-                m.weight = nn.Parameter(w.to_sparse(), requires_grad=False)
+                m.weight = nn.Parameter((w.to_sparse() if fmt == 'coo' else w.to_sparse_csr()), requires_grad=False)
                 del w
     return layer
 
 
 class FastRunner(Runner):
     def __init__(self, S, c, plan, P, dev='cuda', eps=1e-30, fastbuild=False, sparse=False, cache_layers=False, cache_pay=False, seg=2048,
-                 prof=False, kernprof=False, graph=False):
+                 prof=False, kernprof=False, graph=False, sparse_fmt='coo'):
         super().__init__(S, c, plan, P, dev=dev, eps=eps)
-        self.graph = graph; self.plans = {}; self.graphs = {}; self.goff = {}; self.Hs = None; self.pool = torch.cuda.graph_pool_handle() if dev == 'cuda' else None
+        self.graph = graph; self.sparse_fmt = sparse_fmt; self.plans = {}; self.graphs = {}; self.goff = {}; self.Hs = None; self.pool = torch.cuda.graph_pool_handle() if dev == 'cuda' else None
         self.fastbuild, self.sparse, self.cache_layers, self.cache_pay, self.seg, self.prof, self.kernprof = fastbuild, sparse, cache_layers, cache_pay, seg, prof, kernprof
         self.lcache = {}; self.paycache = {}; self.ph = Phase(dev, prof); self.sub = {}; self.kind_t = {}; self.kp_done = {}; self.kp_text = []
 
@@ -67,7 +67,7 @@ class FastRunner(Runner):
             else:
                 with torch.device(dev): layer = Qwen3_5DecoderLayer(cf, li).eval()
         compile_entry(layer, entry, self.D, self.c, self.S, self.P)
-        if self.sparse: layer = sparsify(layer)
+        if self.sparse: layer = sparsify(layer, self.sparse_fmt)
         if self.cache_layers: self.lcache[li] = layer
         return layer
 
