@@ -4,8 +4,12 @@
 
 **The smallest Qwen actually running inside a Qwen.**
 
-Qwen3-0.6B (all 28 layers, real weights) lives inside the real, pretrained Qwen3.5-0.8B,
+Qwen3-0.6B (all 28 layers, real weights) is **hosted** inside the real, pretrained Qwen3.5-0.8B,
 in a single checkpoint, executed by stock `Qwen3_5ForCausalLM` code. No patches, weights only.
+
+> **Read this:** this is the *fast, exact* variant (v1, "hosted"): the two models share one forward pass but never mix; the outer half idles while the inner runs.
+> It is **not** the Qwenputer-style version where the outer model's own DeltaNet weights *execute* the inner model's arithmetic.
+> That route (the original `reference/`, about a year per token) is being built as v3; see Roadmap.
 
 ![demo](assets/demo.gif)
 
@@ -77,6 +81,12 @@ tests/                  exactness tests
 assets/                 demo video, GIF, SVGs, recorded trace
 reference/              the original circuit-based nested-qwen lab
 ```
+
+## Roadmap
+
+- **v1 (this repo, done):** hosted, exact, fast.
+- **v2 (in progress):** recursive / multi-model packing into the same layers.
+- **v3 (in progress):** true nesting: a Qwen3.5 whose compiled DeltaNet/SwiGLU weights and state execute the inner Qwen's ops (extremely slow by design).
 
 ## Caveats
 
