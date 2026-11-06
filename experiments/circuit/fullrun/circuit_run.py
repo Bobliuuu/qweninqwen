@@ -35,6 +35,10 @@ ap.add_argument('--ramimg', action='store_true', help='restore the snapshot RAM 
 ap.add_argument('--inj', default='inj', help='injection file prefix in refdir: inj (all, legacy), injF (filtered), injB (blob-only), injN (no RAM injection)')
 ap.add_argument('--chain', action='store_true', help='ONE continuous circuit run over consecutive chunks (no snapshot restore between chunks); compare circuit state to the reference snapshot at every chunk boundary')
 ap.add_argument('--handoff', action='store_true', help='like --chain, but at each boundary READ the circuit state back (regs, pc, n, wb, bn, 32KB RAM) and re-snapshot the circuit from that read-back state (hidden lag history reset, as a chunk restart)')
+ap.add_argument('--reset0', action='store_true', help='chunk 0 starts from the PROGRAM ONLY (ref.Machine.from_program: reset registers/pc/n/wb, initial .data RAM), asserted equal to the reference state_0000 pickle; no host snapshot of state')
+ap.add_argument('--noforce', action='store_true', help='do NOT force (override) the tokens of VDOT records whose weights are in the 128 unaddressable WROM words: the circuit free-runs through them (first divergence is then measured)')
+ap.add_argument('--nodrom', action='store_true', help='drop all type-3 (DROM-class constant) injections')
+ap.add_argument('--novdot', action='store_true', help='drop all VDOT weight injections (type 2) and zone forcing')
 a = ap.parse_args(); os.makedirs(a.out, exist_ok=True); CHAIN = a.chain or a.handoff
 chunks = [int(x) for x in a.chunks.split(',')]; B = len(chunks); forced_kinds = [int(x) for x in a.kinds.split(',') if x]
 
@@ -102,7 +106,7 @@ if CHAIN:
     chunk_list, chunk_lens = list(chunks), [len(t) for t in toks]; assert chunk_list == list(range(chunk_list[0], chunk_list[0] + len(chunk_list))), 'chain needs consecutive chunks'
     INJ, off = [], 0
     for ci, ch in enumerate(chunk_list):
-        inj_ = np.load(f'{a.refdir}/inj_{ch:04d}.npy'); sh_ = 1 if ch == 0 else 0
+        inj_ = np.load(f'{a.refdir}/{a.inj}_{ch:04d}.npy'); sh_ = 1 if ch == 0 else 0
         inj_ = inj_[inj_[:, 0] - sh_ < chunk_lens[ci]].copy(); inj_[:, 0] = inj_[:, 0] - sh_ + off; INJ.append(inj_); off += chunk_lens[ci]
     INJ = np.concatenate(INJ); bounds = np.cumsum(chunk_lens).tolist()
     nxt_states = []
@@ -116,7 +120,12 @@ from chipformer.rv.asm import Program
 prog = elf.program(a.elf) if REALMAP else Program([int.from_bytes(text[i:i + 4], 'little') for i in range(0, len(text), 4)], b'', {'_start': entry}, data_base=S.RAM_BASE, rodata=b'', wrom=b'')
 def machine(stt, ch=None):
     m = ref.Machine.from_program(prog);
-    if a.ramimg: m.ram = [int(v) for v in np.load(f'{a.refdir}/ramimg_{ch:04d}.npy')]
+    if a.ramimg and not (a.reset0 and ch == 0): m.ram = [int(v) for v in np.load(f'{a.refdir}/ramimg_{ch:04d}.npy')]
+    if a.reset0 and ch == chunks[0] and ch == 0:   # step-0 state comes from the program alone
+        assert list(stt['x']) == list(m.x) and stt['anchor'] == m.anchor and stt['n'] == m.n == 0 and stt['wb'] == 0, 'reference state_0000 != program reset state'
+        if a.ramimg: assert all(int(v) == int(w) for v, w in zip(np.load(f'{a.refdir}/ramimg_{ch:04d}.npy'), m.ram)), 'ramimg_0000 != program initial RAM'
+        if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
+        return m
     m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF
     if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
     return m
@@ -165,10 +174,10 @@ for r in range(B):
         inj = inj[inj[:, 0] - sh < len(toks[r])]; to = inj[:, 0] - sh
     m1 = inj[:, 1] == 1; q = inj[m1]; i1 = to[m1]; sl = lut_ram[q[:, 2]]
     I_kind[r, i1] = (1 << 3) | sl[:, 0]; I_base[r, i1] = sl[:, 1] * 16384 + sl[:, 2] * 128; I_dat[r, i1] = q[:, 3].astype(np.uint32).view(np.int32)
-    m3 = inj[:, 1] == 3; q = inj[m3]; i3 = to[m3]
+    m3 = (inj[:, 1] == 3) & (not a.nodrom); q = inj[m3]; i3 = to[m3]
     if len(q):
         sl = lut_drom[q[:, 2]]; I_kind[r, i3] = (3 << 3) | sl[:, 0]; I_base[r, i3] = sl[:, 1]; I_cc[r, i3] = sl[:, 3]; I_dat[r, i3] = q[:, 3].astype(np.uint32).view(np.int32)
-    m2 = inj[:, 1] == 2; q = inj[m2]; i2 = to[m2]; wp27 = q[:, 2]; wp = wp27 & 0x7FFF
+    m2 = (inj[:, 1] == 2) & (not a.novdot); q = inj[m2]; i2 = to[m2]; wp27 = q[:, 2]; wp = wp27 & 0x7FFF
     cells = wromf[(wp27[:, None] * 8 + np.arange(8)[None, :])].astype(np.uint32)
     packed = (cells << (4 * np.arange(8, dtype=np.uint32))[None, :]).sum(1).astype(np.uint32).view(np.int32)
     sgrp = wp >> 11; ok = (sgrp < 15) | (((wp >> 7) & 15) < 15)
@@ -178,7 +187,7 @@ for r in range(B):
         I_kind[r, i2[n_]] = (2 << 3) | sidx[si]; I_base[r, i2[n_]] = (j + xx[n_]) * 16384 + pp[n_] * 128; I_cc[r, i2[n_]] = 8 * slot[n_]; I_dat[r, i2[n_]] = packed[n_]
     n_inj[r] = len(inj); n_ramin[r] = int((inj[:, 1] == 1).sum()); n_zone[r] = int((~ok).sum())
     fin_idx = np.nonzero(isfinal[toks[r]])[0]      # (computed once per row: was recomputed per forced word, quadratic for long chained rows)
-    for n_ in np.nonzero(~ok)[0]:      # unaddressable WROM words (WP mod 2^15 >= 32640): force the whole record
+    for n_ in ([] if a.noforce or a.novdot else np.nonzero(~ok)[0]):      # unaddressable WROM words (WP mod 2^15 >= 32640): force the whole record
         st0 = int(i2[n_]); en0 = int(np.searchsorted(fin_idx, st0)); MASK[r, st0:int(fin_idx[en0]) + 1] = 1
 if os.environ.get('NOVD'): I_kind[I_kind >> 3 == 2] = 0
 I_kind, I_base, I_cc, I_dat = (torch.from_numpy(x).to('cuda') for x in (I_kind, I_base, I_cc, I_dat)); ICTR = torch.zeros(B, dtype=torch.int32, device='cuda')
@@ -295,7 +304,7 @@ if CHAIN:
         if rstate is None: print(f'boundary {bi + 1}: no reference snapshot (end of trace), circuit state: anchor {o["anchor"]} n {o["n"]} wb {o["wb"]}', flush=True); continue
         d = compare(o, rstate); d['boundary_after_chunk'] = chunk_list[bi]; d['step'] = bnd; bl.append(d)
         msg = f'BOUNDARY after chunk {chunk_list[bi]} (step {bnd:,}): ok={d["ok"]} regs_rd_bad={len(d["regs_rd_bad"])} (rs1 {d["regs_rs1_bad"]}, rs2 {d["regs_rs2_bad"]}) anchor/n {d["anchor"]}/{d["n"]} wb15 {d["wb15"]} ref_wb27 {d["wb_ref_full27"]} high12_lost={d["wb_high12_lost"]} j,vcnt {d["j_vcnt"]} bn_bad {d.get("bn_bad")} ram touched {d.get("ram_slots_touched")} bad {d.get("ram_bad")} untouched-nonzero {d.get("ram_untouched_nonzero")} touched-by-op {d.get("ram_touched_by_op")} bad-by-op {d.get("ram_bad_by_op")}'
-        print(msg, flush=True); log.write(msg + '\n'); log.flush()
+        print(msg, flush=True); log.write(msg + '\n'); log.flush(); json.dump(dict(boundaries=bl, free_tokens=n_free0, free_mismatches=nbad_free0, forced_tokens=n_forced0, step=done, seconds=time.time() - t0), open(a.out + '/chain_partial.json', 'w'), default=str)
         if d['regs_rd_bad']: print('  rd mismatches (reg, circuit, ref):', d['regs_rd_bad'][:8], flush=True)
         if d.get('ram_bad'): print('  ram mismatches (slot, circuit, ref, ref_ea):', d['ram_bad_first'], flush=True)
         if a.handoff and bi + 1 < len(bounds):   # re-snapshot the circuit FROM ITS OWN READ-BACK STATE (rd copy of the regfile) and restart the chunk

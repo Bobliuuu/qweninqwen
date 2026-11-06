@@ -4,6 +4,8 @@
 Writes the exact trace (uint32 tokens, uint8 op-kind per token) in chunks + stats.  Resumable (ckpt.pkl).
 usage: ref_big.py ELF BLOB WROM OUTDIR [QP_RISCV_DIR]"""
 import sys, os, time, json, pickle, numpy as np
+WF = bool(os.environ.get('WF'))   # weight-fetch mode: firmware built with WF=1 (wrow before each VDOT window); VDOT weights come from the row table, no VDOT injections
+if WF: os.environ.setdefault('WF_ROW_CELLS', '3840')   # must be set before importing spec
 elf_path, blob_path, wrom_path, out = sys.argv[1:5]
 sys.path.insert(0, sys.argv[5] if len(sys.argv) > 5 else os.path.expanduser('~/qp/experimental/riscv'))
 from chipformer.rv import spec as S, ref, elf as E
@@ -13,6 +15,7 @@ S.RAM_BASE, S.RAM_WORDS = 0x1000000, 1 << 20; S.SP_INIT = S.RAM_BASE + 4 * S.RAM
 S.DROM_BASE, S.DROM_WORDS = 0x10000000, (len(blob) + 3) // 4
 S.WP_BITS = 27; S.WROM_WORDS = (len(wrom) + 7) // 8; S.WROM_BASE = 0x80000000
 M27 = (1 << 27) - 1
+from wf_table import build_table
 MEMLOAD = ('LB', 'LBU', 'LH', 'LHU', 'LW')
 KIND = dict(other=0, load=1, vdot=2, store=3, wb=4, ecall=5, branch=6, alu=7, div=8, smaqa=9, custom=10)
 
@@ -41,7 +44,7 @@ class Big(ref.Machine):
                         else:
                             w = self.drom_word(ea); w = 0 if w is None else w
                         self.inj.append((self.nbuf(), 1, (ea >> 2) & 0x1FFF, w))
-                elif op == 'VDOT':
+                elif op == 'VDOT' and not WF:
                     self.inj.append((self.nbuf(), 2, (self.wb + i) & M27, 0))
         if self.n != S.N_MAX and i in self.wbset:
             a = self.x[ref.decode(self.rom[i]).rs1]
@@ -54,10 +57,13 @@ class Big(ref.Machine):
 
 prog = E.program(elf_path)
 m = Big.from_program(prog); m.drom = blob; m.wrom = wrom; m.setup()
+if WF:
+    m.rowtab = build_table(wrom); m.wrow_w = 8; m.latch = []; print(f'row table {m.rowtab.shape} {m.rowtab.nbytes/1e6:.0f} MB', flush=True)
 ckp = out + '/ckpt.pkl'; chunk = 0; ntok = 0; t0 = time.time(); fam = {}
 if os.path.exists(ckp):
     st = pickle.load(open(ckp, 'rb')); chunk, ntok, fam = st.pop('chunk'), st.pop('ntok'), st.pop('fam')
     for k, v in st.items(): setattr(m, k, v)
+    if WF: m.rowtab = build_table(wrom); m.wrow_w = 8
     print(f'resumed at chunk {chunk} steps {m.steps}', flush=True)
 else:
     first = np.array([S.tok('GO')], dtype=np.uint32); ntok = 1
@@ -68,7 +74,7 @@ def dump_state():
         top[sl] = tk
         ri = m.ram_index(ea); w = m.ram[ri] if ri is not None else m.drom_word(ea)
         tea[sl] = ea; tval[sl] = 0 if w is None else w
-    pickle.dump(dict(x=list(m.x), anchor=m.anchor, n=m.n, wb=m.wb, steps=m.steps, tok_start=ntok, halted=m.halted, bn=[list(r) for r in m.bn], touch_ea=tea, touch_val=tval, touch_op=top), open(f'{out}/state_{chunk:04d}.pkl', 'wb'))
+    pickle.dump(dict(x=list(m.x), anchor=m.anchor, n=m.n, wb=m.wb, steps=m.steps, tok_start=ntok, halted=m.halted, latch=[list(w) for w in m.latch], bn=[list(r) for r in m.bn], touch_ea=tea, touch_val=tval, touch_op=top), open(f'{out}/state_{chunk:04d}.pkl', 'wb'))
 CH = 1 << 21; buf = []; kbuf = []; nb = 0
 def flush():
     global chunk, buf, kbuf, nb
@@ -76,7 +82,7 @@ def flush():
     np.save(f'{out}/inj_{chunk:04d}.npy', np.array(m.inj, dtype=np.int64).reshape(-1, 4)); m.inj = []
     chunk += 1; buf = []; kbuf = []; nb = 0
     dump_state()
-    st = {k: getattr(m, k) for k in ('x', 'ram', 'bn', 'anchor', 'n', 'halted', 'steps', 'wb', 'out', 'fault', 'exit_code', 'touch')}
+    st = {k: getattr(m, k) for k in ('x', 'ram', 'bn', 'anchor', 'n', 'halted', 'steps', 'wb', 'out', 'fault', 'exit_code', 'touch') + (('latch',) if WF else ())}
     st.update(chunk=chunk, ntok=ntok, fam=fam); pickle.dump(st, open(ckp + '.tmp', 'wb')); os.replace(ckp + '.tmp', ckp)
 if chunk == 0 and not buf: buf.append(S.tok('GO')); kbuf.append(0); nb = 1; ntok = 1
 if chunk == 0: dump_state()

@@ -33,3 +33,181 @@ Runner terminated.
 Runner terminated.
 Runner terminated.
 Runner terminated.
+Runner terminated.
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/modal_fr.py:33 │
+│ in main                                                                      │
+│                                                                              │
+│   32 │   cl = list(range(int(a), int(b) + 1)); extra = ('--steps', str(steps │
+│ ❱ 33 │   for r in FN[gpu].starmap([(c, extra) for c in cl]): print(json.dump │
+│   34                                                                         │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:858 in __iter__                                            │
+│                                                                              │
+│    857 │   │   │   with Runner() as runner:                                  │
+│ ❱  858 │   │   │   │   yield from run_async_gen(runner, self._async_iterable │
+│    859 │   │   except NestedEventLoops:                                      │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:940 in run_async_gen                                       │
+│                                                                              │
+│    939 │   │   │   else:                                                     │
+│ ❱  940 │   │   │   │   next_yield = runner.run(gen.asend(next_send))  # type │
+│    941 │   │   except KeyboardInterrupt as e:                                │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/asyncio/base_events.py:6 │
+│ 91 in run_until_complete                                                     │
+│                                                                              │
+│    690 │   │                                                                 │
+│ ❱  691 │   │   return future.result()                                        │
+│    692                                                                       │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:768 in asend                                               │
+│                                                                              │
+│    767 │   │   self.iterated = True                                          │
+│ ❱  768 │   │   return await self.gen.asend(value)                            │
+│    769                                                                       │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/para │
+│ llel_map.py:1063 in _starmap_async                                           │
+│                                                                              │
+│   1062 │   _maybe_warn_about_wrap_exceptions("starmap.aio", wrap_returned_ex │
+│ ❱ 1063 │   async for output in _map_helper(                                  │
+│   1064 │   │   self,                                                         │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/para │
+│ llel_map.py:1015 in _map_helper                                              │
+│                                                                              │
+│   1014 │   ) as map_output_stream:                                           │
+│ ❱ 1015 │   │   async for output in map_output_stream:                        │
+│   1016 │   │   │   yield output                                              │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1114 in async_merge                                        │
+│                                                                              │
+│   1113 │   │   │   │   │   assert_type(item, ExceptionWrapper)               │
+│ ❱ 1114 │   │   │   │   │   raise item.value                                  │
+│   1115                                                                       │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1093 in producer                                           │
+│                                                                              │
+│   1092 │   │   │   async with aclosing(generator) as stream:                 │
+│ ❱ 1093 │   │   │   │   async for item in stream:                             │
+│   1094 │   │   │   │   │   await queue.put(ValueWrapper(item))               │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_obj │
+│ ect.py:61 in wrapped                                                         │
+│                                                                              │
+│    60 │   │   async with aclosing(method(self, *args, **kwargs)) as stream:  │
+│ ❱  61 │   │   │   async for item in stream:                                  │
+│    62 │   │   │   │   yield item                                             │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_fun │
+│ ctions.py:1962 in _map                                                       │
+│                                                                              │
+│   1961 │   │   │   ) as stream:                                              │
+│ ❱ 1962 │   │   │   │   async for item in stream:                             │
+│   1963 │   │   │   │   │   yield item                                        │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/para │
+│ llel_map.py:971 in _map_invocation_inputplane                                │
+│                                                                              │
+│    970 │   ) as merged:                                                      │
+│ ❱  971 │   │   async for maybe_output in merged:                             │
+│    972 │   │   │   if maybe_output is not None:  # ignore None sentinels     │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1114 in async_merge                                        │
+│                                                                              │
+│   1113 │   │   │   │   │   assert_type(item, ExceptionWrapper)               │
+│ ❱ 1114 │   │   │   │   │   raise item.value                                  │
+│   1115                                                                       │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1093 in producer                                           │
+│                                                                              │
+│   1092 │   │   │   async with aclosing(generator) as stream:                 │
+│ ❱ 1093 │   │   │   │   async for item in stream:                             │
+│   1094 │   │   │   │   │   await queue.put(ValueWrapper(item))               │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/para │
+│ llel_map.py:926 in poll_outputs                                              │
+│                                                                              │
+│    925 │   │   ) as streamer:                                                │
+│ ❱  926 │   │   │   async for idx, output in streamer:                        │
+│    927 │   │   │   │   if not order_outputs:                                 │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1243 in async_map_ordered                                  │
+│                                                                              │
+│   1242 │   async with aclosing(async_map(async_zip(counter(), input_generato │
+│ ❱ 1243 │   │   async for output_idx, output_item in stream:                  │
+│   1244 │   │   │   buffer[output_idx] = output_item                          │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1219 in async_map                                          │
+│                                                                              │
+│   1218 │   ) as stream:                                                      │
+│ ❱ 1219 │   │   async for item in stream:                                     │
+│   1220 │   │   │   yield item                                                │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1114 in async_merge                                        │
+│                                                                              │
+│   1113 │   │   │   │   │   assert_type(item, ExceptionWrapper)               │
+│ ❱ 1114 │   │   │   │   │   raise item.value                                  │
+│   1115                                                                       │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1093 in producer                                           │
+│                                                                              │
+│   1092 │   │   │   async with aclosing(generator) as stream:                 │
+│ ❱ 1093 │   │   │   │   async for item in stream:                             │
+│   1094 │   │   │   │   │   await queue.put(ValueWrapper(item))               │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1208 in worker                                             │
+│                                                                              │
+│   1207 │   │   │   if isinstance(item, ValueWrapper):                        │
+│ ❱ 1208 │   │   │   │   res = await prevent_cancellation_abortion(async_mappe │
+│   1209 │   │   │   │   yield res                                             │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1173 in prevent_cancellation_abortion                      │
+│                                                                              │
+│   1172 │   try:                                                              │
+│ ❱ 1173 │   │   return await asyncio.shield(t)                                │
+│   1174 │   except asyncio.CancelledError:                                    │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/async_utils.py:1232 in mapper_func_wrapper                                │
+│                                                                              │
+│   1231 │   async def mapper_func_wrapper(tup: tuple[int, T]) -> tuple[int, V │
+│ ❱ 1232 │   │   return (tup[0], await async_mapper_func(tup[1]))              │
+│   1233                                                                       │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/para │
+│ llel_map.py:915 in fetch_output                                              │
+│                                                                              │
+│    914 │   │   │   else:                                                     │
+│ ❱  915 │   │   │   │   raise e                                               │
+│    916 │   │   return (item.idx, output)                                     │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/para │
+│ llel_map.py:910 in fetch_output                                              │
+│                                                                              │
+│    909 │   │   try:                                                          │
+│ ❱  910 │   │   │   output = await _process_result(item.result, item.data_for │
+│    911 │   │   except Exception as e:                                        │
+│                                                                              │
+│ /Users/jhome/.pyenv/versions/3.12.10/lib/python3.12/site-packages/modal/_uti │
+│ ls/function_utils.py:574 in _process_result                                  │
+│                                                                              │
+│   573 │   │                                                                  │
+│ ❱ 574 │   │   raise RemoteError(result.exception)                            │
+│   575                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RemoteError
