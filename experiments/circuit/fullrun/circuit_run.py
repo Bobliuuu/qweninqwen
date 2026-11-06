@@ -237,7 +237,12 @@ if CHAIN:
         cnt = grab('count')[0, 0, 2]; o['n'] = int(round(-np.log2(cnt / A_BIT))) if cnt > 0 else None
         o['j'] = float(grab('j')[0, 0, 2]); o['vcnt'] = float(grab('vcnt')[0, 0, 2])
         for p in ('rs1', 'rs2', 'rd'):
-            R = grab(f'regs.{p}')[0]; o['x_' + p] = [0] + [bit(R[r], [c.reg_cols[i][0] for i in range(32)]) for r in range(1, 32)]
+            R = grab(f'regs.{p}')[0]; o['x_' + p] = [0] + [sum(int(R[r, c.reg_cols[i]].sum() > THR) << i for i in range(32)) for r in range(1, 32)]   # bit i = SUM of its channel columns (a write spreads a bit over F0/F1/F2/V/link channels)
+        if os.environ.get('DBGREG'):
+            R = grab('regs.rd')[0]
+            for r in (1, 2, 4):
+                nz = np.nonzero(R[r])[0]; print('DBGREG reg', r, 'nonzero cols/vals', [(int(k), float(R[r, k])) for k in nz][:80], flush=True)
+            print('DBGREG reg_cols[0..40]', {i: c.reg_cols[i] for i in range(0, 32)}, flush=True)
         o['bn'] = []
         for h in range(4):
             for x in range(2): R = grab(f'bn1.{h}')[x]; o['bn'].append([bit(R[r], [2, 3, 4, 5]) for r in range(128)])
