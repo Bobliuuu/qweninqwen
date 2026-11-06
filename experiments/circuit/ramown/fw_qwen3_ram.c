@@ -144,7 +144,14 @@ NOINL void mv_rows(int32_t *out, int add, const int8_t *xs, uint32_t soff, int w
         int wbp = wb + p * (C / 64) * R * 8 + r0 * 8; int32_t *ac = accs_[p];
         for (int c = 0; c < C / 64; c++) {
             vk_x = xs + 64 * c;
+#ifdef WF   // weight fetch (WROW): weights come from the outer model's embedding rows. g = global VDOT word index; row = g / ROWW, slot = g % ROWW (a1 = slot, a4 = row); same stream numbering as the WROM
+#ifndef ROWW
+#define ROWW 480
+#endif
+            { int g = wbp + c * R * 8; if (c == 0) vk_init_raw(ac, g % ROWW, t, 0, g / ROWW); else vk_acc_raw(ac, g % ROWW, t, 0, g / ROWW); }
+#else
             if (c == 0) vk_init_raw(ac, wbp, t, 0, 0); else vk_acc_raw(ac, wbp + c * R * 8, t, 0, 0);
+#endif
         }
     }
     int sh = 4 * P + 8 + 10 - 31; if (sh < 0) sh = 0;

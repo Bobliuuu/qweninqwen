@@ -11,6 +11,8 @@ Full Qwen3-0.6B int4 firmware on Qwenputer's software reference machine (ref.Mac
 Writes the exact trace (uint32 tokens, uint8 op-kind per token) in chunks + stats.  Resumable (ckpt.pkl).
 usage: ref_big.py ELF BLOB WROM OUTDIR [QP_RISCV_DIR]"""
 import sys, os, time, json, pickle, numpy as np
+WF = bool(os.environ.get('WF'))   # weight-fetch firmware (built with fw_build.sh -DWF): VDOT weights from the row table, no type-2 injections
+if WF: os.environ.setdefault('WF_ROW_CELLS', '3840'); sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'fullrun'))
 elf_path, blob_path, wrom_path, out = sys.argv[1:5]
 sys.path.insert(0, sys.argv[5] if len(sys.argv) > 5 else os.path.expanduser('~/qp/experimental/riscv'))
 from chipformer.rv import spec as S, ref, elf as E
@@ -61,7 +63,7 @@ class Big(ref.Machine):
                             if not blob: ST['drom_need_real'] += 1
                             self.inj.append((self.nbuf(), 3, ds, w)); ST['drom_inj'] += 1
                         self.dr_p[ds] = w; self.dr_c[ds] = w
-                elif op == 'VDOT':
+                elif op == 'VDOT' and not WF:
                     self.inj.append((self.nbuf(), 2, (self.wb + i) & M27, 0))
         if self.n != S.N_MAX and i in self.wbset:
             a = self.x[ref.decode(self.rom[i]).rs1]
@@ -75,10 +77,14 @@ class Big(ref.Machine):
 prog = E.program(elf_path)
 _d = np.frombuffer(bytes(prog.rodata).ljust(4 * 32768, b'\0'), dtype='<u4'); DROMW[:] = [int(v) for v in _d]
 m = Big.from_program(prog); m.blob = blob; m.wrom = wrom; m.setup()
+if WF:
+    from wf_table import build_table
+    m.rowtab = build_table(wrom); m.wrow_w = 8; m.latch = []
 ckp = out + '/ckpt.pkl'; chunk = 0; ntok = 0; t0 = time.time(); fam = {}
 if os.path.exists(ckp):
     st = pickle.load(open(ckp, 'rb')); chunk, ntok, fam = st.pop('chunk'), st.pop('ntok'), st.pop('fam')
     for k, v in st.items(): setattr(m, k, v)
+    if WF: m.rowtab = build_table(wrom); m.wrow_w = 8
     print(f'resumed at chunk {chunk} steps {m.steps}', flush=True)
 else:
     first = np.array([S.tok('GO')], dtype=np.uint32); ntok = 1
@@ -87,7 +93,7 @@ def dump_state():
     for sl, (ea, o_) in m.touch.items():
         tea[sl] = ea; tval[sl] = m.ram[ea >> 2]; top[sl] = o_
     np.save(f'{out}/ramimg_{chunk:04d}.npy', np.array(m.ram, dtype=np.uint32))
-    pickle.dump(dict(x=list(m.x), anchor=m.anchor, n=m.n, wb=m.wb, steps=m.steps, tok_start=ntok, halted=m.halted, bn=[list(r) for r in m.bn], touch_ea=tea, touch_val=tval, touch_op=top), open(f'{out}/state_{chunk:04d}.pkl', 'wb'))
+    pickle.dump(dict(x=list(m.x), anchor=m.anchor, n=m.n, wb=m.wb, steps=m.steps, tok_start=ntok, halted=m.halted, latch=[list(w) for w in m.latch] if WF else [], bn=[list(r) for r in m.bn], touch_ea=tea, touch_val=tval, touch_op=top), open(f'{out}/state_{chunk:04d}.pkl', 'wb'))
     m.dr_c = list(DROMW)
 CH = 1 << 21; buf = []; kbuf = []; nb = 0
 def flush():
@@ -96,7 +102,7 @@ def flush():
     np.save(f'{out}/inj_{chunk:04d}.npy', np.array(m.inj, dtype=np.int64).reshape(-1, 4)); m.inj = []
     chunk += 1; buf = []; kbuf = []; nb = 0
     dump_state()
-    st = {k: getattr(m, k) for k in ('x', 'ram', 'bn', 'anchor', 'n', 'halted', 'steps', 'wb', 'out', 'fault', 'exit_code', 'touch', 'dr_p')}
+    st = {k: getattr(m, k) for k in ('x', 'ram', 'bn', 'anchor', 'n', 'halted', 'steps', 'wb', 'out', 'fault', 'exit_code', 'touch', 'dr_p') + (('latch',) if WF else ())}
     st.update(chunk=chunk, ntok=ntok, fam=fam); pickle.dump(st, open(ckp + '.tmp', 'wb')); os.replace(ckp + '.tmp', ckp)
 if chunk == 0 and not buf: buf.append(S.tok('GO')); kbuf.append(0); nb = 1; ntok = 1
 if chunk == 0: dump_state()

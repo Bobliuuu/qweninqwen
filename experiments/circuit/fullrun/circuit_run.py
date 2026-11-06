@@ -154,6 +154,7 @@ def machine(stt, ch=None):
     if a.reset0 and ch == chunks[0] and ch == 0:   # step-0 state comes from the program alone
         assert list(stt['x']) == list(m.x) and stt['anchor'] == m.anchor and stt['n'] == m.n == 0 and stt['wb'] == 0, 'reference state_0000 != program reset state'
         if a.ramimg: assert all(int(v) == int(w) for v, w in zip(np.load(f'{a.refdir}/ramimg_{ch:04d}.npy'), m.ram)), 'ramimg_0000 != program initial RAM'
+        if WF: m.wrow_w = 8; m.latch = []
         if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
         return m
     if WF: m.wrow_w = 8; m.latch = [list(w) for w in stt.get('latch', [])]   # chunk-start snapshot of the latched 8-word window (host-seeded here; a chained run carries it itself)
