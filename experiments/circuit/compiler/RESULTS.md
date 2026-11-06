@@ -24,3 +24,33 @@ Firmware (fixed-point, int8 dynamic activations, INT weights) on real weights: i
 ## Merge status of the nonlinear agent's kernels
 `fw/qwen3_fx.c` contains their EXP2/RSQ/SIGM/AMX/ROT16 semantics (inline asm under `-DEXT`, emulated in `rvemu.c` per `nonlinear/ext.py`) and the plain RV32IM fixed-point fallbacks (`exp2_q`, `rsq_q`, `sigm_q` copied from `nonlinear/kernels.c`). EXT saves only 3.5e6 instr/token (2.6%): after the merge the nonlinears are <10% (rms 2.4e7 incl. 64-bit sumsq, quantize 1.2e7, mv epilogue 5e7 = 64-bit dequant, ~100 instr/row). Dominant: VDOT kernels (7.5e7 VDOT + ~2.9e8/... see `by_symbol`: vk_acc_raw 3.98e8 over 4 tokens = 1.0e8/token) -> the kernel overhead (acc spills) is the next target (the algo agent's register-blocked kernels, commit 158a8f6).
 Attention is now SMAQA int8 K/V cache with EXP2: 1.6e5 instr per context token (was 2.3e7).
+
+## Per-op split reconciliation (v2 int4, EXT, real weights, 4 positions)
+Correction: the per-symbol profile in `res_full_fx_*.json` is the TOTAL over the 4 emulated positions (5.376e+08 instr), not per token. My earlier per-op list mixed a per-token VDOT figure with 4-position totals for the other rows, hence 2.07e8 vs 1.34e8. Per token (total/4):
+| symbol | instr/token | share |
+|---|---|---|
+| vk_acc_raw | 9.938e+07 | 73.9% |
+| mv.constprop.0 | 1.298e+07 | 9.7% |
+| rms | 5.985e+06 | 4.5% |
+| vk_init_raw | 5.589e+06 | 4.2% |
+| quantize | 3.028e+06 | 2.3% |
+| attn | 2.298e+06 | 1.7% |
+| swiglu | 1.979e+06 | 1.5% |
+| rope | 9.948e+05 | 0.7% |
+| kv_store | 8.973e+05 | 0.7% |
+| argmax.constprop.0 | 7.597e+05 | 0.6% |
+| resid.constprop.0 | 4.018e+05 | 0.3% |
+| __divdi3 | 3.691e+04 | 0.0% |
+| total | 1.344e+08 | 100% |
+
+`vk_acc_raw`+`vk_init_raw` = VDOT kernels incl. accumulator load/store (7.45e7 VDOT + ~2.7e7 overhead per token); `mv` = 64-bit dequant epilogue (~1.3e7/token, not 5e7).
+
+## True trace tokens (model-based, emulator `tokens=`)
+`fw/rvemu.c` counts trace tokens with the Qwenputer P2 record-size model from rv32.md (rd value record 1/2/3 tokens by 15-bit chunks, taken branch/JAL/JALR = 1, not-taken/NT/ST/WB = 1, SB/SH = 4, DIV +9, +1 R refresh per 63 instr without a jump). It models the trace format; it is NOT a run of the circuit or of `chipformer.rv.ref.Machine` (the 0.6B program does not fit that machine's 32 KB RAM / 15-bit WROM map).
+| build (4 positions) | trace tokens | instructions | tok/instr | trace tokens/inner token |
+|---|---|---|---|---|
+| v2 int4, EXT | 627,342,604 | 543,494,099 | 1.154 | 1.57e8 |
+| v2 int8 (2 planes), EXT | 1,080,977,440 | 973,500,704 | 1.110 | 2.70e8 |
+| 3072x1024 microbench (plain int8 + SMAQA + VDOT) | 34,600,933 | 25,467,933 | 1.36 | |
+
+So tok/instr for the real firmware is about 1.15 (VDOT-dominated, one-token value records), not 1.4. At 4,963 tok/s: 8.8 h/token (ctx 1, int4); at 4,225 tok/s: 10.3 h; at 5,500 tok/s: 7.9 h. (Instructions per token are 1.358e8 in this later build, 1.343e8 in the earlier one: the per-matrix plane generality added ~1%.)
