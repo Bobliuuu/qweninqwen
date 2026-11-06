@@ -145,3 +145,9 @@ step 1,600,000/2,097,152 1039s 18,479 agg tok/s; free-token mismatches 0 (rows w
 step 1,700,000/2,097,152 1104s 18,479 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 53014 of 53,376
 step 1,800,000/2,097,152 1169s 18,480 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 56067 of 56,448
 step 1,900,000/2,097,152 1234s 18,480 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 59117 of 59,520
+step 2,000,000/2,097,152 1299s 18,480 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 62157 of 62,592
+step 2,097,152/2,097,152 1362s 18,480 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 65202 of 65,664
+{"chunks": [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71], "rows": 12, "steps_per_row": [2097152, 2097152, 2097152, 2097152, 2097152, 2097152, 2097152, 2097152, 2097152, 2097152, 2097152, 2097152], "steps_run": 2097152, "seconds": 1361.788235425949, "agg_tok_per_s": 18479.983398082877, "forced_kinds": [], "free_tokens": [2091648, 2091776, 2091648, 2091648, 2091648, 2091776, 2091648, 2091648, 2091648, 2091776, 2091648, 2091648], "forced_tokens": [5504, 5376, 5504, 5504, 5504, 5376, 5504, 5504, 5504, 5376, 5504, 5504], "free_mismatches": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "first_free_mismatch": [null, null, null, null, null, null, null, null, null, null, null, null], "forced_raw_disagreements": [5476, 5327, 5464, 5464, 5462, 5345, 5428, 5423, 5470, 5355, 5494, 5494], "gpu": "NVIDIA A10G"}
+wave [72, 73, 74, 75, 76, 77]
+injections per row [1575900, 932098, 88448, 88090]..., unaddressable-WROM VDOTs forced [5504, 3072, 0, 0]...
+rows 6, steps/row 2,097,153, forced kinds [], forced fraction [0.00262451171875, 0.001464843051508069, 0.0, 0.0]
