@@ -1,0 +1,83 @@
+{
+ "wf_mode": true,
+ "inj_file": "inj",
+ "ramimg": false,
+ "injections": [
+  158009,
+  114071,
+  88330,
+  88030,
+  126522,
+  95262
+ ],
+ "ram_injections": [
+  158009,
+  114071,
+  88330,
+  88030,
+  126522,
+  95262
+ ],
+ "chunks": [
+  78,
+  79,
+  80,
+  81,
+  82,
+  83
+ ],
+ "rows": 6,
+ "steps_per_row": [
+  2097152,
+  2097154,
+  2097152,
+  2097152,
+  2097152,
+  760071
+ ],
+ "steps_run": 2097154,
+ "seconds": 497.4372696876526,
+ "agg_tok_per_s": 25295.499048167887,
+ "forced_kinds": [],
+ "free_tokens": [
+  2097152,
+  2097154,
+  2097152,
+  2097152,
+  2097152,
+  760071
+ ],
+ "forced_tokens": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "free_mismatches": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "first_free_mismatch": [
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+ ],
+ "forced_raw_disagreements": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "gpu": "NVIDIA L40S"
+}
