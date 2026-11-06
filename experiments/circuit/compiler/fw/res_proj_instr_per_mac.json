@@ -1,0 +1,8 @@
+{"what": "instructions per MAC, one projection R=3072 outputs x C=1024 inputs (3,145,728 MACs), RV32IM emulator (fw/rvemu.c, base ISA matches chipformer.rv.ref), gcc 10.2 -O2 rv32im",
+ "results_checked_vs_numpy_int64": true,
+ "variants": {
+  "plain_rv32im_int8": {"instr": 22041611, "instr_per_mac": 7.007, "note": "gcc -O2 loop, no unroll pragma, lb/lb/mul/add + loop"},
+  "smaqa_int8_optional_ext": {"instr": 2872329, "instr_per_mac": 0.913, "note": "SMAQA 4 MAC/instr, unroll 8; lw w, lw x, smaqa"},
+  "vdot_int4_optional_ext": {"instr": 553950, "instr_per_mac": 0.176, "note": "VDOT 8 MAC/instr, vd2-style kernel: 64 int8 acts in 16 regs, 4 rows per WB, 16 chunk passes, acc in memory"}},
+ "gate": "plan T2 gate <=1 instr/MAC: met by VDOT (0.18) and SMAQA (0.91); plain RV32IM (7.0) is not",
+ "trace_tokens_per_instr": "1.19 (small-C mix) to 1.40 (gcc -O2 C), Qwenputer docs/rv32.md; VDOT record = value record of rd"}
