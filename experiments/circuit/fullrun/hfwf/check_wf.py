@@ -20,7 +20,8 @@ assert chat.model.config.tie_word_embeddings and chat.model.lm_head.weight.data_
 if a.neg:
     cols = torch.tensor(meta['cell_columns'], device=dev); r0 = v0 + S.FAMILIES['ROW'][0]; W = chat.lm.embed_tokens.weight
     blk = W[r0:r0 + S.FAMILIES['ROW'][1]][:, cols].float()
-    W[r0:r0 + S.FAMILIES['ROW'][1], cols] = ((blk + 1) % 16).to(W.dtype); print('NEGATIVE CONTROL: all table entries +1 mod 16', flush=True)
+    with torch.no_grad(): W[r0:r0 + S.FAMILIES['ROW'][1], cols] = ((blk + 1) % 16).to(W.dtype)
+    print('NEGATIVE CONTROL: all table entries +1 mod 16', flush=True)
 # --- reference trace, state, injections (chunk 0) ---
 tok_all = remap_trace(np.load(f'{a.refdir}/tok_0000.npy')); stt = pickle.load(open(f'{a.refdir}/state_0000.pkl', 'rb'))
 inj = np.load(f'{a.refdir}/inj_0000.npy'); assert (inj[:, 1] == 1).all(), 'only type-1 (RAM/blob word) injections expected'
