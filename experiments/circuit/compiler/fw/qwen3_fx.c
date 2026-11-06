@@ -102,34 +102,28 @@ NOINL int32_t quantize(const int32_t *v, int n) {
 }
 
 // ---------------- matvec: out[r] = W_r . x  (Qin -> OQ), W = int4 planes via VDOT ----------------
-NOINL void mv(int32_t *out, uint32_t soff, int wb, int R, int C, int32_t amax, int Qin, int OQ) {
-    for (int c = 0; c < C / 64; c++) {
-        vk_x = xq + 64 * c;
-        if (c == 0) vk_init_raw(acc1, wb, R, 0, 0); else vk_acc_raw(acc1, wb + c * R * 8, R, 0, 0);
+static int32_t acc3[VOCAB > HID ? VOCAB : HID];
+NOINL void mv(int32_t *out, uint32_t soff, int wb, int P, int R, int C, int32_t amax, int Qin, int OQ) {
+    int32_t *accs[3] = {acc1, acc2, acc3};
+    for (int p = 0; p < P; p++) {
+        int wbp = wb + p * (C / 64) * R * 8;
+        for (int c = 0; c < C / 64; c++) {
+            vk_x = xq + 64 * c;
+            if (c == 0) vk_init_raw(accs[p], wbp, R, 0, 0); else vk_acc_raw(accs[p], wbp + c * R * 8, R, 0, 0);
+        }
     }
-#if WPLANES == 2
-    int wb2 = wb + (C / 64) * R * 8;
-    for (int c = 0; c < C / 64; c++) {
-        vk_x = xq + 64 * c;
-        if (c == 0) vk_init_raw(acc2, wb2, R, 0, 0); else vk_acc_raw(acc2, wb2 + c * R * 8, R, 0, 0);
-    }
-#endif
     i64 F = OQ >= Qin ? ((i64)amax << (OQ - Qin)) / 127 : ((i64)amax >> (Qin - OQ)) / 127;
     int kk = 0; while ((F >> kk) >= (1 << 30)) kk++;
     int32_t Fm = (int32_t)(F >> kk);
     const int32_t *s = BI(soff);
     for (int r = 0; r < R; r++) {
-#if WPLANES == 2
-        int32_t a = (acc1[r] << 4) + acc2[r];
-#else
-        int32_t a = acc1[r];
-#endif
+        int32_t a = P == 1 ? acc1[r] : P == 2 ? (acc1[r] << 4) + acc2[r] : (acc1[r] << 8) + (acc2[r] << 4) + acc3[r];
         int32_t sv = s[r], m = sv & ~31, e = sv & 31;
         int32_t t = (int32_t)(((i64)a * m) >> 31);
         out[r] = (int32_t)((((i64)t * Fm) << kk) >> e);
     }
 }
-#define MVL(out, l, m, R, C, am, Qin, OQ) mv(out, SOFF[l][m], WBW[l][m], R, C, am, Qin, OQ)
+#define MVL(out, l, m, R, C, am, Qin, OQ) mv(out, SOFF[l][m], WBW[l][m], PLN[l][m], R, C, am, Qin, OQ)
 
 // ---------------- RoPE on int16 Q10 pairs (i, i+HD/2) ----------------
 NOINL void rope(int16_t *dst, const int32_t *src, int heads, int pos) {      // src Q12 int32 -> dst Q10 int16 rotated
@@ -238,7 +232,7 @@ static int forward(int tok, int pos) {
     }
     rms(xb, x, BI(FINAL_NORM_OFF), DIM, DLOG, 16);
     int32_t am = quantize(xb, DIM);
-    mv(tmp, LM_SOFF, LM_WB, VOCAB, DIM, am, 12, 16);
+    mv(tmp, LM_SOFF, LM_WB, LM_PL, VOCAB, DIM, am, 12, 16);
     return argmax(tmp, VOCAB);
 }
 int main(void) {

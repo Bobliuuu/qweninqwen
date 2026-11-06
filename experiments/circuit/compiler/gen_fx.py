@@ -12,13 +12,14 @@ def scale_word(ws):
     return (m | e).astype(np.int32)
 
 def quant(W, wbits):
-    qmax = 7.0 if wbits == 4 else 119.0
+    P = wbits // 4; qmax = 7 * (16 ** P - 1) // 15          # 7, 119, 1911: signed base-16 digits in [-8,7]
     s = np.abs(W).max(1) / qmax; s[s == 0] = 1e-6
-    q = np.clip(np.rint(W / s[:, None]), -8 if wbits == 4 else -120, 7 if wbits == 4 else 119).astype(np.int64)
-    if wbits == 4: return [q], s
-    lo = ((q + 8) & 15) - 8; hi = (q - lo) // 16
-    assert hi.min() >= -8 and hi.max() <= 7
-    return [hi, lo], s
+    q = np.clip(np.rint(W / s[:, None]), -qmax - 1, qmax).astype(np.int64)
+    planes = []
+    for i in range(P):
+        d = ((q + 8) & 15) - 8; planes.append(d); q = (q - d) // 16
+    assert (q == 0).all()
+    return planes[::-1], s       # most significant digit plane first
 
 def chunks(q):
     R, C = q.shape; assert C % 64 == 0
@@ -29,7 +30,9 @@ class Blob:
     def add(self, a, dt=np.int32):
         a = np.ascontiguousarray(a, dtype=dt); off = len(self.b); self.b += a.tobytes(); return off
 
-def gen(sd, cfg, prompt, outdir, wbits=4, ext=False, maxpos=None, dump=False):
+def gen(sd, cfg, prompt, outdir, wbits=4, ext=False, maxpos=None, dump=False, boost=None):
+    """wbits: default weight bits (4/8/12); boost: {(layer, matname-substring): bits} overrides, e.g. {(27,'mlp'):12}"""
+    boost = boost or {}
     D, NL, NH, NKV, HD, HID, V = (cfg[k] for k in ('hidden_size', 'num_hidden_layers', 'num_attention_heads', 'num_key_value_heads', 'head_dim', 'intermediate_size', 'vocab_size'))
     maxpos = maxpos or len(prompt); os.makedirs(outdir, exist_ok=True)
     g = lambda n: np.asarray(sd[n], dtype=np.float64)
@@ -40,18 +43,20 @@ def gen(sd, cfg, prompt, outdir, wbits=4, ext=False, maxpos=None, dump=False):
     c = np.rint(np.cos(ang) * 32767).astype(np.int64); s_ = np.rint(np.sin(ang) * 32767).astype(np.int64)
     ROPE = B.add(((s_ & 0xFFFF) << 16) | (c & 0xFFFF), np.uint32)
     gain = lambda n: B.add(np.rint(g(n) * 4096))
-    FN = gain('model.norm.weight'); norms, soff, wbw = [], [], []
-    def addmat(W):
+    FN = gain('model.norm.weight'); norms, soff, wbw, plns = [], [], [], []
+    def addmat(W, wb_=None):
         nonlocal wp
-        planes, s = quant(W, wbits); so = B.add(scale_word(s)); base = wp
+        planes, s = quant(W, wb_ or wbits); so = B.add(scale_word(s)); base = wp
         for pl in planes: cc = chunks(pl); wrom.append(cc.ravel()); wp += cc.size // 8
         return so, base
     for l in range(NL):
         p = f'model.layers.{l}.'
         norms.append([gain(p + 'input_layernorm.weight'), gain(p + 'self_attn.q_norm.weight'), gain(p + 'self_attn.k_norm.weight'), gain(p + 'post_attention_layernorm.weight')])
-        so, wb = [], []
-        for m in MATS: a, b = addmat(g(p + m + '.weight')); so.append(a); wb.append(b)
-        soff.append(so); wbw.append(wb)
+        so, wb, pl = [], [], []
+        for m in MATS:
+            bits = next((v for (ll, sub), v in boost.items() if ll == l and sub in m), wbits)
+            a, b = addmat(g(p + m + '.weight'), bits); so.append(a); wb.append(b); pl.append(bits // 4)
+        soff.append(so); wbw.append(wb); plns.append(pl)
     LMS, LMW = addmat(head)
     arr = lambda a: '{' + ','.join(('{' + ','.join(str(int(v)) for v in r) + '}') for r in a) + '}'
     cq = round(math.log2(math.e) * 65536 / (127 ** 2 * 1024 ** 2 * math.sqrt(HD)) * 2 ** 50)
@@ -59,7 +64,7 @@ def gen(sd, cfg, prompt, outdir, wbits=4, ext=False, maxpos=None, dump=False):
     h = f"""#pragma once
 {'#define EXT 1' if ext else ''}
 {'#define DUMP 1' if dump else ''}
-#define WPLANES {1 if wbits == 4 else 2}
+#define LM_PL {wbits // 4}
 #define DIM {D}
 #define NL {NL}
 #define NH {NH}
@@ -83,6 +88,7 @@ def gen(sd, cfg, prompt, outdir, wbits=4, ext=False, maxpos=None, dump=False):
 static const uint32_t NORM_OFF[NL][4] = {arr(norms)};
 static const uint32_t SOFF[NL][7] = {arr(soff)};
 static const int WBW[NL][7] = {arr(wbw)};
+static const int PLN[NL][7] = {arr(plns)};
 """
     assert D & (D - 1) == 0 and HD & (HD - 1) == 0
     open(f'{outdir}/cfg.h', 'w').write(h); open(f'{outdir}/blob.bin', 'wb').write(bytes(B.b))

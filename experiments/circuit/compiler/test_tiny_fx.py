@@ -4,8 +4,8 @@ import os, subprocess, sys, json, numpy as np, torch
 from transformers import Qwen3Config, Qwen3ForCausalLM
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE); import gen_fx
 
-def build_run(sd, cd, prompt, out, wbits, ext, dump=True, extra=()):
-    stats = gen_fx.gen(sd, cd, prompt, out, wbits, ext, dump=dump)
+def build_run(sd, cd, prompt, out, wbits, ext, dump=True, extra=(), boost=None):
+    stats = gen_fx.gen(sd, cd, prompt, out, wbits, ext, dump=dump, boost=boost)
     elf = f'{out}/fw.elf'
     subprocess.check_call([f'{HERE}/fw/build.sh', elf, '-I', out, f'{HERE}/fw/qwen3_fx.c', f'{HERE}/fw/vdk.S', *extra])
     emu = f'{HERE}/fw/rvemu'
