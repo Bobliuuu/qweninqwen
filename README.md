@@ -85,7 +85,7 @@ reference/              the original circuit-based nested-qwen lab
 ## Roadmap
 
 - **v1 (this repo, done):** hosted, exact, fast.
-- **v2 (in progress):** recursive / multi-model packing into the same layers.
+- **v2 (prototype, `v2_recursiveqwen/`):** several hosted models share the same layers; still hosted, not executed.
 - **v3 (in progress):** true nesting: a Qwen3.5 whose compiled DeltaNet/SwiGLU weights and state execute the inner Qwen's ops (extremely slow by design).
 
 ## Caveats
