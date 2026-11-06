@@ -17,9 +17,17 @@ REGS = ['ra', 'sp', 'gp', 'tp', 't0', 't1', 't2', 's0', 's1', 's2', 's3', 's4', 
         'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 't3', 't4', 't5', 't6']   # all 31 usable (no calls in kernels)
 WBASE = 0x20000      # DROM base: plain-weight kernels read weights from here
 
-def problem(R, K, seed=0):
+def problem(R, K, seed=0, dist='real'):
+    """dist='uniform': x uniform int8 (token-pessimistic: packed words are ~always 3 tokens).
+    dist='real': heavy-tailed activations as after absmax int8 quantisation (Laplace, scale ~10, 2 outlier channels at +-127);
+    weights ~ clipped round(N(0,2.5)) int4.  Token counts depend on VALUE SIZE so the data distribution matters."""
     rng = np.random.default_rng(seed)
-    W = rng.integers(-8, 8, (R, K)); x = rng.integers(-128, 128, K)
+    if dist == 'uniform':
+        W = rng.integers(-8, 8, (R, K)); x = rng.integers(-128, 128, K)
+    else:
+        W = np.clip(np.rint(rng.normal(0, 2.5, (R, K))), -8, 7).astype(np.int64)
+        x = np.clip(np.rint(rng.laplace(0, 10, K)), -127, 127).astype(np.int64)
+        x[rng.choice(K, 2, replace=False)] = [127, -127]
     return W, x, W @ x
 
 class Kernel:
@@ -183,6 +191,138 @@ blk:
     wr = _wrom_blocked(W, RB, C, K)
     return Kernel(f'K4 VDOT blocked RB={RB} C={C}' + (' WB/chunk' if wb_per_chunk else ''), src, xbytes(x),
                   wrom=pack_wrom_nibbles(wr), R=R, K=K)
+
+def k5_vdk_like(W, x, rows4=4, acts=64):
+    """The structure of the existing compiler kernel (compiler/fw/gen_vdk.py): 64 int8 acts in 16 regs, 4 rows per WB
+    (32 VDOT), accumulators round-trip through memory every pass.  Re-implemented here to be measured by the same harness."""
+    R, K = W.shape
+    npass = K // acts
+    A = REGS[11:27]                     # 16 act regs
+    acc = REGS[27:31]                   # 4 accumulators
+    p_acc, p_w, p_cnt, p_pass, p_ap = 'ra', 'sp', 'gp', 'tp', 't0'   # t0..: other fixed regs
+    # regs used: ra sp gp tp t0 + s... A = REGS[11:27] = s4..a... ; acc REGS[27:31] = a7? t3..t6
+    ld = ''.join(f" lw {A[i]}, {4*i}({p_ap})\n" for i in range(16))
+    body = ''
+    for r, a in enumerate(acc):
+        body += f" lw {a}, {4*r}(t1)\n"
+    body += f" wb {p_w}\n"
+    for a in acc:
+        body += ''.join(f" vdot {a}, {A[2*j]}, {A[2*j+1]}\n" for j in range(8))
+    for r, a in enumerate(acc):
+        body += f" sw {a}, {4*r}(t1)\n"
+    src = f"""_start:
+ li {p_w}, 0
+ li {p_pass}, {npass}
+ li {p_ap}, {ACT}
+pas:
+{ld} li t1, {OUT}
+ li {p_cnt}, {R // rows4}
+grp:
+{body} addi t1, t1, 16
+ addi {p_w}, {p_w}, 32
+ addi {p_cnt}, {p_cnt}, -1
+ bnez {p_cnt}, grp
+ addi {p_ap}, {p_ap}, {acts}
+ addi {p_pass}, {p_pass}, -1
+ bnez {p_pass}, pas
+""" + _exit()
+    # OUT must start at zero: the harness RAM is zero-initialised.  weights: pass-major, row, 8 words of the pass's 64 acts
+    out = []
+    for p in range(npass):
+        for r in range(R):
+            for w8 in range(8):
+                out.append(W[r, p * acts + w8 * 8:p * acts + w8 * 8 + 8])
+    return Kernel('K5 VDOT, existing-compiler structure (64 acts in regs, 4 rows/WB, acc in memory)', src, xbytes(x),
+                  wrom=pack_wrom_nibbles(np.array(out)), R=R, K=K)
+
+def q_ref(acc, m, S):
+    return np.clip((acc * m) >> S, -127, 127)
+
+def k6_vdot_requant(W, x, m, S, RB=24, C=2):
+    """K4 + fused epilogue: y_r = clamp((acc_r * m_r) >> S, -127, 127) packed 4 int8 per word (the next layer's activation vector).
+    One outer-loop pointer (op) doubles as the m-table / output index; a sentinel byte ends the row-block loop (frees a register)."""
+    R, K = W.shape
+    assert R % RB == 0 and RB % 4 == 0 and K % (8 * C) == 0
+    acc = REGS[:RB]; actr = REGS[RB:RB + 2 * C]; wp, ap, op = REGS[RB + 2 * C:RB + 2 * C + 3]
+    assert RB + 2 * C + 3 <= 31
+    ACTEND = ACT + K
+    MB, SENT, OUTB = 0x1400, 0x1600, 0x1800        # m bytes, sentinel bytes, packed int8 outputs
+    tmp = actr + [ap]                              # 5 temps in the epilogue (acts are reloaded next block, ap reset)
+    assert len(tmp) >= 5
+    t, mr, w, lo, hi = tmp[:5]
+    zero = ''.join(f" li {a}, 0\n" for a in acc)
+    loads = ''.join(f" lw {actr[2*c]}, {ACTEND + 8*c}({ap})\n lw {actr[2*c+1]}, {ACTEND + 8*c + 4}({ap})\n" for c in range(C))
+    vd = ''.join(f" vdot {a}, {actr[2*c]}, {actr[2*c+1]}\n" for c in range(C) for a in acc)
+    ep = f" li {lo}, -127\n li {hi}, 127\n"
+    stubs = ''
+    for i, a in enumerate(acc):
+        ep += f" lb {mr}, {MB - OUTB + i}({op})\n mul {t}, {a}, {mr}\n srai {t}, {t}, {S}\n"
+        ep += f" blt {t}, {lo}, FL{i}\n bgt {t}, {hi}, FH{i}\nB{i}:\n"
+        stubs += f"FL{i}:\n mv {t}, {lo}\n j B{i}\nFH{i}:\n mv {t}, {hi}\n j B{i}\n"
+        if i % 4 == 0: ep += f" slli {w}, {t}, 24\n"
+        else: ep += f" srli {w}, {w}, 8\n slli {t}, {t}, 24\n or {w}, {w}, {t}\n"
+        if i % 4 == 3: ep += f" sw {w}, {i - 3}({op})\n"       # 4 outputs = one word at OUTB + blk*RB + (i-3)
+    src = f"""_start:
+ li {wp}, 0
+ li {op}, {OUTB}
+blk:
+ li {ap}, {-K}
+{zero}in:
+{loads} wb {wp}
+{vd} addi {wp}, {wp}, {RB * C}
+ addi {ap}, {ap}, {8 * C}
+ bnez {ap}, in
+{ep} addi {op}, {op}, {RB}
+ lbu {t}, {SENT - OUTB}({op})
+ bnez {t}, blk
+""" + _exit() + stubs
+    ram = dict(xbytes(x)); ram[MB] = i8bytes(m)
+    for j in range(R // RB - 1): ram[SENT + RB * (j + 1)] = bytes([1])
+    return Kernel(f'K6 VDOT blocked RB={RB} C={C} + requant/clamp/pack epilogue', src, ram,
+                  wrom=pack_wrom_nibbles(_wrom_blocked(W, RB, C, K)), R=R, K=K, out=OUTB)
+
+def k7_vdot_argmax(W, x, m, RB=24, C=2):
+    """LM-head: K4 loop + epilogue best = argmax_r (acc_r * m_r) (strictly greater wins -> first max), no store, no softmax.
+    taken branch per row (acc <= best is the common case) = 1 token."""
+    R, K = W.shape
+    acc = REGS[:RB]; actr = REGS[RB:RB + 2 * C]; wp, ap, op = REGS[RB + 2 * C:RB + 2 * C + 3]
+    assert RB + 2 * C + 3 <= 31
+    ACTEND = ACT + K; MB, SENT = 0x1400, 0x1600
+    bestv = actr[0]; mr = actr[1]; t = actr[2]
+    zero = ''.join(f" li {a}, 0\n" for a in acc)
+    loads = ''.join(f" lw {actr[2*c]}, {ACTEND + 8*c}({ap})\n lw {actr[2*c+1]}, {ACTEND + 8*c + 4}({ap})\n" for c in range(C))
+    vd = ''.join(f" vdot {a}, {actr[2*c]}, {actr[2*c+1]}\n" for c in range(C) for a in acc)
+    # best value/index must survive the block loop: keep them in memory-free regs -> use gp-like spare: here RB+2C+3 regs used,
+    # remaining spare regs hold bestv/bidx
+    spare = REGS[RB + 2 * C + 3:]
+    bv, bi = spare[0], spare[1] if len(spare) > 1 else None
+    assert bi is not None, 'need 2 spare regs: lower RB'
+    ep = ''
+    for i, a in enumerate(acc):
+        ep += f" lb {mr}, {i}({op})\n mul {t}, {a}, {mr}\n ble {t}, {bv}, N{i}\n mv {bv}, {t}\n addi {bi}, {op}, {i}\nN{i}:\n"
+    src = f"""_start:
+ li {wp}, 0
+ li {op}, {MB}
+ li {bv}, -2147483648
+ li {bi}, 0
+blk:
+ li {ap}, {-K}
+{zero}in:
+{loads} wb {wp}
+{vd} addi {wp}, {wp}, {RB * C}
+ addi {ap}, {ap}, {8 * C}
+ bnez {ap}, in
+{ep} addi {op}, {op}, {RB}
+ lbu {t}, {SENT - MB}({op})
+ bnez {t}, blk
+ li {t}, {MB}
+ sub {bi}, {bi}, {t}
+ li {t}, {OUT}
+ sw {bi}, 0({t})
+""" + _exit()
+    ram = dict(xbytes(x)); ram[MB] = i8bytes(m)
+    for j in range(R // RB - 1): ram[SENT + RB * (j + 1)] = bytes([1])
+    return Kernel(f'K7 LM-head argmax RB={RB} C={C}', src, ram, wrom=pack_wrom_nibbles(_wrom_blocked(W, RB, C, K)), R=R, K=K)
 
 if __name__ == '__main__':
     import sys

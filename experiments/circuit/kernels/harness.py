@@ -38,9 +38,13 @@ def run(src, ram_bytes=None, rodata=b'', wrom=b'', max_records=50_000_000):
         for i, v in enumerate(b):
             w = (a + i) >> 2; sh = 8 * ((a + i) & 3)
             m.ram[w] = (m.ram[w] & ~(255 << sh) & M32) | (v << sh)
-    toks = m.run(max_records)
+    toks = [S.tok('GO')]; by_op = collections.Counter(); cnt_op = collections.Counter()
+    while not m.halted and len(toks) < max_records:
+        pc = m.pc; op = ref.decode(m.rom[(pc - S.ROM_BASE) >> 2]).op if m.n != S.N_MAX else 'REFRESH'
+        t = m.record(); toks += t; by_op[op] += len(t); cnt_op[op] += 1
     assert m.halted and m.fault is None, ('fault', m.fault)
-    return Result(m, toks, prog)
+    r = Result(m, toks, prog); r.by_op, r.cnt_op = by_op, cnt_op
+    return r
 
 def pack_wrom_nibbles(W):
     """W: int array (n_words, 8) of weights in [-8,7] -> WROM bytes (cell = w+8)."""
