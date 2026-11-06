@@ -35,3 +35,21 @@ if __name__ == '__main__':
     if os.path.exists(p):
         r = json.load(open(p)); iss = {f"v{k['variant']} rb{k['rb']} u{k['unr']}": k['instr_per_mac'] for k in r['kernels']}
     print(json.dumps(dict(macs=MACS, nonlinear=nonlinear_instr(), rows=table(iss)), indent=1))
+
+
+def scenarios(iss_best=0.1588):
+    """Seconds per inner token under successive ideas (matvec instr/MAC measured; wider-instruction rows are HYPOTHETICAL ISA extensions)."""
+    nl = sum(nonlinear_instr().values()); base_macs = MACS + attn_macs(); rows = []
+    def add(name, ipm, macs=base_macs, note=''):
+        ins = macs * ipm + nl; rows.append(dict(idea=name, instr_per_mac=ipm, instr=ins, trace_tokens=ins * TOK_PER_INSTR, seconds=ins * TOK_PER_INSTR / TOKS, note=note))
+    add('plain C, int8 weights (Qwenputer baseline)', 8.009, note='measured ISS')
+    add('int4 packed, scalar unpack', 7.008, note='measured ISS')
+    add('int8 + SMAQA (4 MAC/instr), 4 rows share act loads', 1.0046, note='measured ISS')
+    add('int4 + VDOT (8 MAC/instr), 1 row', 0.6329, note='measured ISS')
+    add('int4 + VDOT, 12 rows register-blocked, unrolled', iss_best, note='measured ISS, bit-exact')
+    for w in (32, 128, 1024):
+        add(f'hypothetical {w}-MAC vector dot instruction', 1.0 / w + 0.01, note='ISA extension (QwenPU-style vector unit); not built')
+    return rows
+
+if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'scen':
+    for r in scenarios(): print('%-58s %.4f instr/MAC  %.3e instr  %.3e tokens  %10.0f s  [%s]' % (r['idea'], r['instr_per_mac'], r['instr'], r['trace_tokens'], r['seconds'], r['note']))
