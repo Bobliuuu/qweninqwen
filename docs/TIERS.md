@@ -103,7 +103,7 @@ Compiler, aa7b367 / 3011004, `experiments/circuit/compiler/RESULTS.md` (emulated
 
 ## Algorithmic scenario table (algo c1e4ad0, `experiments/circuit/algo/RESULTS.md`; instr/MAC measured in an ISS, bit-exact; totals computed)
 
-Blocked VDOT 12 rows: 0.1588 instr/MAC, 1.02e8 matvec instr, 1.43e8 tokens at 1.4 tok/instr, 7.2 h at 5.5k tok/s (matvec-only plus a flagged 5.4M non-matvec estimate). Hypothetical wider vector instruction (not in the ISA, not built): 32 / 128 / 1024 MACs per instruction = 0.041 / 0.018 / 0.011 instr/MAC, 3.1k to 7.8k s per token. Did not work (measured): exact LM-head pruning (fraction of MACs 1.000), SVD shortlist (worst rank about 149k of 151,936). Algo's note that its count excludes real nonlinear work: the compiler's measured full-model 1.34e8 is the reference.
+Blocked VDOT 12 rows: 0.1588 instr/MAC, 1.02e8 matvec instr, 1.43e8 tokens at 1.4 tok/instr, 7.2 h at 5.5k tok/s (matvec-only plus a flagged 5.4M non-matvec estimate). Hypothetical wider vector instruction (not in the ISA, not built): 32 / 128 / 1024 MACs per instruction = 0.041 / 0.018 / 0.011 instr/MAC, 3.1k to 7.8k s per token. Did not work (measured): exact LM-head pruning (fraction of MACs 1.000), SVD shortlist (worst rank about 149k of 151,936). Caveat from the algo agent: its ISS VDOT/SMAQA semantics were written from the Qwenputer README (npu branch not in its checkout), so its instr/MAC is not a ref.Machine run; the kernels agent's token-accurate ref.Machine figures (0.163-0.1765 tok/MAC) are the ones to trust for tokens. Algo's note that its count excludes real nonlinear work: the compiler's measured full-model 1.34e8 is the reference.
 
 ## Corrected ROM circuit timing (engine bea5d2e, `engine/results/corrected.json`; MEASURED step times, composite time computed)
 
@@ -111,7 +111,7 @@ k=14 pipelines, 110 appended layers: ROM_DOT token 1.078 ms (928 tok/s); other t
 
 ## Compiled route (stepping stone, NOT a circuit-route tier)
 
-Custom giant outer (1006 layers, D=40775), real fp32 matvecs, host streams weights. Measured 236.3 s / 237.1 s per position dense baseline (maxrel 5.8e-5, argmax == HF); with COO sparse weights, layers cached on GPU and payload caching, 28.8 s steady (39.7 s on the first position, profiling hooks on), 9.3x. Caveat: the caching is simulation-side (precomputed weight/payload caches that a real run of the same graph would not skip), maxrel 2.8e-5, and the block-best result differs from dense by 2.6e-5 rel; headline 268.6 s for the first run is the untuned number. Evidence: `experiments/vslice/PERF_NOTES.md`, `perf/`. Different thing from the table above.
+Custom giant outer (1006 layers, D=40775), real fp32 matvecs, host streams weights. Measured 236.3 s / 237.1 s per position dense baseline (maxrel 5.8e-5, argmax == HF); with COO sparse weights, layers cached on GPU and payload caching, 28.8 s steady (39.7 s on the first position, profiling hooks on), 9.3x. Caveat: the caching is simulation-side (precomputed weight/payload caches that a real run of the same graph would not skip), maxrel 2.8e-5, and the block-best result differs from dense by 2.6e-5 rel; headline 268.6 s for the first run is the untuned number. CUDA graphs are not working (COO fails in capture; CSR gives all-zero output), the sparse parameters probably conflict with the audit's dense-parameter inventory, and TF32 was rejected (4e-4). Evidence: `experiments/vslice/PERF_NOTES.md`, `perf/`. Different thing from the table above.
 
 ## Combined projection (PROJECTED): blocked or W4A4 matvec + merged nonlinear kernels + attention
 
