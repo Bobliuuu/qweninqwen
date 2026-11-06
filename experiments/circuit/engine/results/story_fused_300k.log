@@ -1,0 +1,4 @@
+reference: 12,834,869 tokens, 10,021,206 instructions (92 s): 'Once upon a time, there was a little girl named Lily. She loved to play outside in the park. One day, she saw a big, red ball. She wanted to play with it, but it was too high\n'
+Once
+exact
+fused: 300,000 steps in 92.0 s = 3,259 tok/s (0.307 ms/step)
