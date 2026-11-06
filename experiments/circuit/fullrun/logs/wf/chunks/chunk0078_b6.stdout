@@ -1,0 +1,10 @@
+
+--STDERR--
+Traceback (most recent call last):
+  File "/data/circuit_wf/fullrun/circuit_run.py", line 114, in <module>
+    t = np.load(f'{a.refdir}/tok_{ch:04d}.npy'); k = np.load(f'{a.refdir}/kind_{ch:04d}.npy')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ref785wf/tok_0078.npy'

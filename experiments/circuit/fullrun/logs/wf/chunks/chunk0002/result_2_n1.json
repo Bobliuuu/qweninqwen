@@ -1,0 +1,38 @@
+{
+ "wf_mode": true,
+ "inj_file": "inj",
+ "ramimg": false,
+ "injections": [
+  155727
+ ],
+ "ram_injections": [
+  155727
+ ],
+ "chunks": [
+  2
+ ],
+ "rows": 1,
+ "steps_per_row": [
+  2097152
+ ],
+ "steps_run": 2097152,
+ "seconds": 750.486834526062,
+ "agg_tok_per_s": 2794.3887880817547,
+ "forced_kinds": [],
+ "free_tokens": [
+  2097152
+ ],
+ "forced_tokens": [
+  0
+ ],
+ "free_mismatches": [
+  0
+ ],
+ "first_free_mismatch": [
+  null
+ ],
+ "forced_raw_disagreements": [
+  0
+ ],
+ "gpu": "NVIDIA A10"
+}

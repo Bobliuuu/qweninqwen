@@ -1,0 +1,65 @@
+{
+ "wf_mode": true,
+ "inj_file": "inj",
+ "ramimg": false,
+ "injections": [
+  2752,
+  4688,
+  3758,
+  4650
+ ],
+ "ram_injections": [
+  2752,
+  4688,
+  3758,
+  4650
+ ],
+ "chunks": [
+  4,
+  5,
+  6,
+  7
+ ],
+ "rows": 4,
+ "steps_per_row": [
+  60000,
+  60000,
+  60000,
+  60000
+ ],
+ "steps_run": 60000,
+ "seconds": 26.669713258743286,
+ "agg_tok_per_s": 8998.971570840993,
+ "forced_kinds": [],
+ "free_tokens": [
+  60000,
+  60000,
+  60000,
+  60000
+ ],
+ "forced_tokens": [
+  0,
+  0,
+  0,
+  0
+ ],
+ "free_mismatches": [
+  0,
+  0,
+  0,
+  0
+ ],
+ "first_free_mismatch": [
+  null,
+  null,
+  null,
+  null
+ ],
+ "forced_raw_disagreements": [
+  0,
+  0,
+  0,
+  0
+ ],
+ "gpu": "NVIDIA A10G"
+}

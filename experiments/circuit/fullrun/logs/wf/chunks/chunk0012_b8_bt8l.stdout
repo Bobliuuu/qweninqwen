@@ -1,0 +1,9 @@
+ROW table slice materialised for this run: rows 23397..33889 of 155205
+injections per row [3290, 4621, 4688, 4642]... (RAM-type [3290, 4621, 4688, 4642]), inj file inj, ramimg False, unaddressable-WROM VDOTs forced [0, 0, 0, 0]...
+rows 8, steps/row 60,000, forced kinds [], forced fraction [0.0, 0.0, 0.0, 0.0]
+step 60,000/60,000 16s 29,778 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+{"wf_mode": true, "inj_file": "inj", "ramimg": false, "injections": [3290, 4621, 4688, 4642, 4076, 2607, 4684, 5711], "ram_injections": [3290, 4621, 4688, 4642, 4076, 2607, 4684, 5711], "chunks": [12, 13, 14, 15, 16, 17, 18, 19], "rows": 8, "steps_per_row": [60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000], "steps_run": 60000, "seconds": 16.119954586029053, "agg_tok_per_s": 29776.75706473026, "forced_kinds": [], "free_tokens": [60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000], "forced_tokens": [0, 0, 0, 0, 0, 0, 0, 0], "free_mismatches": [0, 0, 0, 0, 0, 0, 0, 0], "first_free_mismatch": [null, null, null, null, null, null, null, null], "forced_raw_disagreements": [0, 0, 0, 0, 0, 0, 0, 0], "gpu": "NVIDIA L40S"}
+
+--STDERR--
+/usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
+  warn_once(FP_FUSION_DEFAULT_WARNING)
