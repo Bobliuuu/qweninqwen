@@ -49,9 +49,9 @@ def sparsify(layer, fmt='coo'):
 
 class FastRunner(Runner):
     def __init__(self, S, c, plan, P, dev='cuda', eps=1e-30, fastbuild=False, sparse=False, cache_layers=False, cache_pay=False, seg=2048,
-                 prof=False, kernprof=False, graph=False, sparse_fmt='coo'):
+                 prof=False, kernprof=False, graph=False, sparse_fmt='coo', checksum=False):
         super().__init__(S, c, plan, P, dev=dev, eps=eps)
-        self.graph = graph; self.sparse_fmt = sparse_fmt; self.plans = {}; self.graphs = {}; self.goff = {}; self.Hs = None; self.pool = torch.cuda.graph_pool_handle() if dev == 'cuda' else None
+        self.checksum = checksum; self.ck = []; self.graph = graph; self.sparse_fmt = sparse_fmt; self.plans = {}; self.graphs = {}; self.goff = {}; self.Hs = None; self.pool = torch.cuda.graph_pool_handle() if dev == 'cuda' else None
         self.fastbuild, self.sparse, self.cache_layers, self.cache_pay, self.seg, self.prof, self.kernprof = fastbuild, sparse, cache_layers, cache_pay, seg, prof, kernprof
         self.lcache = {}; self.paycache = {}; self.ph = Phase(dev, prof); self.sub = {}; self.kind_t = {}; self.kp_done = {}; self.kp_text = []
 
@@ -221,6 +221,7 @@ class FastRunner(Runner):
                         d = self.sub.setdefault(nme, {}); d[kind] = d.get(kind, 0.0) + s_
                     for h in hs: h.remove()
             self.offs[li] = off
+            if self.checksum: torch.cuda.synchronize(); self.ck.append((li, kind, float(self.Hs.double().abs().sum()), float(self.Hs[:, :64].double().sum())))
             if trace_rows is not None and (trace_layers is None or li in trace_layers):
                 for nme, r in trace_rows.items(): trace[(nme, li)] = self.Hs[r.to(dev) if torch.is_tensor(r) else r].cpu().clone()
             if not self.cache_layers: del layer

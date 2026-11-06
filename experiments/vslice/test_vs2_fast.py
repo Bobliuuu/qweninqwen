@@ -27,7 +27,7 @@ def run_fast(positions=2, nlayers=28, vocab=151936, tf32=False, **rk):
     seq = list(prompt)
     for step in range(positions):
         for d in (rn.ph.t, rn.ph.n): d.clear()
-        rn.sub.clear(); rn.kind_t.clear(); rn.stats.update(rows=0)
+        rn.sub.clear(); rn.kind_t.clear(); rn.ck = []; rn.stats.update(rows=0)
         torch.cuda.synchronize(); t00 = time.time()
         pr = Prog(S, c, plan, dev); token_program(pr, seq[step], step, Wd, emb); t_prog = time.time() - t00
         t1 = time.time()
@@ -55,8 +55,8 @@ def run_fast(positions=2, nlayers=28, vocab=151936, tf32=False, **rk):
         rec = dict(step=step, frames=pr.total, total_s=tot, prog_s=t_prog, ref_s=t_ref, run_s=t_run, maxrel=err, outer_argmax=int(lg.argmax()), hf_argmax=int(rr.argmax()),
                    top_code_score=float(lg.max()), phases={k: round(v, 3) for k, v in rn.ph.t.items()}, rows=rn.stats['rows'],
                    sub={k: {kk: round(vv, 3) for kk, vv in v.items()} for k, v in rn.sub.items()}, kind_s={k: round(v, 3) for k, v in rn.kind_t.items()},
-                   bestblk=bestblk.tolist())
-        out['steps'].append(rec); print({k: v for k, v in rec.items() if k not in ('bestblk', 'sub')}, flush=True)
+                   bestblk=bestblk.tolist(), ck=list(rn.ck))
+        out['steps'].append(rec); print({k: v for k, v in rec.items() if k not in ('bestblk', 'sub', 'ck')}, flush=True)
         if rn.prof and step == 0: print('SUB', json.dumps(rec['sub']), flush=True)
         if len(seq) == step + 1: seq.append(int(lg.argmax()))
     if rn.kp_text: out['kernprof'] = rn.kp_text; print('\n'.join(rn.kp_text), flush=True)

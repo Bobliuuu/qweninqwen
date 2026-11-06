@@ -59,3 +59,17 @@ def multi(variants=()):
         print('PERFJSON ' + json.dumps(r), flush=True); outs.append(r)
         gc.collect(); torch.cuda.empty_cache(); torch.cuda.reset_peak_memory_stats()
     return dict(results=[{k: v for k, v in o.items() if k != 'steps'} for o in outs])
+
+
+def gcheck(nlayers=1, positions=2):
+    """per-layer checksum comparison eager-sparse vs graph (debugging graph capture)."""
+    import gc
+    common = dict(positions=positions, nlayers=nlayers, fastbuild=True, sparse=True, cache_layers=True, cache_pay=True, checksum=True)
+    a = run(variant='gc_eager', sparse_fmt='csr', **common); gc.collect(); torch.cuda.empty_cache()
+    b = run(variant='gc_graph', sparse_fmt='csr', graph=True, **common)
+    out = dict(eager_maxrel=[s['maxrel'] for s in a['steps']], graph_maxrel=[s['maxrel'] for s in b['steps']], first_bad=[])
+    for st in range(positions):
+        ca, cb = a['steps'][st]['ck'], b['steps'][st]['ck']
+        bad = [(x[0], x[1], x[2], y[2]) for x, y in zip(ca, cb) if abs(x[2] - y[2]) > 1e-3 * (abs(x[2]) + 1e-9)]
+        out['first_bad'].append(bad[:6])
+    return out
