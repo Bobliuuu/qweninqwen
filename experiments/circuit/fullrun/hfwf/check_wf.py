@@ -27,8 +27,8 @@ inj = np.load(f'{a.refdir}/inj_0000.npy'); assert (inj[:, 1] == 1).all(), 'only 
 N = min(a.steps, len(tok_all) - 1); inj = inj[inj[:, 0] - 1 < N]
 entry, segs = elf.segments(a.elf); text = [s for s in segs if s[0] == S.ROM_BASE][0][1]
 prog = Program([int.from_bytes(text[i:i + 4], 'little') for i in range(0, len(text), 4)], b'', {'_start': entry}, data_base=S.RAM_BASE, rodata=b'', wrom=b'')
-m = ref.Machine.from_program(prog); assert list(stt['x']) == list(m.x) and stt['anchor'] == m.anchor and stt['n'] == m.n == 0 and stt['wb'] == 0
-m.wrow_w = 8; m.latch = []
+m = ref.Machine.from_program(prog); assert stt['n'] == 0 and stt['wb'] == 0 and not stt.get('latch')
+m.wrow_w = 8; m.latch = []; m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF   # chunk-0 start state (registers, pc anchor) from the reference, as circuit_run.py
 # --- chip layers: prompt prefill, snapshot, inject (hfcheck pattern) ---
 ids = chat.prompt_ids([{"role": "user", "content": "Hi"}]); ccache = chat._chip_cache()
 h = chat.cm.embed_tokens(torch.tensor([ids], device=dev))

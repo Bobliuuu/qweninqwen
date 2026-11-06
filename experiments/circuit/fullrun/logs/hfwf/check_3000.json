@@ -1,0 +1,26 @@
+{
+ "model": "/wf/ckpt",
+ "neg": false,
+ "steps_requested": 3000,
+ "steps_checked": 3000,
+ "mismatches": [],
+ "n_mismatch": 0,
+ "first_mismatch": null,
+ "full_vocab": 666624,
+ "table_rows": 155205,
+ "hidden": 7680,
+ "family_counts_checked": {
+  "V": 857,
+  "F1": 857,
+  "J": 424,
+  "F0": 425,
+  "ST1": 223,
+  "ST0": 214
+ },
+ "n_row_tokens_checked": 0,
+ "n_vdot_tokens_checked": 857,
+ "min_top1_top2_logit_margin": 22528.0,
+ "steps_where_code_decode_ne_fullvocab_argmax": 0,
+ "injections_applied": 424,
+ "seconds": 20.049726009368896
+}

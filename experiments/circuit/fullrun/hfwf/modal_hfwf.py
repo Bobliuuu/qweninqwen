@@ -8,7 +8,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 img = (modal.Image.debian_slim(python_version='3.12').pip_install('torch', 'numpy', 'triton', 'safetensors', 'transformers==5.19.0', 'tokenizers', 'huggingface_hub', 'accelerate')
        .add_local_dir(HERE, '/hfwf', ignore=['__pycache__']))
 data = modal.Volume.from_name('qfr-data'); wf = modal.Volume.from_name('qfr-wfhf', create_if_missing=True)
-KW = dict(image=img, timeout=24 * 3600, volumes={'/data': data, '/wf': wf}, gpu='A100-80GB', memory=131072, ephemeral_disk=600 * 1024)
+KW = dict(image=img, timeout=24 * 3600, volumes={'/data': data, '/wf': wf}, gpu=['H100', 'A100-80GB', 'L40S', 'A100-40GB'], memory=131072, ephemeral_disk=600 * 1024)
 ENV = dict(os.environ, PYTHONPATH='/hfwf:/data/qpriscv_wf', PYTHONUNBUFFERED='1')
 def sh(cmd, log):
     with open(log, 'a') as f: r = subprocess.run(cmd, cwd='/hfwf', env=ENV, stdout=f, stderr=subprocess.STDOUT, text=True)
