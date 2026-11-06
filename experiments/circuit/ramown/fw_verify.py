@@ -15,8 +15,9 @@ def cc(out, src, ld, flags):
     subprocess.check_call([GCC, '-march=rv32im', '-mabi=ilp32', '-O2', '-DDUMP=1', *flags, '-isystem', PICO + '/include', '-I' + cfg, '-I' + C, '-nostdlib', '-nostartfiles', '-static', '-T' + ld, '-o', out,
                            C + '/env/crt0.S', src, C + '/vdk.S', '-Wl,--start-group', PICO + '/lib/rv32im/ilp32/libc.a', libgcc, '-Wl,--end-group'])
 cc(cfg + '/old_d.elf', C + '/qwen3_fx.c', C + '/env/qemu.ld', fl)
-cc(cfg + '/new_d.elf', H + '/fw_qwen3_ram.c', H + '/fw_rom.ld', fl + ['-DNOMARK', '-DPUTCHAR'])
-io, o = run(cfg + '/old_d.elf', [], 'old'); inn, n = run(cfg + '/new_d.elf', ['-s', '0x8000'], 'new')
+SING = NT == 1      # ctx 1: real 32 KB map; ctx > 1 (generic KV path) does not fit 32 KB RAM -> flat map (tests the tiling/fusion transformations only)
+cc(cfg + '/new_d.elf', H + '/fw_qwen3_ram.c', H + '/fw_rom.ld' if SING else C + '/env/qemu.ld', fl + ['-DNOMARK', '-DPUTCHAR'])
+io, o = run(cfg + '/old_d.elf', [], 'old'); inn, n = run(cfg + '/new_d.elf', ['-s', '0x8000'] if SING else [], 'new')
 o = o.reshape(NT, 1 + V); n = n.reshape(NT, V + 1)           # old: [argmax][logits]; new: [logits][argmax]
 am_o, lg_o = o[:, 0], o[:, 1:]; am_n, lg_n = n[:, V], n[:, :V]
 res = dict(cfg=cfg, flags=fl, ntok=NT, argmax_old=am_o.tolist(), argmax_new=am_n.tolist(), logits_identical=bool((lg_o == lg_n).all()), n_logit_diff=int((lg_o != lg_n).sum()),

@@ -1,0 +1,17 @@
+touched 7514 words; stored 6984; read-only-touched 530; loads 10,428,156 stores 9,166,022
+PEAK live (stored values, exact) = 4657 words = 18.2 KB ; incl. read-before-write = 5177
+buffer            decl B    words   stored      RO        loads       stores
+accs_               1024      256      256       0    7,936,000    7,936,000
+other               None       73       71       2      829,613      413,222
+hg                 12288     3072     3072       0      544,768      315,392
+hut                 1024      256      256       0      237,952      237,952
+xqi                 1088      256      256       0      411,136       58,368
+x                   4096     1024     1024       0      174,080       58,368
+v32                 4096     1024     1024       0      143,360       57,344
+xb                  4096     1024     1024       0      116,736       58,368
+vk_x                   4        1        1       0       31,008       31,008
+__clz_tab            256       56        0      56        2,107            0
+PLN                  784      139        0     139          447            0
+SOFF                 784      139        0     139          447            0
+WBW                  784      139        0     139          447            0
+NORM_OFF             448       55        0      55           55            0
