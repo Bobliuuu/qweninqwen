@@ -1,11 +1,11 @@
 """recursiveqwen / merge2: N inner Qwen3 models hosted side by side in ONE stock Qwen3.5-0.8B checkpoint.
 
-Changes vs v1 (qweninqwen/merge.py):
+Changes vs the single-model builder (../hosted-nesting/qweninqwen/merge.py):
   * all N inner models share the SAME appended full-attention layers (layer i of every inner model is
     hosted in appended layer 24+i, in disjoint hidden subspaces / heads / MLP neurons / head-dim slots)
   * RoPE: rope_type='longrope' gives an arbitrary per-pair frequency table (short_factor==long_factor,
     rope_theta=1, attention_factor=1) so every model gets its own exact frequencies in its own head-dim
-    slots. No shared integer grid needed -> head_dim = 2*(32+sum hd_m/2)+192 instead of 640 (v1),
+    slots. No shared integer grid needed -> head_dim = 2*(32+sum hd_m/2)+192 instead of 640 in the single-model builder,
     and no grid-growth limit on which inner models can be hosted.
   * one flag dim per inner model plus one for the outer model: gate saturation (own flag) and
     lm_head masking of every foreign vocab range (-LAM*flag), so greedy argmax is exact even when the

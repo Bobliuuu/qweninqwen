@@ -1,0 +1,28 @@
+{
+  "shape": [
+    64,
+    4
+  ],
+  "tile_rows": 8,
+  "output": [
+    2204,
+    -285,
+    2934,
+    -2320
+  ],
+  "expected": [
+    2204,
+    -285,
+    2934,
+    -2320
+  ],
+  "tile_stats": {
+    "layers": 18,
+    "dims": 1409,
+    "heads": 8,
+    "ffn_units": 5084
+  },
+  "seconds": 3.9076772110000775,
+  "evidence": "tile_and_accumulation_in_circuit_IR",
+  "limitation": "host_scheduling_and_encoding_not_merged_checkpoint"
+}

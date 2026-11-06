@@ -1,0 +1,53 @@
+{
+ "q3_qnorm_L0": {
+  "norm_only": {
+   "max_abs": 1.430511474609375e-06,
+   "max_rel_to_maxabs": 1.545325796401678e-07,
+   "rmse_rel": 9.889385573527978e-08
+  },
+  "norm_x_gain_product": {
+   "max_abs": 9.5367431640625e-06,
+   "max_rel_to_maxabs": 2.8762861025679024e-07,
+   "rmse_rel": 1.6679755593422928e-07
+  }
+ },
+ "q3_qnorm_L13": {
+  "norm_only": {
+   "max_abs": 1.430511474609375e-06,
+   "max_rel_to_maxabs": 1.9021387648271718e-07,
+   "rmse_rel": 9.19424155052483e-08
+  },
+  "norm_x_gain_product": {
+   "max_abs": 5.7220458984375e-06,
+   "max_rel_to_maxabs": 2.729546439456795e-07,
+   "rmse_rel": 1.734771945854101e-07
+  }
+ },
+ "q3_qnorm_L27": {
+  "norm_only": {
+   "max_abs": 1.430511474609375e-06,
+   "max_rel_to_maxabs": 2.2096371112972117e-07,
+   "rmse_rel": 8.867984625851526e-08
+  },
+  "norm_x_gain_product": {
+   "max_abs": 7.62939453125e-06,
+   "max_rel_to_maxabs": 3.073939700215568e-07,
+   "rmse_rel": 1.710196657297339e-07
+  }
+ },
+ "residual_add_gadget": {
+  "max_abs": 8.940696716308594e-08,
+  "max_rel_to_maxabs": 5.5337091342988225e-11,
+  "rmse_rel": 6.588971620518405e-10
+ },
+ "identity_copy": {
+  "max_abs": 1.9073486328125e-06,
+  "max_rel_to_maxabs": 1.181541396938095e-09,
+  "rmse_rel": 3.914409234513844e-09
+ },
+ "embedding_row": {
+  "max_abs": 0.0,
+  "max_rel_to_maxabs": 0.0,
+  "rmse_rel": 0.0
+ }
+}

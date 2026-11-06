@@ -1,0 +1,365 @@
+{
+  "environment": "CPU NumPy; no torch, checkpoint, or CUDA",
+  "circuit_evidence": "upstream exactness evaluator with check=True",
+  "experiments": [
+    {
+      "name": "upstream_baseline",
+      "seconds": 1.3493319579999934,
+      "runs": [
+        {
+          "config": [
+            8,
+            8,
+            3,
+            3
+          ],
+          "readouts": 64,
+          "stats": {
+            "layers": 2,
+            "dims": 218,
+            "heads": 16,
+            "ffn_units": 145
+          }
+        },
+        {
+          "config": [
+            8,
+            8,
+            5,
+            5
+          ],
+          "readouts": 64,
+          "stats": {
+            "layers": 7,
+            "dims": 501,
+            "heads": 16,
+            "ffn_units": 556
+          }
+        },
+        {
+          "config": [
+            16,
+            16,
+            5,
+            5
+          ],
+          "readouts": 128,
+          "stats": {
+            "layers": 10,
+            "dims": 978,
+            "heads": 32,
+            "ffn_units": 833
+          }
+        },
+        {
+          "config": [
+            32,
+            32,
+            3,
+            3
+          ],
+          "readouts": 256,
+          "stats": {
+            "layers": 6,
+            "dims": 824,
+            "heads": 64,
+            "ffn_units": 376
+          }
+        }
+      ],
+      "readouts": 512
+    },
+    {
+      "name": "signed_tiles",
+      "seconds": 5.472469178999972,
+      "runs": [
+        {
+          "rows": 2,
+          "columns": 2,
+          "extreme": false,
+          "readouts": 40,
+          "stats": {
+            "layers": 14,
+            "dims": 583,
+            "heads": 4,
+            "ffn_units": 844
+          }
+        },
+        {
+          "rows": 2,
+          "columns": 2,
+          "extreme": true,
+          "readouts": 40,
+          "stats": {
+            "layers": 14,
+            "dims": 583,
+            "heads": 4,
+            "ffn_units": 844
+          }
+        },
+        {
+          "rows": 4,
+          "columns": 2,
+          "extreme": false,
+          "readouts": 40,
+          "stats": {
+            "layers": 16,
+            "dims": 741,
+            "heads": 4,
+            "ffn_units": 1516
+          }
+        },
+        {
+          "rows": 4,
+          "columns": 2,
+          "extreme": true,
+          "readouts": 40,
+          "stats": {
+            "layers": 16,
+            "dims": 741,
+            "heads": 4,
+            "ffn_units": 1516
+          }
+        },
+        {
+          "rows": 8,
+          "columns": 2,
+          "extreme": false,
+          "readouts": 40,
+          "stats": {
+            "layers": 18,
+            "dims": 719,
+            "heads": 4,
+            "ffn_units": 2542
+          }
+        },
+        {
+          "rows": 8,
+          "columns": 2,
+          "extreme": true,
+          "readouts": 40,
+          "stats": {
+            "layers": 18,
+            "dims": 719,
+            "heads": 4,
+            "ffn_units": 2542
+          }
+        },
+        {
+          "rows": 16,
+          "columns": 2,
+          "extreme": false,
+          "readouts": 40,
+          "stats": {
+            "layers": 17,
+            "dims": 1047,
+            "heads": 4,
+            "ffn_units": 4856
+          }
+        },
+        {
+          "rows": 16,
+          "columns": 2,
+          "extreme": true,
+          "readouts": 40,
+          "stats": {
+            "layers": 17,
+            "dims": 1047,
+            "heads": 4,
+            "ffn_units": 4856
+          }
+        },
+        {
+          "rows": 32,
+          "columns": 2,
+          "extreme": false,
+          "readouts": 40,
+          "stats": {
+            "layers": 18,
+            "dims": 1231,
+            "heads": 4,
+            "ffn_units": 9104
+          }
+        },
+        {
+          "rows": 32,
+          "columns": 2,
+          "extreme": true,
+          "readouts": 40,
+          "stats": {
+            "layers": 18,
+            "dims": 1231,
+            "heads": 4,
+            "ffn_units": 9104
+          }
+        },
+        {
+          "rows": 64,
+          "columns": 2,
+          "extreme": false,
+          "readouts": 40,
+          "stats": {
+            "layers": 21,
+            "dims": 1449,
+            "heads": 4,
+            "ffn_units": 17452
+          }
+        },
+        {
+          "rows": 64,
+          "columns": 2,
+          "extreme": true,
+          "readouts": 40,
+          "stats": {
+            "layers": 21,
+            "dims": 1449,
+            "heads": 4,
+            "ffn_units": 17452
+          }
+        }
+      ],
+      "readouts": 480,
+      "max_integer_error": 0
+    },
+    {
+      "name": "exhaustive_int8_int4",
+      "seconds": 1.18878000899997,
+      "cases": 4096,
+      "max_integer_error": 0,
+      "stats": {
+        "layers": 14,
+        "dims": 300,
+        "heads": 2,
+        "ffn_units": 422
+      }
+    },
+    {
+      "name": "wide_adder",
+      "seconds": 0.01429179199999453,
+      "cases": 100,
+      "width": 23,
+      "stats": {
+        "layers": 24,
+        "dims": 93,
+        "heads": 0,
+        "ffn_units": 69
+      },
+      "scope": "arithmetic_gadget_not_persistent_state_or_token_protocol"
+    },
+    {
+      "name": "mutation",
+      "seconds": 0.12236908600004881,
+      "expected": 7112,
+      "corrupted": 0,
+      "detected": true
+    },
+    {
+      "name": "cancellation",
+      "seconds": 0.05456407599990598,
+      "raw_tile_results": [
+        1778,
+        -1778
+      ],
+      "correct_sum": 0,
+      "old_clamped_sum": 31,
+      "scope": "cross_tile_sum_is_host_reference_only"
+    },
+    {
+      "name": "full_projection_oracle",
+      "seconds": 0.44365006800001083,
+      "shape": [
+        1024,
+        3072
+      ],
+      "macs": 3145728,
+      "outputs": 3072,
+      "max_integer_error": 0,
+      "evidence": "numpy_bitplane_oracle_only_not_full_projection_circuit"
+    }
+  ],
+  "plans": {
+    "Qwen3-0.6B": {
+      "config": {
+        "h": 1024,
+        "ff": 3072,
+        "l": 28,
+        "q": 2048,
+        "kv": 1024,
+        "vocab": 151936
+      },
+      "macs_per_token": 595984384,
+      "packed_int4_bytes": 297992192,
+      "kv_bf16_bytes_context128": 14680064,
+      "protocols": {
+        "1": {
+          "trace_tokens": 651857920,
+          "seconds_at_assumed_100k_trace_tokens_per_s": 6518.5792
+        },
+        "8": {
+          "trace_tokens": 130371584,
+          "seconds_at_assumed_100k_trace_tokens_per_s": 1303.71584
+        },
+        "32": {
+          "trace_tokens": 74498048,
+          "seconds_at_assumed_100k_trace_tokens_per_s": 744.98048
+        },
+        "256": {
+          "trace_tokens": 58201600,
+          "seconds_at_assumed_100k_trace_tokens_per_s": 582.016
+        }
+      },
+      "evidence": "analytical_hypothetical_protocol_not_measured",
+      "exclusions": [
+        "scales",
+        "attention",
+        "nonlinearities",
+        "control",
+        "limb arithmetic"
+      ]
+    },
+    "Qwen2.5-0.5B": {
+      "config": {
+        "h": 896,
+        "ff": 4864,
+        "l": 24,
+        "q": 896,
+        "kv": 128,
+        "vocab": 151936
+      },
+      "macs_per_token": 493961216,
+      "packed_int4_bytes": 246980608,
+      "kv_bf16_bytes_context128": 1572864,
+      "protocols": {
+        "1": {
+          "trace_tokens": 540270080,
+          "seconds_at_assumed_100k_trace_tokens_per_s": 5402.7008
+        },
+        "8": {
+          "trace_tokens": 108054016,
+          "seconds_at_assumed_100k_trace_tokens_per_s": 1080.54016
+        },
+        "32": {
+          "trace_tokens": 61745152,
+          "seconds_at_assumed_100k_trace_tokens_per_s": 617.45152
+        },
+        "256": {
+          "trace_tokens": 48238400,
+          "seconds_at_assumed_100k_trace_tokens_per_s": 482.384
+        }
+      },
+      "evidence": "analytical_hypothetical_protocol_not_measured",
+      "exclusions": [
+        "scales",
+        "attention",
+        "nonlinearities",
+        "control",
+        "limb arithmetic"
+      ]
+    }
+  },
+  "runtime": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "numpy": "2.3.5",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "evidence": "actual_Qwen3_5_CPU_BF16_cached_execution",
+  "pretrained_language_weights": false,
+  "runs": [
+    {
+      "k": 16,
+      "macs": 16,
+      "seconds": 0.8457958869998947,
+      "macs_per_second": 18.917093646261716,
+      "tile_tokens": 34,
+      "accumulator_tokens": 28,
+      "result": -336,
+      "partials": [
+        369,
+        -705
+      ]
+    },
+    {
+      "k": 64,
+      "macs": 64,
+      "seconds": 3.176385299000003,
+      "macs_per_second": 20.148689146794826,
+      "tile_tokens": 136,
+      "accumulator_tokens": 100,
+      "result": -3974,
+      "partials": [
+        -1993,
+        392,
+        -617,
+        -584,
+        -1753,
+        -1736,
+        1415,
+        902
+      ]
+    },
+    {
+      "k": 128,
+      "macs": 128,
+      "seconds": 6.328708081000059,
+      "macs_per_second": 20.225296910799134,
+      "tile_tokens": 272,
+      "accumulator_tokens": 196,
+      "result": 6319,
+      "partials": [
+        102,
+        669,
+        797,
+        1285,
+        -548,
+        1686,
+        -93,
+        -995,
+        837,
+        47,
+        712,
+        933,
+        -281,
+        208,
+        1092,
+        -132
+      ]
+    }
+  ],
+  "seconds": 24.24324390400011,
+  "scope": "host_scheduled_two_component_projection_not_full_Qwen_inference"
+}

@@ -1,15 +1,14 @@
 <div align="center">
 
-# qweninqwen v1: hosted nesting (older version)
+# Hosted nesting (earlier experiment)
 
 **The smallest Qwen actually running inside a Qwen.**
 
 Qwen3-0.6B (all 28 layers, real weights) is **hosted** inside the real, pretrained Qwen3.5-0.8B,
 in a single checkpoint, executed by stock `Qwen3_5ForCausalLM` code. No patches, weights only.
 
-> **Note:** this is the *fast, exact* older version (v1, "hosted"): the two models share one forward pass but never mix; the outer half idles while the inner runs.
-> It is **not** the Qwenputer-style version where the outer model's own DeltaNet weights *execute* the inner model's arithmetic.
-> That route is v3, see the top-level README.
+> **Note:** this is the *fast, exact* hosted-nesting experiment: the two models share one forward pass but never mix; the outer half idles while the inner runs.
+> It is **not** the Qwenputer-style construction in which the outer model's own DeltaNet weights and state *execute* the inner model's arithmetic. That construction is the subject of the top-level README.
 
 ![demo](assets/demo.gif)
 
@@ -55,7 +54,7 @@ Details: `qweninqwen/merge.py`.
 | fp32 exactness, outer vs untouched Qwen3.5-0.8B | max abs logit diff 6.1e-5, argmax identical at all 150 positions, 32-token greedy text identical on 10/10 prompts |
 | bf16 (A100), 10 prompts, top-1 where reference has a clear margin | 147/147 inner, 150/150 outer positions agree (`tests/test_merged.py`) |
 | Mutation: zero 12 inner MLPs | output collapses to `........`, so the inner weights do the work |
-| Speed (A100, HF eager, no fused kernels) | 11.4 tok/s nested vs 27.7 tok/s plain Qwen3-0.6B (v1 numbers) |
+| Speed (A100, HF eager, no fused kernels) | 11.4 tok/s nested vs 27.7 tok/s plain Qwen3-0.6B |
 
 bf16 is not bit-identical to the standalone model: greedy text can diverge at near-tie tokens because accumulation order differs. fp32 is the strict test.
 

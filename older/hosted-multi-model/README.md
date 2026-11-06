@@ -1,6 +1,6 @@
-# v2 prototype: multi-model hosting ("recursiveqwen")
+# Hosted multi-model prototype ("recursiveqwen")
 
-Still the *hosted* kind of nesting (see top-level README): several inner models share the same appended layers of one Qwen3.5-0.8B checkpoint, each in its own hidden slice, heads and MLP neurons.
+Still the *hosted* kind of nesting (see `../hosted-nesting/README.md`): several inner models share the same appended layers of one Qwen3.5-0.8B checkpoint, each in its own hidden slice, heads and MLP neurons.
 
 - per-model RoPE tables via `rope_type="longrope"` config values (no shared integer grid limit)
 - per-model qk-norm slots, one flag dim per hosted model, foreign vocab masked in `lm_head`
