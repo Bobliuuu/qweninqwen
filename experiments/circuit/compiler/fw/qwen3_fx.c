@@ -6,9 +6,18 @@
 typedef int64_t i64; typedef uint64_t u64;
 #define WBASE 0x10000000u
 #define BI(off) ((const int32_t *)(WBASE + (off)))
+#ifdef NOMARK
+#define MARK() ((void)0)
+#else
 #define MARK() __asm__ volatile("li a7,2\n ecall" ::: "a7", "memory")
+#endif
 #define NOINL __attribute__((noinline)) static
+#ifdef PUTCHAR
+// Qwenputer ABI: ecall a7=1 putchar(a0), one byte per ecall
+static void wr(void *p, int n) { const uint8_t *b = (const uint8_t *)p; for (int i = 0; i < n; i++) { register long a0 __asm__("a0") = b[i], a7 __asm__("a7") = 1; __asm__ volatile("ecall" :: "r"(a0), "r"(a7) : "memory"); } }
+#else
 static void wr(void *p, int n) { register long a0 __asm__("a0") = 1, a1 __asm__("a1") = (long)p, a2 __asm__("a2") = n, a7 __asm__("a7") = 64; __asm__ volatile("ecall" :: "r"(a0), "r"(a1), "r"(a2), "r"(a7) : "memory"); }
+#endif
 void exit(int c) { register long a0 __asm__("a0") = c, a7 __asm__("a7") = 93; __asm__ volatile("ecall" :: "r"(a0), "r"(a7)); for (;;); }
 #define SMAQA(acc, a, b) __asm__ volatile(".insn r 0x0B, 7, 0, %0, %1, %2" : "+r"(acc) : "r"(a), "r"(b))
 #ifdef EXT
