@@ -4,6 +4,12 @@ Maintained by the integration lead. Rule: a number in a **measured** column come
 
 Not this: the README's 268.6 s/token result is the earlier compiled route (custom giant outer, 1006 layers, D=40775). It is a stepping stone, not a circuit-route tier.
 
+## Headline (2026-11-06)
+
+Best build with MEASURED instruction counts on real Qwen3-0.6B weights: v2 integer-only int4 VDOT + custom nonlinear instructions: **1.34e8 instr/token at ctx 1, 1.55e8 at ctx 129** (compiler emulator, `experiments/circuit/compiler/RESULTS.md`). Seconds are computed, not measured: **about 8 to 12 hours per token at ctx 1** (7.7 h best case, 12.4 h worst case), 9 to 14 h at ctx 129, 17 to 27 h at ctx 1024 (extrapolated at 1.6e5 instr per context token). No Qwen3-0.6B token has been run on the circuit executor; fidelity is 92 % top-1 vs HF, not exact (R4).
+
+Range arithmetic (explicit): trace tokens = instr x tok/instr with tok/instr in 1.02 (VDOT-dominated, kernels agent, token-accurate) to 1.40 (gcc-C mix, Qwenputer docs): ctx 1 gives 1.37e8 to 1.88e8 tokens. Rates are MEASURED but on other firmware: 4,963 tok/s (A10G, tuned, stories260k, `engine/results/autotune.json`) and 4,225 tok/s (A100, untuned, our tiny q3). Best = 1.37e8 / 4,963 = 2.76e4 s = 7.7 h; worst = 1.88e8 / 4,225 = 4.45e4 s = 12.4 h. ctx 129: 1.58e8 to 2.17e8 tokens, 8.8 to 14.3 h. ctx 1024: 2.98e8 instr, 3.04e8 to 4.17e8 tokens, 17 to 27 h. Whether the real 0.6B firmware reaches the stories260k-class rate on the 4B chip circuit is unmeasured (chip layers and per-step arithmetic are the same circuit, but the hidden-4096 core was timed only on those two firmwares).
+
 ## Leaderboard (last updated 2026-11-06, commit of this file)
 
 s/token = trace tokens per token / trace-tok/s. Rate column for T1+ is Qwenputer's measured executor figure on a stories260K-class program, not yet measured on a Qwen3-0.6B-shaped program.
@@ -55,6 +61,18 @@ Reconciliation of q4v 1.7 days with the T3 projection of 6-12 h: the q4v build h
 
 Fidelity flag: `res_full_q4v.json` records `argmax_fw` [13, 315, 279, 374] vs `argmax_hf` [15846, 315, 279, 374] on the 4-token prompt: the q4v firmware differs from HF at position 0 (agrees at 1-3). Argmax vs HF is not yet a pass; this belongs under R4 (numeric contract).
 
+## Fidelity rows (open ruling R4: numeric contract)
+
+| Build | Top-1 agreement with HF fp32 | Notes | Evidence |
+|---|---|---|---|
+| firmware int4 per-row, EXT, real weights | 120/130 positions = 92.3 % | float weight-only int4: 91.5 %, so the firmware adds little beyond int4 RTN | `compiler/RESULTS.md`, `res_full_fx_*.json` |
+| float weight-only int8 per-row | 47/48 | position 0 WRONG | `res_fidelity_ablation.json` |
+| firmware int8 weights | positions 1-3 match | position 0 WRONG (argmax 14582 vs HF 15846); 12-bit last-layer MLP does not fix it | same |
+
+Position 0 is the attention-sink token with top1-top2 logit gap 0.136; even int8 misses it. State plainly: no current firmware is argmax-exact against HF. Whether the target is "equals HF" or "equals the pinned integer emulator" is the open numeric-contract ruling (R4). The integer emulator itself is the correctness reference for trace equality; HF agreement is reported separately.
+
+Per-op instruction split quoted by the compiler for v2 int4 (VDOT kernels about 1.0e8, mv epilogue 5e7, rms 2.4e7, quantize 1.2e7, attention 9e6, swiglu 8e6, rope 4e6) sums to 2.07e8, more than the 1.34e8 total, so it was taken over a different position set or build; I use only the totals. Asked the compiler to reconcile.
+
 ## Merged integer-only build (MEASURED instructions on real weights; seconds computed)
 
 Compiler, aa7b367 / 3011004, `experiments/circuit/compiler/RESULTS.md` (emulated RV32IM firmware, real Qwen3-0.6B weights, nonlinear agent's EXP2/RSQ/SIGM/AMX/ROT16 merged as `-DEXT`, plain RV32IM fallback available). This is the first build that approaches the PROJECTED builds above, and it is measured as instructions.
@@ -74,7 +92,7 @@ Compiler, aa7b367 / 3011004, `experiments/circuit/compiler/RESULTS.md` (emulated
 
 ## Combined projection (PROJECTED): blocked or W4A4 matvec + merged nonlinear kernels + attention
 
-Built from measured per-op token costs, nothing run end to end. Components, tokens per inner token:
+NOTE: build A below is superseded by the measured-instruction headline above (1.34e8 instr vs my 1.10e8 tokens projection). Kept for B and C and for the blocked-kernel target. Built from measured per-op token costs, nothing run end to end. Components, tokens per inner token:
 - Matvec (kernels agent, exact on Qwenputer `ref.Machine`, token-accurate): blocked VDOT + requant epilogue 0.1765 tok/MAC on layers, 0.1656 on the LM head (fused argmax) = 1.035e8. Proposed VDOT16 (W4A4, K9): 0.0921 / 0.084 = 5.36e7 (modelled on the same Machine, not built in the circuit).
 - Nonlinear with custom instructions (nonlinear agent, `res_counts.json`, ext_tokens): 9.57e6 at T=1, 1.02e7 at T=64, 1.47e7 at T=512 (linear in T between); I subtract requant (3.02e6) and unfused argmax (1.5e5) because the K6/K7 kernels already include them.
 - Attention score and PV MACs (114,688 x T int8 x int8, not in either table): estimated at 1.325 tok/MAC (SMAQA K2 class). ESTIMATE; no attention kernel is measured.
@@ -93,7 +111,17 @@ All PROJECTED [needs R2, R4]. Not included: ROM read overhead and address writes
 
 Reconciling the two tok/MAC views: the compiler reports 0.176 instr/MAC and applies an assumed 1.19-1.40 tok/instr (0.21-0.25 tok/MAC); the kernels agent measures tokens directly on `ref.Machine` and gets 0.18 for the same kernel structure (about 1.02 tok/instr, since VDOT records are one small token). For VDOT-dominated code use the kernels figure; the 1.19-1.40 ratio is for general C and overstates the matvec by about 20-40 %.
 
-### Variant C (PROJECTED, supersedes the VDOT/WROM matvec assumption if built): ROM + MAC in appended 4B layers
+### Variant C, corrected row (memory section 10, 08bceb7; engine sparse timing)
+
+| Item | Value | Status |
+|---|---|---|
+| ROM banks / layers | 29 banks, 14 pipelines: 29 ROM + 70 + 11 digit-accumulation = 110 appended layers, about 121 per step | built exact, executor time not measured |
+| Trace tokens per inner token for matvec | 2.4e6 to 4.6e6 (per-result epilogue about 8 tokens; 1.85e5 ROM_DOT calls) | estimated |
+| Engine sparse ROM timing | 0.543 ms/step (1,842 tok/s) for 13 pipelines, 52 sequential kernels on A10G; 0.425 ms stage-batched | MEASURED for 13 pipelines only, timing only (random table). NOT valid for 29 banks / 121 layers |
+| With layer skip (appended layers run only on ROM_DOT tokens) | ordinary tokens at 0.2015 ms/step; non-matvec work about 3.4e7 instr (about 4.8e7 tokens) = 2.7 h, plus ROM tokens 2.4-4.6e6 x 0.5-2 ms = 0.3-2.6 h; total about 3 to 5 h | PROJECTED, needs layer-skip, R2, R4 |
+| Without layer skip | every token pays about 1 ms+: more than 12 h, loses to build A | PROJECTED |
+
+### Variant C (PROJECTED, earlier notes, superseded by the table above the VDOT/WROM matvec assumption if built): ROM + MAC in appended 4B layers
 
 Memory agent, measured stage by stage in bf16 (CPU, GPU reruns queued; `MEMORY_DESIGN.md` section 8, 58f0b0b): 230 int4 x int8 MACs per word per pipeline (5 sublayers), 13 pipelines = 65 appended layers = 2,990 MACs per position, exact over 64 positions; address from a DeltaNet register costs 1 layer and 0 extra tokens (exact). NOT built: accumulating the digits into CPU rails (estimated 4 layers); the MLP-ROM earlier estimate of 1,150 MACs/layer was about 3x too optimistic and is withdrawn.
 - Matvec: about 2.0e5 trace positions per token (4.7e-4 tokens/MAC) versus 1.0e8 for blocked VDOT, a 500x cut in tokens. That is not a 500x cut in time: the chip grows from 11 to about 76-81 layers, and the fused executor's step time scales with layer count (kernels agent's assumption; a ROM layer may be cheaper as a gather, unmeasured), so the rate drops to about 4,225 x 11/76-81 = 570-620 tok/s.
