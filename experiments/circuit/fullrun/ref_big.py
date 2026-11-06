@@ -13,20 +13,34 @@ S.RAM_BASE, S.RAM_WORDS = 0x1000000, 1 << 20; S.SP_INIT = S.RAM_BASE + 4 * S.RAM
 S.DROM_BASE, S.DROM_WORDS = 0x10000000, (len(blob) + 3) // 4
 S.WP_BITS = 27; S.WROM_WORDS = (len(wrom) + 7) // 8; S.WROM_BASE = 0x80000000
 M27 = (1 << 27) - 1
+MEMLOAD = ('LB', 'LBU', 'LH', 'LHU', 'LW')
 KIND = dict(other=0, load=1, vdot=2, store=3, wb=4, ecall=5, branch=6, alu=7, div=8, smaqa=9, custom=10)
 
 class Big(ref.Machine):
     def setup(self):
-        self.wbset = set(); self.kind = [0] * len(self.rom)
+        self.wbset = set(); self.kind = [0] * len(self.rom); self.dec = [None] * len(self.rom); self.inj = []; self.nbuf = lambda: 0
         for i, w in enumerate(self.rom):
             if w == 0: continue
-            op = ref.decode(w).op
+            self.dec[i] = ref.decode(w); op = self.dec[i].op
             if op == 'WB': self.wbset.add(i)
             self.kind[i] = (KIND['load'] if op in ref.LOAD_OPS else KIND['store'] if op in ref.STORE_OPS else KIND['vdot'] if op == 'VDOT' else KIND['smaqa'] if op == 'SMAQA'
                             else KIND['wb'] if op == 'WB' else KIND['ecall'] if op == 'ECALL' else KIND['branch'] if op in ref.BRANCH_OPS or op in ('JAL', 'JALR')
                             else KIND['div'] if op in ref.DIV_OPS else KIND['custom'] if op in ref.CUSTOM else KIND['alu'])
     def record(self):
         i = self.anchor + self.n
+        if self.n != S.N_MAX:
+            d = self.dec[i]
+            if d is not None:
+                op = d.op
+                if op in MEMLOAD or op in ('SB', 'SH'):   # host-served memory word (aligned), circuit RAM slot = word index mod 8192
+                    ea = (self.x[d.rs1] + d.imm) & 0xFFFFFFFF
+                    ri = self.ram_index(ea)
+                    if ri is not None: w = self.ram[ri]
+                    else:
+                        w = self.drom_word(ea); w = 0 if w is None else w
+                    self.inj.append((self.nbuf(), 1, (ea >> 2) & 0x1FFF, w))
+                elif op == 'VDOT':
+                    self.inj.append((self.nbuf(), 2, (self.wb + i) & M27, 0))
         if self.n != S.N_MAX and i in self.wbset:
             a = self.x[ref.decode(self.rom[i]).rs1]
             self.wb = (a - i - 1) & M27; self.n += 1
@@ -45,21 +59,29 @@ if os.path.exists(ckp):
     print(f'resumed at chunk {chunk} steps {m.steps}', flush=True)
 else:
     first = np.array([S.tok('GO')], dtype=np.uint32); ntok = 1
-CH = 1 << 24; buf = []; kbuf = []; nb = 0
+def dump_state():
+    # machine state at this record boundary (= the start of chunk `chunk`): enough to snapshot the circuit (no RAM: loads are host-served)
+    pickle.dump(dict(x=list(m.x), anchor=m.anchor, n=m.n, wb=m.wb, steps=m.steps, tok_start=ntok, halted=m.halted), open(f'{out}/state_{chunk:04d}.pkl', 'wb'))
+CH = 1 << 21; buf = []; kbuf = []; nb = 0
 def flush():
     global chunk, buf, kbuf, nb
     np.save(f'{out}/tok_{chunk:04d}.npy', np.array(buf, dtype=np.uint32)); np.save(f'{out}/kind_{chunk:04d}.npy', np.array(kbuf, dtype=np.uint8))
+    np.save(f'{out}/inj_{chunk:04d}.npy', np.array(m.inj, dtype=np.int64).reshape(-1, 4)); m.inj = []
     chunk += 1; buf = []; kbuf = []; nb = 0
+    dump_state()
     st = {k: getattr(m, k) for k in ('x', 'ram', 'bn', 'anchor', 'n', 'halted', 'steps', 'wb', 'out', 'fault', 'exit_code')}
     st.update(chunk=chunk, ntok=ntok, fam=fam); pickle.dump(st, open(ckp + '.tmp', 'wb')); os.replace(ckp + '.tmp', ckp)
 if chunk == 0 and not buf: buf.append(S.tok('GO')); kbuf.append(0); nb = 1; ntok = 1
+if chunk == 0: dump_state()
+m.nbuf = lambda: nb
 rom_kind = m.kind; rec = m.record; last = time.time()
 while not m.halted:
     i = m.anchor + m.n; k = rom_kind[i] if m.n != S.N_MAX else 0
     r = rec(); L = len(r); buf += r; kbuf += [k] * L; nb += L; ntok += L
     if nb >= CH:
-        flush(); print(f'{ntok:,} tokens {m.steps:,} instr {time.time()-t0:.0f}s ({m.steps/(time.time()-t0):,.0f} instr/s)', flush=True)
-if buf: flush()
+        flush()
+        if chunk % 8 == 0: print(f'{ntok:,} tokens {m.steps:,} instr {time.time()-t0:.0f}s ({m.steps/(time.time()-t0):,.0f} instr/s)', flush=True)
+if buf or m.inj: flush()
 fams = {}
 for c in range(chunk):
     t = np.load(f'{out}/tok_{c:04d}.npy'); b = np.zeros(S.VOCAB, dtype=np.int64)
