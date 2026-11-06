@@ -12,6 +12,10 @@ before the next embedding) by the reference token, because the circuit's RAM (32
 Every other token (ALU, MUL/DIV, branches/jumps, WB, R refresh, ecall) is the circuit's own and is compared to the reference trace; raw circuit predictions at host-served tokens are logged too.
 usage: circuit_run.py ELF REFDIR OUTDIR --chunks 0,1,2 [--steps N] [--block K] [--kinds 1,2,3]"""
 import argparse, json, os, sys, time, pickle
+WF = bool(os.environ.get('WF'))   # WEIGHT-FETCH MODE: firmware built with WF=1 (wrow before every 8-word VDOT window), circuit = core.build(wrow=8): the VDOT weights come from the outer model's own
+# embedding rows (ROW tokens; table rows are parameters), NO weight word is injected, NO VDOT record is forced. Still host-assisted: RAM/blob words (type 1/3 injections), chunk-start snapshot
+# (regs, pc anchor, n, weight base low 15 bits, latch window), the chunk schedule. Needs PYTHONPATH to a tree patched with weight_fetch/wf_npu.patch.
+if WF: os.environ.setdefault('WF_ROW_CELLS', '3840')
 import numpy as np, torch, triton, triton.language as tl
 import types
 from chipformer.rv import core as _core0, elf, ref, fusedexec
@@ -32,6 +36,7 @@ from tune_warps import W
 ap = argparse.ArgumentParser(); ap.add_argument('elf'); ap.add_argument('refdir'); ap.add_argument('out'); ap.add_argument('--chunks', required=True)
 ap.add_argument('--steps', type=int, default=0); ap.add_argument('--block', type=int, default=50000); ap.add_argument('--kinds', default=''); ap.add_argument('--tuned', default='autotune.json'); ap.add_argument('--forcewin', default=''); ap.add_argument('--wrom', default='')
 ap.add_argument('--ramimg', action='store_true', help='restore the snapshot RAM image (refdir/ramimg_NNNN.npy, 8192 aliased words) into the circuit RAM head state at chunk start')
+ap.add_argument('--rowtab', default='/data/rowtab.npy', help='WF mode: full row table (npy uint8 [rows, 3840])')
 ap.add_argument('--inj', default='inj', help='injection file prefix in refdir: inj (all, legacy), injF (filtered), injB (blob-only), injN (no RAM injection)')
 ap.add_argument('--chain', action='store_true', help='ONE continuous circuit run over consecutive chunks (no snapshot restore between chunks); compare circuit state to the reference snapshot at every chunk boundary')
 ap.add_argument('--handoff', action='store_true', help='like --chain, but at each boundary READ the circuit state back (regs, pc, n, wb, bn, 32KB RAM) and re-snapshot the circuit from that read-back state (hidden lag history reset, as a chunk restart)')
@@ -39,7 +44,9 @@ ap.add_argument('--reset0', action='store_true', help='chunk 0 starts from the P
 ap.add_argument('--noforce', action='store_true', help='do NOT force (override) the tokens of VDOT records whose weights are in the 128 unaddressable WROM words: the circuit free-runs through them (first divergence is then measured)')
 ap.add_argument('--nodrom', action='store_true', help='drop all type-3 (DROM-class constant) injections')
 ap.add_argument('--novdot', action='store_true', help='drop all VDOT weight injections (type 2) and zone forcing')
-a = ap.parse_args(); os.makedirs(a.out, exist_ok=True); CHAIN = a.chain or a.handoff
+a = ap.parse_args()
+if WF: a.novdot = True   # no weight injection, no forcing
+os.makedirs(a.out, exist_ok=True); CHAIN = a.chain or a.handoff
 chunks = [int(x) for x in a.chunks.split(',')]; B = len(chunks); forced_kinds = [int(x) for x in a.kinds.split(',') if x]
 
 @triton.jit
@@ -88,7 +95,7 @@ def _inject(S0, S1, S2, S3, S4, S5, S6, S7, SV0: tl.constexpr, SV1: tl.constexpr
         else: _put(S7, SV7, bat, ty, b0, cc, d)
     tl.store(ictr + bat, c + 1)
 
-cfg = json.load(open(a.tuned))
+cfg = dict(ffn_warps={}, head_warps={}) if (WF or a.tuned == 'none') else json.load(open(a.tuned))   # tuned warps belong to the 11-layer circuit
 for n, tab in (('_ffn3', 'wf'), ('_ffn4', 'wf'), ('_head3', 'wh'), ('_head4', 'wh')):
     setattr(fusedexec, n, AL.PL(getattr(fusedexec, n), tab, 'd' + tab))
 fusedexec._decode_embed = W(fusedexec._decode_embed, num_warps=cfg.get('decode_embed_warps', 4))
@@ -113,7 +120,23 @@ if CHAIN:
     for ch in chunk_list:   # reference snapshot at the END of each chunk = start of chunk ch+1
         p_ = f'{a.refdir}/state_{ch + 1:04d}.pkl'; nxt_states.append(pickle.load(open(p_, 'rb')) if os.path.exists(p_) else None)
     toks, kinds, states, chunks = [np.concatenate(toks)], [np.concatenate(kinds)], [states[0]], [chunk_list[0]]; B = 1; N = len(toks[0]) + 1   # +1: the step that feeds the chunk's last token
-c = core.build()
+if WF:
+    from chipformer.rv import fastexec as _fe
+    class SliceTab:   # the ROW family's table rows [lo, hi] (all rows a chunk can touch) of the full table file (155,205 x 3840 uint8)
+        def __init__(s_, full, lo, hi): s_.lo, s_.hi, s_.n = lo, hi, len(full); s_.a = np.ascontiguousarray(full[lo:hi + 1])
+        def __len__(s_): return s_.n
+        def __getitem__(s_, p): return s_.a[p - s_.lo] if s_.lo <= p <= s_.hi else np.zeros(s_.a.shape[1], np.uint8)
+    _tab = np.load(a.rowtab, mmap_mode='r'); _lo = _hi = None; _b0, _sz = S.FAMILIES['ROW']
+    for r_ in range(B):
+        tt_ = toks[r_][(toks[r_] >= _b0) & (toks[r_] < _b0 + _sz)] - _b0
+        if len(tt_): _lo = int(tt_.min()) if _lo is None else min(_lo, int(tt_.min())); _hi = int(tt_.max()) if _hi is None else max(_hi, int(tt_.max()))
+    _lo, _hi = max((_lo or 0) - 2, 0), (_hi or 0) + 2
+    S.ROW_TABLE = SliceTab(_tab, _lo, _hi); print(f'ROW table slice materialised for this run: rows {_lo}..{_hi} of {len(_tab)}', flush=True)
+    _fs = open(_fe.__file__).read(); _o = "            if size <= 4096:\n"
+    assert _o in _fs
+    _fs = _fs.replace(_o, "            if nm == 'ROW':\n                small[f], row0[f] = True, len(table) - ROWLO\n                table += list(self.ex.embed(list(range(t0 + ROWLO, t0 + ROWHI + 1))).cpu().numpy())\n            elif size <= 4096:\n")
+    _m = types.ModuleType('chipformer.rv.fastexec_wf'); _m.__file__ = _fe.__file__; _m.__dict__.update(ROWLO=_lo, ROWHI=_hi); exec(compile(_fs, 'fastexec_wf.py', 'exec'), _m.__dict__); _fe.FreeRun = _m.FreeRun
+c = core.build(wrow=8) if WF else core.build()
 entry, segs = elf.segments(a.elf)
 text = [s for s in segs if s[0] == S.ROM_BASE][0][1]
 from chipformer.rv.asm import Program
@@ -126,6 +149,7 @@ def machine(stt, ch=None):
         if a.ramimg: assert all(int(v) == int(w) for v, w in zip(np.load(f'{a.refdir}/ramimg_{ch:04d}.npy'), m.ram)), 'ramimg_0000 != program initial RAM'
         if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
         return m
+    if WF: m.wrow_w = 8; m.latch = [list(w) for w in stt.get('latch', [])]   # chunk-start snapshot of the latched 8-word window (host-seeded here; a chained run carries it itself)
     m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF
     if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
     return m
@@ -154,7 +178,7 @@ sidx = {si: n for n, si in enumerate(used)}
 Ss = [fr.ex.steps[si]['S'] for si in used] + [fr.ex.steps[used[0]]['S']] * (8 - len(used))
 SVs = [int(x.shape[1]) for x in Ss]
 I_kind = np.zeros((B, N), np.int8); I_base = np.zeros((B, N), np.int32); I_cc = np.zeros((B, N), np.int16); I_dat = np.zeros((B, N), np.int32)
-wromf = np.memmap(a.wrom, dtype=np.uint8, mode='r') if a.wrom else None
+wromf = np.memmap(a.wrom, dtype=np.uint8, mode='r') if (a.wrom and not WF) else None
 isfinal = np.zeros(S.VOCAB, bool)
 for t_ in range(S.VOCAB): isfinal[t_] = S.is_final(t_)
 rl = lambda name, h, x: loc[f'{name}{h}'][1] + x
@@ -178,7 +202,8 @@ for r in range(B):
     if len(q):
         sl = lut_drom[q[:, 2]]; I_kind[r, i3] = (3 << 3) | sl[:, 0]; I_base[r, i3] = sl[:, 1]; I_cc[r, i3] = sl[:, 3]; I_dat[r, i3] = q[:, 3].astype(np.uint32).view(np.int32)
     m2 = (inj[:, 1] == 2) & (not a.novdot); q = inj[m2]; i2 = to[m2]; wp27 = q[:, 2]; wp = wp27 & 0x7FFF
-    cells = wromf[(wp27[:, None] * 8 + np.arange(8)[None, :])].astype(np.uint32)
+    if WF: assert not (inj[:, 1] == 2).any(), 'WF reference must contain no VDOT weight injections'
+    cells = wromf[(wp27[:, None] * 8 + np.arange(8)[None, :])].astype(np.uint32) if wromf is not None else np.zeros((0, 8), np.uint32)
     packed = (cells << (4 * np.arange(8, dtype=np.uint32))[None, :]).sum(1).astype(np.uint32).view(np.int32)
     sgrp = wp >> 11; ok = (sgrp < 15) | (((wp >> 7) & 15) < 15)
     hh = np.where(sgrp < 15, (wp >> 7) & 15, 16); xx = (wp >> 6) & 1; pp = wp & 63; slot = np.where(sgrp < 15, sgrp, (wp >> 7) & 15)
@@ -341,7 +366,7 @@ if os.environ.get('DUMPSLOT'):   # debug: print the circuit's current RAM head s
 for r in range(B):
     if first_bad[r] is not None:
         fb = first_bad[r]; print(f'row {r} (chunk {chunks[r]}) first free mismatch at step {fb}: ' + ' | '.join(f'{j}:{S.name(int(TREF[r,j]))}/{S.name(int(RAW[r,j]))}/f{int(MASK[r,j])}' for j in range(max(0, fb - 16), fb + 2)), flush=True)
-res = dict(inj_file=a.inj, ramimg=a.ramimg, injections=n_inj.tolist(), ram_injections=n_ramin.tolist(), chunks=chunks, rows=B, steps_per_row=[len(t) for t in toks], steps_run=done, seconds=time.time() - t0, agg_tok_per_s=done * B / (time.time() - t0), forced_kinds=forced_kinds,
+res = dict(wf_mode=WF, inj_file=a.inj, ramimg=a.ramimg, injections=n_inj.tolist(), ram_injections=n_ramin.tolist(), chunks=chunks, rows=B, steps_per_row=[len(t) for t in toks], steps_run=done, seconds=time.time() - t0, agg_tok_per_s=done * B / (time.time() - t0), forced_kinds=forced_kinds,
            free_tokens=n_free.tolist(), forced_tokens=n_forced.tolist(), free_mismatches=nbad_free.tolist(), first_free_mismatch=first_bad, forced_raw_disagreements=nbad_forced.tolist(),
            gpu=torch.cuda.get_device_name())
 json.dump(res, open(a.out + '/result_' + '_'.join(map(str, chunks[:3])) + f'_n{len(chunks)}.json', 'w'), indent=1); print(json.dumps(res), flush=True)
