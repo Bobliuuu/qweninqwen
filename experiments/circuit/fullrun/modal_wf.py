@@ -17,24 +17,25 @@ def mktab():
     t = build_table(open('/data/w785/wrom.bin', 'rb').read()); np.save('/data/rowtab.npy', t); data.commit()
     return dict(shape=t.shape, nbytes=int(t.nbytes), md5_first_rows=__import__('hashlib').md5(t[:64].tobytes()).hexdigest())
 
-def _run(ch, extra):
-    os.makedirs('/out/wf', exist_ok=True); o = f'/out/wf/chunk{ch:04d}'
-    env = dict(os.environ, PYTHONPATH='.:/data/circuit_wf/engine', WF='1', WF_ROW_CELLS='3840')
+def _run(ch, extra, tag='', extra_env=()):
+    os.makedirs('/out/wf', exist_ok=True); o = f'/out/wf/chunk{ch:04d}{tag}'
+    env = dict(os.environ, PYTHONPATH='.:/data/circuit_wf/engine', WF='1', WF_ROW_CELLS='3840'); env.update(dict(x.split('=') for x in extra_env))
     cmd = ['python', '-u', '/data/circuit_wf/fullrun/circuit_run.py', '/data/w785wf/ref.elf', '/data/ref785wf', o, '--chunks', str(ch), '--block', '100000', '--rowtab', '/data/rowtab.npy'] + extra
     r = subprocess.run(cmd, cwd='/data/qpriscv_wf', env=env, capture_output=True, text=True)
     open(o + '.stdout', 'w').write(r.stdout[-300000:] + '\n--STDERR--\n' + r.stderr[-60000:]); out.commit()
     return dict(chunk=ch, rc=r.returncode, tail=(r.stdout[-1800:] + r.stderr[-1800:]))
 
 @app.function(gpu='A10G', **KW)
-def a10g(ch, extra=()): return _run(ch, list(extra))
+def a10g(ch, extra=(), tag='', extra_env=()): return _run(ch, list(extra), tag, list(extra_env))
 @app.function(gpu='L40S', **KW)
-def l40s(ch, extra=()): return _run(ch, list(extra))
+def l40s(ch, extra=(), tag='', extra_env=()): return _run(ch, list(extra), tag, list(extra_env))
 @app.function(gpu='A100-40GB', **KW)
-def a100(ch, extra=()): return _run(ch, list(extra))
+def a100(ch, extra=(), tag='', extra_env=()): return _run(ch, list(extra), tag, list(extra_env))
 FN = dict(A10G=a10g, L40S=l40s, A100=a100)
 
 @app.local_entrypoint()
-def main(chunks: str = '0-0', gpu: str = 'A10G', steps: int = 0):
+def main(chunks: str = '0-0', gpu: str = 'A10G', steps: int = 0, neg: bool = False):
     a, b = chunks.split('-') if '-' in chunks else (chunks, chunks)
     cl = list(range(int(a), int(b) + 1)); extra = ('--steps', str(steps)) if steps else ()
-    for r in FN[gpu].starmap([(c, extra) for c in cl]): print(json.dumps(r)[:900], flush=True)
+    tag, ee = ('_neg', ('WF_NEG=1',)) if neg else ('', ())
+    for r in FN[gpu].starmap([(c, extra, tag, ee) for c in cl]): print(json.dumps(r)[:900], flush=True)

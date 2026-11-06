@@ -131,6 +131,7 @@ if WF:
     from chipformer.rv import fastexec as _fe
     class SliceTab:   # the ROW family's table rows [lo, hi] (all rows a chunk can touch) of the full table file (155,205 x 3840 uint8)
         def __init__(s_, full, lo, hi): s_.lo, s_.hi, s_.n = lo, hi, len(full); s_.a = np.ascontiguousarray(full[lo:hi + 1])
+            if os.environ.get('WF_NEG'): s_.a = (s_.a + 1) & 15   # NEGATIVE CONTROL: every table entry +1, the circuit must then diverge from the reference
         def __len__(s_): return s_.n
         def __getitem__(s_, p): return s_.a[p - s_.lo] if s_.lo <= p <= s_.hi else np.zeros(s_.a.shape[1], np.uint8)
     _tab = np.load(a.rowtab, mmap_mode='r'); _lo = _hi = None; _b0, _sz = S.FAMILIES['ROW']
