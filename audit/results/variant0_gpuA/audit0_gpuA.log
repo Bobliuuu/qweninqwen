@@ -1,0 +1,53 @@
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]Loading weights:  41%|████      | 127/311 [00:00<00:00, 1250.67it/s]Loading weights:  86%|████████▋ | 269/311 [00:00<00:00, 1333.65it/s]Loading weights: 100%|██████████| 311/311 [00:00<00:00, 1362.98it/s]
+prompt [785, 6722, 315, 9625, 374]
+[real151936_L28] d=1024 D=40775 outer_layers=1006 I_MLP=8192
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+  worst blocks [(129, 5.8913, 5.89), (270, 6.5443, 6.5431), (178, 6.9652, 6.9641), (14, 7.4206, 7.4195)] nblk 594
+  rails [-0.001, 1.001, 1.0, -0.0, 1.0, -0.0, -0.0, 1.0] top code score 18.001054763793945
+{'step': 0, 'frames': 293068, 'sec': 366.0942702293396, 'build_s': 42.86770176887512, 'run_s': 306.8712968826294, 'maxrel': 0.00010397381993243471, 'outer_argmax': 15846, 'hf_argmax': 15846}
+  worst blocks [(116, 8.3687, 8.3745), (181, 6.558, 6.5637), (131, 7.8703, 7.8757), (64, 6.9789, 6.9841)] nblk 594
+  rails [1.0, -0.0, 1.0, -0.0, -0.0, 1.0, 1.0, -0.0] top code score 18.000459671020508
+{'step': 1, 'frames': 293068, 'sec': 366.49384474754333, 'build_s': 42.910075426101685, 'run_s': 306.74563360214233, 'maxrel': 0.0003221328661311418, 'outer_argmax': 315, 'hf_argmax': 315}
+  worst blocks [(332, 7.2491, 7.2538), (441, 6.3164, 6.321), (355, 6.85, 6.8546), (329, 5.4833, 5.4875)] nblk 594
+  rails [1.0, 0.0, 1.0, -0.0, 1.0, 0.0, 0.0, 1.0] top code score 17.99917221069336
+{'step': 2, 'frames': 293068, 'sec': 366.79981541633606, 'build_s': 42.93515992164612, 'run_s': 306.89526772499084, 'maxrel': 0.00027824786957353354, 'outer_argmax': 279, 'hf_argmax': 279}
+  worst blocks [(179, 8.589, 8.5936), (170, 8.5816, 8.5856), (306, 5.9499, 5.9536), (14, 8.9233, 8.9267)] nblk 594
+  rails [-0.001, 1.001, 1.0, -0.0, 1.0, 0.0, -0.0, 1.0] top code score 18.001752853393555
+{'step': 3, 'frames': 293068, 'sec': 367.47296118736267, 'build_s': 42.86120319366455, 'run_s': 307.70356583595276, 'maxrel': 0.00024194843717850745, 'outer_argmax': 374, 'hf_argmax': 374}
+  worst blocks [(168, 6.1062, 6.1108), (382, 7.1722, 7.1765), (503, 6.2774, 6.2814), (132, 6.4039, 6.4078)] nblk 594
+  rails [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0] top code score 17.998708724975586
+{'step': 4, 'frames': 293068, 'sec': 367.78367924690247, 'build_s': 42.71509051322937, 'run_s': 308.1034710407257, 'maxrel': 0.00025821736198849976, 'outer_argmax': 12095, 'hf_argmax': 12095}
+  worst blocks [(438, 2.952, 2.9478), (375, 6.6796, 6.6831), (536, 1.8504, 1.8471), (394, 4.7483, 4.7451)] nblk 594
+  rails [1.001, -0.001, -0.001, 1.001, 1.0, -0.0, 1.0, -0.0] top code score 18.00211524963379
+{'step': 5, 'frames': 293068, 'sec': 368.0603721141815, 'build_s': 42.85197925567627, 'run_s': 308.11953020095825, 'maxrel': 0.00021751820167992264, 'outer_argmax': 13, 'hf_argmax': 13}
+{"tag": "real151936_L28", "d": 1024, "D": 40775, "layers": 1006, "tokens": [785, 6722, 315, 9625, 374, 12095, 13], "maxrel_worst": 0.0003221328661311418, "params_per_layer_M": null}
+=== HostGuard report [test_vs2.py] mode=log -> FAIL ===
+outer rounds=17444 steps=27590982 bytes streamed=4,503,007,824,701 {'0': 4500089164200, '1': 331091784, 'position_ids': 110363928, 'cache_position': 110363928, 'attention_mask': 2366840861}
+stock-module calls driven by host: {'Qwen3_5TextRotaryEmbedding': 8722, 'Qwen3_5DecoderLayer': 8722}
+ATen ops INSIDE outer forward: 9,641,017 (top: view:1928669, expand:1772968, select:1573684, _unsafe_view:968608, bmm:881920, add:520067, mul:424432, transpose:302324)
+host ops allowed: {'move:lift_fresh': 1155833, 'move:_local_scalar_dense': 414, 'move:cat': 36465, 'move:unsqueeze': 53708, 'move:clone': 118, 'move:detach': 56, 'move:slice': 52446, 'move:zeros': 39462, 'move:select': 1648922, 'move:copy': 986883, 'move:stack': 7, 'move:_to_copy': 70830, 'move:zero': 101129, 'move:fill': 68519, 'move:arange': 34224, 'move:index': 417208, 'move:index_put': 363506, 'move:expand': 8722, 'move:view': 41574, 'move:permute': 13644, 'move:full_like': 27288, 'forbidden!:mv': 6, 'forbidden!:max': 6, 'argmax!:argmax': 14}
+host readbacks: 0 (non-logits: 0)
+EXEMPT scope reference: 'load the real HF Qwen3-0.6B inner weights (weights + reference model)' entries=1 ops=945  <-- reviewer must read
+EXEMPT scope build: 'construct stock Qwen3_5TextRotaryEmbedding (inv_freq from rope_theta config constant)' entries=1 ops=10  <-- reviewer must read
+EXEMPT scope build: 'construct a stock Qwen3_5DecoderLayer (random init, all params zeroed by compile_entry)' entries=7042 ops=111657  <-- reviewer must read
+EXEMPT scope transport: 'causal mask from position indices (token-independent addresses)' entries=203 ops=1624  <-- reviewer must read
+EXEMPT scope reference: 'HF inner Qwen3 forward on host: reference logits for the error metric only; never fed back' entries=6 ops=14442  <-- reviewer must read
+EXEMPT scope reference: 'error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)' entries=6 ops=7374  <-- reviewer must read
+EXEMPT scope transport: 'host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)' entries=6 ops=876  <-- reviewer must read
+EXEMPT scope validation: 'print first 8 rails + top code score (display only; the decode above is host-side, see audit report)' entries=6 ops=6  <-- reviewer must read
+WARNING non-outer HF model forwards executed: {'Qwen3ForCausalLM': 6, 'Qwen3Model': 6}
+EXEMPT (declared via --scope) build frame engine.py:<module> ops=4  <-- reviewer must read
+EXEMPT (declared via --scope) weight_prep frame test_vs2.py:weights ops=57  <-- reviewer must read
+EXEMPT (declared via --scope) build frame vs2.py:compile_entry ops=962815  <-- reviewer must read
+EXEMPT (declared via --scope) weight_prep frame vs2.py:tile_payload ops=4843620  <-- reviewer must read
+EXEMPT (declared via --scope) transport frame vs2.py:dense_job ops=13644  <-- reviewer must read
+VIOLATION x12 argmax-on-non-logits: op=argmax at test_vs2.py:88 in run
+VIOLATION x6 host-math-on-outer-output: op=mv at test_vs2.py:83 in run
+VIOLATION x6 host-math: op=mv at test_vs2.py:83 in run
+VIOLATION x6 host-math: op=max at test_vs2.py:85 in run
+VIOLATION x2 argmax-on-non-logits: op=argmax at test_vs2.py:86 in run
+sources hashed: 7
+WARNING: no Qwen3_5ForCausalLM forward observed -> nothing was run on an outer model
+AUDIT RESULT: FAIL
+exit=1

@@ -28,3 +28,5 @@
 | 2026-11-06 | Modal CPU (ap-wZF3oE2b3muOu5Q2WOOC4a) | `modal_algo.py::main --job iss` (RV32IM+SMAQA/VDOT ISS matvec kernels, 192x1024) | done: 8.01 -> 0.159 instr/MAC, all bit-exact; experiments/circuit/algo/results/iss.json |
 | 2026-11-06 | Modal A100 (ap-nocBpoCBdmvy7IQRidec90) | `--job lmhead` exact lm-head pruning | queued |
 | 2026-11-06 | Modal A100 (ap-u3WtFSMu77qbOZDCuR8HED) | `--job quant` quantisation + block-zero study | queued |
+| 2026-11-06 07:34-08:13 | AWS g5 A10G (gpuA) | same as the variant 1 audit with `--variant 0` | done: same 26 violations; driver maxrel bit-identical to variant 1 at all 6 steps; files in audit/results/variant0_gpuA |
+| 2026-11-06 08:17 | AWS g5 A10G (gpuA) | `experiments/circuit/nonlinear/capture_acts.py` then `test_real.py` (HF activations, 6 layers; kernels in RV32 interpreter) | done: per-op errors in nonlinear/README.md, res_real.json |
