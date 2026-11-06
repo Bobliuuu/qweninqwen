@@ -1,0 +1,9 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/jerry-zhu/main/ap-wMaCRbD2Mif3DTH1BAwnn4
+✓ Created objects.
+├── ✓ Uploaded 
+│   /Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/modal_chain.py
+├── ✓ Created Function a100.
+├── ✓ Created Function h100.
+└── ✓ Created Function a10g.

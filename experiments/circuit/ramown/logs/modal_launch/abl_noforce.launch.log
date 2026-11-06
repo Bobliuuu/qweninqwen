@@ -1,0 +1,7 @@
+[modal-client] 2026-11-06T13:00:55-0500 Warning: Received Status.RESOURCE_EXHAUSTED
+App create rate limit exceeded. Please wait and retry.
+for /modal.client.ModalClient/AppCreate (8dc77eb8). Retrying...
+╭─ Error ──────────────────────────────────────────────────────────────────────╮
+│ App create rate limit exceeded. Please wait and retry.                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
