@@ -16,3 +16,14 @@ one CPU at 4,350 tok/s: ~1.6e5-2.5e5 s (45-70 h) per token; perfectly 64-way spl
 `autotune_layers.py`: CUPTI kernel durations over a grid of triton num_warps, best warps chosen per sublayer (ffn 4/8, head 8/16/32) and for _decode_embed (16 warps: 14.2 -> 3.9 us).
 Per-step kernel sum 297 -> ~190 us; **0.2015 ms/step = 4,963 tok/s at B=1, exact token-for-token vs the reference (20k steps of stories260k)** (baseline 3,350; +48%).
 Timeline (prof_timeline.py): 21 kernels/step, every kernel 4.5-21 us with zero gaps in the graph; ~4.5 us is the per-kernel floor, so a megakernel could save at most ~2 us x 21.
+
+## ROM+MAC pipelines (memory/mac_layer.py, MEMORY_DESIGN s.8): step time on gpuB (A10G), results/mac_exec.{json,log}
+`mac_exec_bench.py`: exact sparsity structure of mac_layer.run(K=230, H=2560, I=9216): ROM 9216 units (gate nnz 29, down 230 scattered only for active units = sparse ROM gather, 2.12M nnz),
+PRODUCT 1840, DIGITIZE 5152, LOSUM 368 units; new Triton kernel `_ffn_mo` (multi-output CSR down, predicated scatter). TIMING ONLY (random table, relu-gated kernel arithmetic; values are checked by mac_layer.py, not here; DeltaNet-read layers modelled as 13 x 11 us = measured head-kernel time).
+| treatment (13 pipelines x [DN read, ROM, PRODUCT, DIGITIZE, LOSUM]) | added ms/step | total with chip step (0.2015 ms) | tok/s |
+|---|---|---|---|
+| sparse, 52 kernels sequential | 0.198 + 0.143 (DN) | **0.543 ms** | **1,842** |
+| sparse, each stage launched once for all 13 pipelines (grid.y) | 0.080 + 0.143 | 0.425 ms | 2,353 |
+| dense HF bf16 (stock Qwen3_5MLP x 52, no DN layers: lower bound) | **17.4 ms** | >17.6 ms | <57 |
+Per-pipeline kernels: ROM 7.3 us, PRODUCT 4.3, DIGITIZE 4.9, LOSUM 4.4 (floor ~4.4 us per kernel). Memory: sparse ROM+MAC state 231 MB for 13 pipelines (CSR fp32/int32); dense 52 MLPs 6.9 GB bf16 (3.68 B params) + the 13 DN layers + the 4B base 8.4 GB: tight on 23 GB.
+Implied: 2.0e5 positions per Qwen3-0.6B token for the MACs (MEMORY_DESIGN s.7) x 0.543 ms = **~108 s** (sparse) / ~85 s (stage-batched) versus >= 3,500 s dense; nonlinear glue not included. Caveat: the 13 pipelines share one residual in the real circuit, so the stage-batched number assumes independent residual regions (not designed).

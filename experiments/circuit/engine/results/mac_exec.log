@@ -1,0 +1,6 @@
+ROM (0.0072956085205078125, 4)
+PRODUCT (0.0043451786041259766, 8)
+DIGITIZE (0.004935264587402344, 2)
+LOSUM (0.00441431999206543, 2)
+{"gpu": "NVIDIA A10G", "K": 230, "H": 2560, "I": 9216, "P": 13, "base_chip_step_ms": 0.2015, "stages": {"ROM": {"U": 9216, "nnz_down": 2119680, "single_pipeline_ms": 0.0072956085205078125, "num_warps": 4}, "PRODUCT": {"U": 1840, "nnz_down": 1840, "single_pipeline_ms": 0.0043451786041259766, "num_warps": 8}, "DIGITIZE": {"U": 5152, "nnz_down": 10304, "single_pipeline_ms": 0.004935264587402344, "num_warps": 2}, "LOSUM": {"U": 368, "nnz_down": 368, "single_pipeline_ms": 0.00441431999206543, "num_warps": 2}}, "sparse_sequential_all_pipelines_ms": 0.19839882850646973, "sparse_stage_batched_over_pipelines_ms": 0.0804281234741211, "total_ms_per_step_sequential": 0.5428988285064698, "tok_per_s_sequential": 1841.963819946027, "total_ms_per_step_stage_batched": 0.4249281234741211, "tok_per_s_stage_batched": 2353.3391761039834, "sparse_state_mb": 230.7216339111328}
+{"dense_hf_mlp_layers": 52, "dense_hf_ms_per_step": 17.387986183166504, "dense_hf_mem_gb": 6.914189338684082, "dense_hf_params_b": 3.68050176}
