@@ -1,0 +1,74 @@
+[
+ {
+  "build": "T0  plain C int8 (K0)",
+  "layer_tok_per_mac": 8.007,
+  "head_tok_per_mac": 8.007,
+  "chip_layers": 11,
+  "tokens_per_token": 4772172000.0,
+  "seconds_per_token": 857995.6850053937
+ },
+ {
+  "build": "T0+ plain unrolled int8 (K1)",
+  "layer_tok_per_mac": 4.3195,
+  "head_tok_per_mac": 4.3195,
+  "chip_layers": 11,
+  "tokens_per_token": 2574422000.0,
+  "seconds_per_token": 462859.043509529
+ },
+ {
+  "build": "T0++ plain, 2 rows/mul lane trick (K1b)",
+  "layer_tok_per_mac": 3.5078,
+  "head_tok_per_mac": 3.5078,
+  "chip_layers": 11,
+  "tokens_per_token": 2090648800.0,
+  "seconds_per_token": 375880.7623157138
+ },
+ {
+  "build": "SMAQA int8 (K2)",
+  "layer_tok_per_mac": 1.3249,
+  "head_tok_per_mac": 1.3249,
+  "chip_layers": 11,
+  "tokens_per_token": 789640400.0,
+  "seconds_per_token": 141970.5861201007
+ },
+ {
+  "build": "VDOT existing compiler structure (K5)",
+  "layer_tok_per_mac": 0.1802,
+  "head_tok_per_mac": 0.1802,
+  "chip_layers": 11,
+  "tokens_per_token": 107399200.0,
+  "seconds_per_token": 19309.45702984538
+ },
+ {
+  "build": "VDOT blocked RB=22 C=2 + requant (K6) / argmax (K7)",
+  "layer_tok_per_mac": 0.1765,
+  "head_tok_per_mac": 0.1656,
+  "chip_layers": 11,
+  "tokens_per_token": 103493600.0,
+  "seconds_per_token": 18607.263574253866
+ },
+ {
+  "build": "PROPOSED VDOT16 W4A4 (K9) +requant, 11-12 layers",
+  "layer_tok_per_mac": 0.0921,
+  "head_tok_per_mac": 0.084,
+  "chip_layers": 12,
+  "tokens_per_token": 53628000.0,
+  "seconds_per_token": 10518.387761106207
+ },
+ {
+  "build": "PROPOSED VDOTA W4A8 acts-from-RAM (K8) +requant, 14 layers",
+  "layer_tok_per_mac": 0.1443,
+  "head_tok_per_mac": 0.13620000000000002,
+  "chip_layers": 14,
+  "tokens_per_token": 84739200.00000001,
+  "seconds_per_token": 19390.487398254394
+ },
+ {
+  "build": "PROPOSED VDOTA16 W4A8 16-wide from RAM (K10) +requant, 14 layers",
+  "layer_tok_per_mac": 0.0809,
+  "head_tok_per_mac": 0.0728,
+  "chip_layers": 14,
+  "tokens_per_token": 46952800.0,
+  "seconds_per_token": 10743.99660030728
+ }
+]

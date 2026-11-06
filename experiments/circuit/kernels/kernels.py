@@ -104,6 +104,41 @@ in:
 """ + _exit()
     return Kernel(f'K1 unroll x{U} (imm offsets)', src, xbytes(x), i8bytes(W), R=R, K=K)
 
+def k1b_lane_pair(W, x, U=32):
+    """plain RV32IM trick: TWO rows per multiply.  Weights of rows (2p, 2p+1) are stored as one word w0 + (w1 << 16); one mul by the
+    (shared) activation gives both products in 16-bit lanes; flush every U=32 MACs (|lane| <= 32*8*128 < 2^15 -> exact)."""
+    R, K = W.shape
+    assert R % 2 == 0 and K % U == 0
+    body = ''
+    for k in range(U):
+        body += f" lw t0, {4*k}(s1)\n lb t1, {k}(s3)\n"
+        body += " mul s5, t0, t1\n" if k == 0 else " mul t0, t0, t1\n add s5, s5, t0\n"
+    flush = " slli t0, s5, 16\n srai t0, t0, 16\n sub t1, s5, t0\n srai t1, t1, 16\n add s6, s6, t0\n add s7, s7, t1\n"
+    src = f"""_start:
+ li s0, {R // 2}
+ li s1, {WBASE}
+ li s2, {OUT}
+row:
+ li s3, {ACT}
+ li s4, {ACT + K}
+ li s6, 0
+ li s7, 0
+in:
+{body}{flush} addi s1, s1, {4*U}
+ addi s3, s3, {U}
+ bne s3, s4, in
+ sw s6, 0(s2)
+ sw s7, 4(s2)
+ addi s2, s2, 8
+ addi s0, s0, -1
+ bnez s0, row
+""" + _exit()
+    packed = (W[0::2].astype(np.int64) + (W[1::2].astype(np.int64) << 16)) & 0xFFFFFFFF
+    ro = b''.join(int(v).to_bytes(4, 'little') for v in np.asarray(packed.T).reshape(-1) ) if False else b''
+    # layout: for pair p, for k: one word  ->  index p*K + k
+    ro = b''.join(int(v).to_bytes(4, 'little') for v in packed.reshape(-1))
+    return Kernel(f'K1b plain RV32IM, 2 rows per mul (16-bit lanes), flush/{U}', src, xbytes(x), ro, R=R, K=K)
+
 # ---------------------------------------------------------------- SMAQA (4 int8 MAC / instr), int8 weights
 def k2_smaqa(W, x, U=16):
     R, K = W.shape
@@ -158,14 +193,17 @@ in:
 """ + _exit()
     return Kernel(f'K3 VDOT, 1 row (acts reloaded per row), U={U}', src, xbytes(x), wrom=pack_wrom_nibbles(W.reshape(-1, 8)), R=R, K=K)
 
-def k4_vdot_blocked(W, x, RB=16, C=4, wb_per_chunk=False):
+def k4_vdot_blocked(W, x, RB=16, C=4, wb_per_chunk=False, abs_ptr=False):
     """Row-blocked VDOT: C chunks of 8 acts live in 2C registers; RB accumulators; one WB per C chunks.
     negative-index trick: ap runs -K..0 so pointer values are 1 token; weights word pointer wp is small."""
     R, K = W.shape
     assert R % RB == 0 and K % (8 * C) == 0
     acc = REGS[:RB]; actr = REGS[RB:RB + 2 * C]; (wp, ap, op, rc) = REGS[RB + 2 * C:RB + 2 * C + 4]
     ACTEND = ACT + K
-    assert ACTEND < 2040 and len(REGS) >= RB + 2 * C + 4
+    if abs_ptr:        # K > ~1.7k: the negative-index trick needs the vector end address < 2048; use a real pointer + one end register
+        aend = REGS[RB + 2 * C + 4]; ACTEND = 0
+    else:
+        assert ACTEND < 2040 and len(REGS) >= RB + 2 * C + 4
     zero = ''.join(f" li {a}, 0\n" for a in acc)
     loads = ''.join(f" lw {actr[2*c]}, {ACTEND + 8*c}({ap})\n lw {actr[2*c+1]}, {ACTEND + 8*c + 4}({ap})\n" for c in range(C))
     vd = ''.join(f" vdot {a}, {actr[2*c]}, {actr[2*c+1]}\n" for c in range(C) for a in acc)
@@ -173,17 +211,17 @@ def k4_vdot_blocked(W, x, RB=16, C=4, wb_per_chunk=False):
     if not wb_per_chunk:
         inner = f"{loads} wb {wp}\n{vd}"
     else:
-        inner = loads + ''.join(f" wb {wp}\n" + ''.join(f" vdot {a}, {actr[2*c]}, {actr[2*c+1]}\n" for a in acc) for c in range(C))
+        inner = loads + ''.join(f" wb {wp}\n" + ''.join(f" vdot {a}, {actr[2*c]}, {actr[2*c+1]}\n" for a in acc) + f" addi {wp}, {wp}, {RB}\n" for c in range(C))
     src = f"""_start:
  li {wp}, 0
  li {op}, {OUT}
  li {rc}, {R // RB}
+{f' li {aend}, {ACT + K}' if abs_ptr else ''}
 blk:
- li {ap}, {-K}
+ li {ap}, {ACT if abs_ptr else -K}
 {zero}in:
-{inner} addi {wp}, {wp}, {RB * C}
- addi {ap}, {ap}, {8 * C}
- bnez {ap}, in
+{inner}{'' if wb_per_chunk else f' addi {wp}, {wp}, {RB * C}' + chr(10)} addi {ap}, {ap}, {8 * C}
+ {f'bne {ap}, {aend}' if abs_ptr else f'bnez {ap}'}, in
 {sts} addi {op}, {op}, {4 * RB}
  addi {rc}, {rc}, -1
  bnez {rc}, blk
