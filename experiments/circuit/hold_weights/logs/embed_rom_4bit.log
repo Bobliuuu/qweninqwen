@@ -1,0 +1,2 @@
+bits/entry 4: 595,984,384 nibbles -> 595,984,384 symbols -> 259,124 rows x 2560 dims, filler dims used (max) 14, C=655360 var=256, table 1.327 GB bf16, build 0.5s
+{"bits_per_entry": 4, "nibbles": 595984384, "rows": 259124, "hidden": 2560, "data_dims": 2300, "filler_dims_max": 14, "var": 256, "bf16_table_bytes": 1326714880, "payload_bytes": 297992192, "overhead_x": 4.452180008797009, "norm_entries_inexact": 0, "symbol_mismatches": 0, "nibble_stream_identical": true, "seconds": 0.7218759059906006, "gpu": "NVIDIA A10G"}
