@@ -127,9 +127,9 @@ if a.hf:
         g = m.generate(ids, max_new_tokens=a.ntok - 1, do_sample=False)[0].tolist()
         full = m(torch.tensor([[1] + toks[:-1]])).logits[0].numpy()
     print("HF generate tokens (start tok 1, incl. start)", g)
-    print("HF == numpy ref:", g[1:] == toks[1:] or None, "max logit err (teacher forced)", float(np.abs(full - lg).max()))
+    print("HF == numpy ref:", g[1:] == toks[:len(g) - 1], "max logit err (teacher forced)", float(np.abs(full - lg).max()))
     ref.update(hf_tokens=g[1:], hf_logit_maxerr=float(np.abs(full - lg).max()), hf_first=g[1] if len(g) > 1 else None,
-               hf_matches_numpy=bool(g[1:] == toks[1:]))
+               hf_matches_numpy=bool(g[1:] == toks[:len(g) - 1]))
 # calibration of KV scales on sampled sequences
 st = [np.zeros(nl), np.zeros(nl)]
 for sd in range(4):
