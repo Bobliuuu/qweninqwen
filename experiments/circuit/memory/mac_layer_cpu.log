@@ -1,0 +1,1 @@
+{"K": 160, "H": 2560, "I": 9216, "positions": 64, "dims_used": 1783, "stage_units": [["ROM", 9216], ["PRODUCT", 1280], ["DIGITIZE", 3584], ["LOSUM", 256]], "layers": 4, "rom_exact": true, "dot_exact": true, "max_digit_frac_err": 0.0, "max_digit": 102.0, "dot_range": 369964}

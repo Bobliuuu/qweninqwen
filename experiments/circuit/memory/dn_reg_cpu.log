@@ -1,0 +1,1 @@
+{"H": 2560, "I": 9216, "positions": 64, "register_roundtrip_exact": true, "max_rail_err": 0.0, "rom_word_exact_from_register": true, "extra_layers_before_rom": 1}
