@@ -26,13 +26,18 @@ NROWS = 6
 
 
 def make_table(seed=0, nrows=NROWS):
+    """Table entries [rows, ROW_CELLS]: int4 cells (the real Qwen3-0.6B stream if WROM_BIN is set,
+    else random) packed ROW_EPW entries per word of 8 cells (S.pack_word)."""
+    nw = nrows * S.ROW_WORDS * 8
     p = os.environ.get("WROM_BIN")
     if p and os.path.exists(p):
         off = int(os.environ.get("WROM_OFF", 7_000_003))
-        raw = np.fromfile(p, dtype=np.uint8, count=off + nrows * S.ROW_CELLS)[off:]
-        return (raw[: nrows * S.ROW_CELLS] & 15).reshape(nrows, S.ROW_CELLS).copy()
-    rng = np.random.default_rng(seed)
-    return rng.integers(0, 16, (nrows, S.ROW_CELLS), dtype=np.uint8)
+        raw = (np.fromfile(p, dtype=np.uint8, count=off + nw)[off:] & 15)
+    else:
+        raw = np.random.default_rng(seed).integers(0, 16, nw, dtype=np.uint8)
+    words = raw.reshape(nrows * S.ROW_WORDS, 8)
+    ents = np.array([S.pack_word(w) for w in words], dtype=np.uint8)
+    return ents.reshape(nrows, S.ROW_CELLS)
 
 
 def wf_program(rng, tab, W, n_blocks, per_block):
@@ -41,8 +46,8 @@ def wf_program(rng, tab, W, n_blocks, per_block):
     lines = [f"li {r}, {sx32(word(rng))}" for r in regs]
     for _ in range(n_blocks):
         row = rng.randrange(len(tab) + 1)  # one past the table too: reads as zeros
-        win = rng.randrange(S.ROW_CELLS // 8 // W)
-        x = win * W - 1  # wb: the next word (wrow) is at WP = x, the first vdot at win * W
+        win = rng.randrange(-(-S.ROW_WORDS // W))
+        x = (win * W - 1) & 0x7FFF  # wb: the next word (wrow) is at WP = x, the first vdot at win * W
         acc = rng.choice(["s2", "s3"])
         init = rng.choice([0, rng.randint(-2**14, 2**14), rng.randint(-2**31, 2**31 - 1)])
         lines += [f"li s4, {x & 0x7FFF}", f"li s5, {row}", f"li {acc}, {init}", "wb s4", "wrow s5"]
@@ -90,7 +95,7 @@ def test_negative_control(circ_tab):
     W, tab, c = circ_tab
     rng = random.Random(7)
     prog = assemble(wf_program(rng, tab, W, 4, 1 if W == 1 else min(W, 5)))
-    bad_tab = (tab + 1) & 15
+    bad_tab = (tab + 1) & ((1 << S.ROW_ENT_BITS) - 1)
     with pytest.raises(AssertionError):
         check(c, prog, bad_tab, W)
 
@@ -122,20 +127,23 @@ def chunk(rng, W, n_vdot, rows=True):
     body, w = [], n0
     used: dict = {}  # row -> {col: u}
     cur_row, tab_rows = 0, {}
-    nwin = S.ROW_CELLS // 8 // W
     wrom = bytearray()
     exp = 0
     i = 0
     while i < n_vdot:
         if rows:
             wp_next = (D + w + 1) & 0x7FFF
-            win = (wp_next & 255) // W
+            win = (wp_next & ((1 << S.ROW_SLOT_BITS) - 1)) // W
+            if win * W >= S.ROW_WORDS:  # this PC maps past the row's last window: skip a word
+                body.append("nop")
+                w += 1
+                continue
             grp = list(range(i, min(i + W, n_vdot)))
             need = {}
             for j, v in enumerate(grp):
                 wiw = (D + w + 1 + j) & (W - 1)
-                for k in range(8):
-                    need[win * 8 * W + 8 * wiw + k] = want[v][k]
+                for m_, e_ in enumerate(S.pack_word(want[v])):
+                    need[win * S.ROW_EPW * W + S.ROW_EPW * wiw + m_] = e_
             r = cur_row
             while any(used.get(r, {}).get(c_, u) != u for c_, u in need.items()):
                 r += 1
