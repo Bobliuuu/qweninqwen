@@ -30,3 +30,4 @@
 | 2026-11-06 | Modal A100 (ap-u3WtFSMu77qbOZDCuR8HED) | `--job quant` quantisation + block-zero study | queued |
 | 2026-11-06 07:34-08:13 | AWS g5 A10G (gpuA) | same as the variant 1 audit with `--variant 0` | done: same 26 violations; driver maxrel bit-identical to variant 1 at all 6 steps; files in audit/results/variant0_gpuA |
 | 2026-11-06 08:17 | AWS g5 A10G (gpuA) | `experiments/circuit/nonlinear/capture_acts.py` then `test_real.py` (HF activations, 6 layers; kernels in RV32 interpreter) | done: per-op errors in nonlinear/README.md, res_real.json |
+| 2026-11-06 08:30-09:20 UTC | gpuB (A10G) | `bench_exec.py --wf 4 --wh 32 --batch 1..64`, `tune_warps.py`, `prof_steps.py` | B=1 4,350 tok/s with head 32 warps (+30%, exact); aggregate 21.5k tok/s at B=64 default warps; see experiments/circuit/engine/README.md |

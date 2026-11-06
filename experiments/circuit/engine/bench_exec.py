@@ -35,14 +35,21 @@ class FreeRunK(fusedexec.FreeRun3):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("elf"); ap.add_argument("--steps", type=int, default=100000)
     ap.add_argument("--batch", default="1"); ap.add_argument("--k", default="1"); ap.add_argument("--out", default=None)
+    ap.add_argument("--wf", type=int, default=0); ap.add_argument("--wh", type=int, default=0)
     ap.add_argument("--profile", action="store_true"); ap.add_argument("--want", default="want.npy")
     a = ap.parse_args()
+    if a.wf or a.wh:   # triton num_warps override (default kernels use 4)
+        from tune_warps import W
+        for n in ("_ffn3", "_ffn4"):
+            if a.wf: setattr(fusedexec, n, W(getattr(fusedexec, n), num_warps=a.wf))
+        for n in ("_head3", "_head4"):
+            if a.wh: setattr(fusedexec, n, W(getattr(fusedexec, n), num_warps=a.wh))
     prog = elf.program(a.elf)
     if os.path.exists(a.want) and len(np.load(a.want)) > a.steps: want = np.load(a.want)
     else:
         m = ref.Machine.from_program(prog); t = time.time(); tr = m.run(int(a.steps * 1.1)); want = np.asarray(tr); np.save(a.want, want)
         print(f"reference prefix {len(want)} tokens in {time.time()-t:.0f}s", flush=True)
-    res = dict(gpu=torch.cuda.get_device_name(), steps=a.steps, runs=[])
+    res = dict(gpu=torch.cuda.get_device_name(), steps=a.steps, num_warps_ffn=a.wf or 4, num_warps_head=a.wh or 4, runs=[])
     c = core.build()
     for B in [int(x) for x in a.batch.split(",")]:
         for K in [int(x) for x in a.k.split(",")]:

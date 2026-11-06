@@ -1,0 +1,6 @@
+{"B": 1, "K": 1, "seconds": 4.597920656204224, "ms_per_step": 0.2298960328102112, "agg_tok_per_s": 4349.792329063555, "per_row_tok_per_s": 4349.792329063555, "exact_all_rows": true}
+{"B": 4, "K": 1, "seconds": 7.39458155632019, "ms_per_step": 0.3697290778160095, "agg_tok_per_s": 10818.732526064785, "per_row_tok_per_s": 2704.683131516196, "exact_all_rows": true}
+{"B": 8, "K": 1, "seconds": 12.03603219985962, "ms_per_step": 0.6018016099929809, "agg_tok_per_s": 13293.417410587032, "per_row_tok_per_s": 1661.677176323379, "exact_all_rows": true}
+{"B": 16, "K": 1, "seconds": 20.72176194190979, "ms_per_step": 1.0360880970954895, "agg_tok_per_s": 15442.702261374772, "per_row_tok_per_s": 965.1688913359233, "exact_all_rows": true}
+{"B": 32, "K": 1, "seconds": 38.19767141342163, "ms_per_step": 1.9098835706710815, "agg_tok_per_s": 16754.948045736663, "per_row_tok_per_s": 523.5921264292707, "exact_all_rows": true}
+{"B": 64, "K": 1, "seconds": 75.47095108032227, "ms_per_step": 3.773547554016113, "agg_tok_per_s": 16960.16787489164, "per_row_tok_per_s": 265.00262304518185, "exact_all_rows": true}

@@ -1,0 +1,114 @@
+[
+ {
+  "warps_ffn": 1,
+  "warps_head": 1,
+  "ms_per_step": 1.3266568978627522,
+  "tok_per_s": 753.7743945785852,
+  "exact": true
+ },
+ {
+  "warps_ffn": 1,
+  "warps_head": 2,
+  "ms_per_step": 0.7815008958180746,
+  "tok_per_s": 1279.589064262301,
+  "exact": true
+ },
+ {
+  "warps_ffn": 1,
+  "warps_head": 4,
+  "ms_per_step": 0.6036103566487631,
+  "tok_per_s": 1656.6978829720338,
+  "exact": true
+ },
+ {
+  "warps_ffn": 1,
+  "warps_head": 8,
+  "ms_per_step": 0.5574325720469157,
+  "tok_per_s": 1793.9389446295868,
+  "exact": true
+ },
+ {
+  "warps_ffn": 2,
+  "warps_head": 1,
+  "ms_per_step": 1.0686354637145996,
+  "tok_per_s": 935.7727999443129,
+  "exact": true
+ },
+ {
+  "warps_ffn": 2,
+  "warps_head": 2,
+  "ms_per_step": 0.5385069052378337,
+  "tok_per_s": 1856.986401239082,
+  "exact": true
+ },
+ {
+  "warps_ffn": 2,
+  "warps_head": 4,
+  "ms_per_step": 0.3628539244333903,
+  "tok_per_s": 2755.929956005124,
+  "exact": true
+ },
+ {
+  "warps_ffn": 2,
+  "warps_head": 8,
+  "ms_per_step": 0.31627964973449707,
+  "tok_per_s": 3161.758908103813,
+  "exact": true
+ },
+ {
+  "warps_ffn": 4,
+  "warps_head": 1,
+  "ms_per_step": 1.0073362191518147,
+  "tok_per_s": 992.7172089990054,
+  "exact": true
+ },
+ {
+  "warps_ffn": 4,
+  "warps_head": 2,
+  "ms_per_step": 0.47597241401672363,
+  "tok_per_s": 2100.962094758845,
+  "exact": true
+ },
+ {
+  "warps_ffn": 4,
+  "warps_head": 4,
+  "ms_per_step": 0.2991151014963786,
+  "tok_per_s": 3343.1946264074104,
+  "exact": true
+ },
+ {
+  "warps_ffn": 4,
+  "warps_head": 8,
+  "ms_per_step": 0.2523730595906576,
+  "tok_per_s": 3962.3880679735535,
+  "exact": true
+ },
+ {
+  "warps_ffn": 8,
+  "warps_head": 1,
+  "ms_per_step": 1.0013172626495361,
+  "tok_per_s": 998.6844702486696,
+  "exact": true
+ },
+ {
+  "warps_ffn": 8,
+  "warps_head": 2,
+  "ms_per_step": 0.476511557896932,
+  "tok_per_s": 2098.5849837797577,
+  "exact": true
+ },
+ {
+  "warps_ffn": 8,
+  "warps_head": 4,
+  "ms_per_step": 0.29969994227091473,
+  "tok_per_s": 3336.6706460558703,
+  "exact": true
+ },
+ {
+  "warps_ffn": 8,
+  "warps_head": 8,
+  "ms_per_step": 0.2529824574788412,
+  "tok_per_s": 3952.8432523177526,
+  "exact": true
+ }
+]

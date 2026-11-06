@@ -1,0 +1,33 @@
+{
+ "gpu": "NVIDIA A10G",
+ "steps": 100000,
+ "runs": [
+  {
+   "B": 1,
+   "K": 1,
+   "seconds": 29.853740692138672,
+   "ms_per_step": 0.2985374069213867,
+   "agg_tok_per_s": 3349.66398453152,
+   "per_row_tok_per_s": 3349.66398453152,
+   "exact_all_rows": true
+  },
+  {
+   "B": 1,
+   "K": 4,
+   "seconds": 29.82697582244873,
+   "ms_per_step": 0.2982697582244873,
+   "agg_tok_per_s": 3352.6697642855506,
+   "per_row_tok_per_s": 3352.6697642855506,
+   "exact_all_rows": true
+  },
+  {
+   "B": 1,
+   "K": 16,
+   "seconds": 29.69150733947754,
+   "ms_per_step": 0.29691507339477535,
+   "agg_tok_per_s": 3367.9664308265337,
+   "per_row_tok_per_s": 3367.9664308265337,
+   "exact_all_rows": true
+  }
+ ]
+}
