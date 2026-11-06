@@ -40,7 +40,8 @@ def run(src, ram_bytes=None, rodata=b'', wrom=b'', max_records=50_000_000):
             m.ram[w] = (m.ram[w] & ~(255 << sh) & M32) | (v << sh)
     toks = [S.tok('GO')]; by_op = collections.Counter(); cnt_op = collections.Counter()
     while not m.halted and len(toks) < max_records:
-        pc = m.pc; op = ref.decode(m.rom[(pc - S.ROM_BASE) >> 2]).op if m.n != S.N_MAX else 'REFRESH'
+        pc = m.pc; w_ = m.rom[(pc - S.ROM_BASE) >> 2]
+        op = ('EXT%d' % (w_ >> 12 & 7) if w_ & 0x7F == 0x5B else ref.decode(w_).op) if m.n != S.N_MAX else 'REFRESH'
         t = m.record(); toks += t; by_op[op] += len(t); cnt_op[op] += 1
     assert m.halted and m.fault is None, ('fault', m.fault)
     r = Result(m, toks, prog); r.by_op, r.cnt_op = by_op, cnt_op
