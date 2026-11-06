@@ -12,7 +12,7 @@ s/token = trace tokens per token / trace-tok/s. Rate column for T1+ is Qwenputer
 |---|---|---|---|---|---|---|---|---|---|---|
 | T0 | literal: plain C int8 RV32IM, stock HF modules | 4.0e9 [P] | 5.6e9 [P] | 91-250 [M upstream, HF path] | 1 | L4 | 2.2e7 - 6.1e7 (0.7-1.9 yr) | PROJECTED | plan sec. 3, 5 | e713778 |
 | T1 | T0 + fused executor (Triton + CUDA graph) | 4.0e9 [P] | 5.6e9 [P] | 5,562 [M upstream] | 1 | L4 | 1.0e6 (11.6 d) | PROJECTED | plan sec. 5 | e713778 |
-| T2 | T1 + SMAQA int8 build (VDOT int4 is T3) | 5.4e8 matvec only [P from M instr/MAC 0.913] | 7.6e8 at 1.4 tok/instr [P] | 5,562 | 1 | L4 | 1.4e5 (39 h) | PROJECTED | plan sec. 3, 5 | e713778 |
+| T2 | T1 + SMAQA int8 build (ctx 1 throughout; see context table) (VDOT int4 is T3) | 5.4e8 matvec only [P from M instr/MAC 0.913] | 7.6e8 at 1.4 tok/instr [P] | 5,562 | 1 | L4 | 1.4e5 (39 h) | PROJECTED | plan sec. 3, 5 | e713778 |
 | T3 | T2 + VDOT int4 (0.176 instr/MAC) + nonlinear ISA ext + algorithmic cuts | 1.05e8 matvec only [P from M 0.176] + nonlinear, not yet counted | 1.25e8-1.5e8 matvec only [P] (plan said 1.2e8) | 3,300-5,562 | 1 | L4/A10G | 2.3e4 - 4.5e4 (6-12 h), nonlinear extra |  PROJECTED | plan sec. 5 | e713778 |
 | T4 | T3 + persistent kernel, faster GPU | same | 1.2e8 | 1.0e4-1.6e4 [E] | 1 | L40S/A100/H100 | 7.5e3 - 1.2e4 | PROJECTED | plan sec. 5 | e713778 |
 | T5 | T3 + in-forward-pass lanes (SIMT) | same | ~1.3e8 + join | 5,562 per executor [M upstream, batch 1] | 2-4 lanes (4B only; 0.8B 1 lane) | 1 GPU, fused executor needed | 8.3-12.4 h/token at 16 lanes, 8.7-10.1 h at 4 lanes (multicore model, nonlinear unsplit); gain bounded ~1.4x by token bus | PROJECTED [needs R2, R4] | `experiments/circuit/multicore/res_model.json` | efc7dad |
@@ -30,6 +30,30 @@ Correction (multicore, 44ba97c, modeled not run): lane-level parallelism inside 
 - Effects multiply only when they act on different factors: instruction count (compiler, kernels, algo, nonlinear), trace tokens per instruction (ISA fusion), and tokens per second (engine, hardware, lanes). Within the same factor they overlap (for example nonlinear ISA and kernels both cut instructions) and must be re-measured jointly, not multiplied.
 - Lanes (T5) multiply the rate only if the work is divisible without a serial dependency; layers are serial, so lane speedup applies within a layer's matvec rows, and the per-layer synchronisation cost is unmeasured.
 - Stories260K scaling to Qwen3-0.6B assumes cost proportional to parameters; plan sec. 3 gives caveats (LM head 26 % of MACs, nonlinear ops not proportional). Treat as +-2x until the compiler agent's measured instr/MAC replaces it.
+
+## Measured tiny-model runs (NOT Qwen3-0.6B; model size stated)
+
+| Run | Inner model | Outer / executor | Trace tokens | Rate | Exactness | Evidence | Commit |
+|---|---|---|---|---|---|---|---|
+| tiny Qwen3-architecture firmware, 16 generated tokens | dim 64, 8 heads / 4 kv, head size 8, hidden 128, 1 layer, vocab 128, random weights | Qwenputer fused circuit executor (checkpoint size and GPU not stated in the log; asked e2e) | 708,920 steps (reference 708,921 tokens, 529,035 instr: 1.34 tok/instr) = 44.3k trace tokens per generated token | 4,225 tok/s (0.237 ms/step) = 10.5 s per tiny token [M] | fused trace "exact" vs reference emulator; HF check of the same firmware at f32 rel err 6.3e-7 (compiler `res_tiny.json`) | `experiments/circuit/e2e/logs/fused_q3_16tok.log` | eb4f4f3 |
+
+This is the first MEASURED circuit-route run. It validates the pipeline (firmware -> executor -> exact trace) at toy size only. Nothing here is a Qwen3-0.6B number.
+
+## Qwen3-0.6B: MEASURED instruction counts, s/token COMPUTED from assumed rates
+
+Instructions measured by the compiler's RV32IM emulator on real HF weights (positions 0..3; larger contexts extrapolate the measured per-context-token slope). Seconds are NOT measured: s = instr x tok/instr / rate, with 1.40 tok/instr and 5,500 tok/s (best 1.19 @5,500, worst 1.40 @3,200 give 1.3e5 / 2.6e5 s at ctx 1). Evidence: `experiments/circuit/compiler/RESULTS.md`, `res_full_q4v.json`.
+
+| Build | ctx | instr/token [M] | s/token [computed] | days |
+|---|---|---|---|---|
+| q4v (VDOT int4, soft-float glue) | 1 | 5.87e8 | 1.49e5 | 1.73 |
+| q4v | 128 | 3.47e9 | 8.84e5 | 10.2 |
+| q4v | 1024 | 2.38e10 | 6.07e6 | 70.2 |
+
+Context dimension: attention grows linearly, about 2.3e7 instructions per context token in the q4v build (about 200 instr per attention MAC, all soft-float). Every tier row above is at ctx 1; at ctx 128 the q4v build is 5.9x more expensive and at ctx 1024 40x. Tier rows must name their context length.
+
+Reconciliation of q4v 1.7 days with the T3 projection of 6-12 h: the q4v build has VDOT (and SMAQA/custom class 3.1e8 of 2.6e9 instr over 4 positions) but still runs RMSNorm, softmax, exp, SwiGLU and RoPE as compiled soft-float: `__mulsf3` 1.25e9, `__addsf3`/`__subsf3` 2.5e8 each, `expf` 3.8e7 of 2.6e9 total. The nonlinear agent's fixed-point build with EXP2/RSQ/SIGM/AMX/ROT16 instructions costs 6.1e6 (T=1) to 9.4e6 (T=512) instructions for all nonlinear plus glue, against about 4.9e8 of non-matvec instructions in q4v at ctx 1. So the custom instructions and fixed-point kernels (9096c9d, ef9a958) are NOT yet in the q4v build; folding them in is the next integration step (compiler + nonlinear). The nonlinear agent's own matvec figure is 9.7e7 (VDOT, 8 rows sharing activations) vs 2.5e8 for single-row VDOT; q4v matvec uses the 0.176 instr/MAC kernel (1.05e8). Expected combined instruction count at ctx 1 is about 1.1e8-1.2e8, i.e. the T3 range, once both are merged; at long context the fixed-point softmax cost (14.4 instr per score element, 448 rows x T) must be added, not the plain soft-float one. PROJECTED until the merged build runs.
+
+Fidelity flag: `res_full_q4v.json` records `argmax_fw` [13, 315, 279, 374] vs `argmax_hf` [15846, 315, 279, 374] on the 4-token prompt: the q4v firmware differs from HF at position 0 (agrees at 1-3). Argmax vs HF is not yet a pass; this belongs under R4 (numeric contract).
 
 ## Measured components (not full-model tiers)
 

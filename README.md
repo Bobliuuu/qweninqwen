@@ -32,7 +32,7 @@ Single source of truth for what is done and what is not. Pending rows are flippe
 | Free-running generation vs HF greedy (outer token fed back) | **in progress** | pending: result path `TBD` |
 | HostGuard audit of the real driver | **in progress** | pending: result path `TBD` |
 | Speedup work (tuned executor) | **in progress** | pending, see [`PERF_NOTES.md`](PERF_NOTES.md) / [`RUNS.md`](RUNS.md); the 268.6 s headline is the untuned baseline |
-| Circuit route: Qwen3-0.6B as a program on a Qwenputer-style RV32IM CPU inside a real Qwen3.5-0.8B/4B | **not run yet** (build agents working; no end-to-end token) | [`docs/TIERS.md`](docs/TIERS.md), [`docs/CIRCUIT_ROUTE_PLAN.md`](docs/CIRCUIT_ROUTE_PLAN.md) |
+| Circuit route: Qwen3-0.6B as a program on a Qwenputer-style RV32IM CPU inside a real Qwen3.5-0.8B/4B | **tiny model only**: a toy Qwen3-architecture firmware ran exact on the fused circuit executor (708,920 trace tokens, 4,225 tok/s). Qwen3-0.6B: instruction counts measured (5.87e8 instr/token at ctx 1), no 0.6B run yet | [`docs/TIERS.md`](docs/TIERS.md), [`docs/CIRCUIT_ROUTE_PLAN.md`](docs/CIRCUIT_ROUTE_PLAN.md) |
 <!-- STATUS:END -->
 
 ## Watch it

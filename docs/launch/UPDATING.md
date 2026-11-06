@@ -36,3 +36,5 @@ Source of truth: `docs/TIERS.md`; a row flips only from a committed `experiments
 - `make_media.py`: add the new tier as its own rung/bar (do not reuse the compiled-route T-names; label it "circuit T<n>"); regenerate tier ladder and climb GIF, add the measured s/token as a separate bar in `sc_cost`.
 - `TWEET.md`: add one line with tier, model size actually run (tiny/0.6B), trace tokens, s/token; keep "projected" wording for unmeasured tiers.
 - `PROVENANCE.md`: row with the result JSON path.
+
+Current state (2026-11-06): the only measured circuit-route run is the tiny-model fused-executor run (eb4f4f3, `docs/TIERS.md` tiny-model table). Do not feature it as a tier-ladder rung; if media mention it, label it "toy model, 16 tokens". Qwen3-0.6B instruction counts are measured but s/token is computed from assumed rates and must be drawn hatched/labelled "projected". Tier media must state context length (ctx 1 vs 128 vs 1024).
