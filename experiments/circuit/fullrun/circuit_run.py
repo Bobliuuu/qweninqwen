@@ -295,6 +295,8 @@ if CHAIN:
             rowv = cache[sd][jx, rw]; ram[wi] = sum(int(rowv[2 + i] + rowv[34 + i] > THR) << i for i in range(32))   # word = block A (SW data, cols 2..33) + block B (SB/SH merged word, cols 34..65)
         o['ram'] = ram
         if WB27: _wb27.extract_hi(o, grab, bit)   # WB27
+        if WF:   # WF latch window (8 words x 8 int4 cells) read back from the circuit's own wlatch heads
+            o['latch'] = [[sum(int(grab(f'wlatch{(i // 3) // 2}')[(i // 3) % 2, 0][2 + 32 * (i % 3) + 4 * k + b_] > THR) << b_ for b_ in range(4)) for k in range(8)] for i in range(8)]
         return o
     def compare(o, rs):
         d = {}
@@ -313,6 +315,9 @@ if CHAIN:
             d['ram_untouched_nonzero'] = int(((~m_) & (o['ram'] != 0)).sum())
         d['ok'] = (not d['regs_rd_bad']) and d['pc_ok'] and d['wb15_ok'] and d.get('ram_bad', 0) == 0
         if WB27: _wb27.compare_hi(o, rs, d); d['ok'] = d['ok'] and d['wb27_ok']   # WB27
+        if WF:
+            d['latch_bad'] = sum(o['latch'][i][k] != rs['latch'][i][k] for i in range(8) for k in range(8)) if rs.get('latch') else (64 if any(any(w) for w in o['latch']) else 0)
+            d['row_reg_a4'] = (o['x_rd'][14], rs['x'][14] & 0xFFFFFFFF); d['ok'] = d['ok'] and d['latch_bad'] == 0
         return d
     bl = []; done = 0; cmp_ = 0; t0 = time.time(); log = open(a.out + '/chain_progress.log', 'a'); diverged = False
     n_free0 = n_forced0 = nbad_free0 = nbad_forced0 = 0; first_bad0 = None
@@ -339,6 +344,7 @@ if CHAIN:
         d = compare(o, rstate); d['boundary_after_chunk'] = chunk_list[bi]; d['step'] = bnd; bl.append(d)
         msg = f'BOUNDARY after chunk {chunk_list[bi]} (step {bnd:,}): ok={d["ok"]} regs_rd_bad={len(d["regs_rd_bad"])} (rs1 {d["regs_rs1_bad"]}, rs2 {d["regs_rs2_bad"]}) anchor/n {d["anchor"]}/{d["n"]} wb15 {d["wb15"]} ref_wb27 {d["wb_ref_full27"]} high12_lost={d["wb_high12_lost"]} j,vcnt {d["j_vcnt"]} bn_bad {d.get("bn_bad")} ram touched {d.get("ram_slots_touched")} bad {d.get("ram_bad")} untouched-nonzero {d.get("ram_untouched_nonzero")} touched-by-op {d.get("ram_touched_by_op")} bad-by-op {d.get("ram_bad_by_op")}'
         print(msg, flush=True); log.write(msg + '\n'); log.flush(); json.dump(dict(boundaries=bl, free_tokens=n_free0, free_mismatches=nbad_free0, forced_tokens=n_forced0, step=done, seconds=time.time() - t0), open(a.out + '/chain_partial.json', 'w'), default=str)
+        if WF: m_ = f'  WF boundary after chunk {chunk_list[bi]}: latch_bad {d["latch_bad"]}/64 row-id reg a4 circuit/ref {d["row_reg_a4"]} (hex {d["row_reg_a4"][0]:#x}/{d["row_reg_a4"][1]:#x})'; print(m_, flush=True); log.write(m_ + '\n'); log.flush()
         if WB27: m_ = f'  WB27 boundary after chunk {chunk_list[bi]}: circuit wb27 {d["wb27"][0]} (wbase {o["wb"]}, wbase_hi {o["wb_hi"]}) ref wb {d["wb27"][1]} wb27_ok={d["wb27_ok"]}'; print(m_, flush=True); log.write(m_ + '\n'); log.flush()   # WB27
         if d['regs_rd_bad']: print('  rd mismatches (reg, circuit, ref):', d['regs_rd_bad'][:8], flush=True)
         if d.get('ram_bad'): print('  ram mismatches (slot, circuit, ref, ref_ea):', d['ram_bad_first'], flush=True)
