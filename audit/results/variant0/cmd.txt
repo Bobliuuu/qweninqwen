@@ -1,0 +1,1 @@
+cd experiments/vslice; VS2_PROGRESS=1 python3 -u ../../audit/run_audit.py --mode log --fast --check-outer --entry layer --variant 0 --scope weight_prep:test_vs2.py:weights --scope weight_prep:vs2.py:tile_payload --scope build:vs2.py:compile_entry --scope build:engine.py:\<module\> --scope transport:vs2.py:dense_job --out audit0.json test_vs2.py real151936_L28 1

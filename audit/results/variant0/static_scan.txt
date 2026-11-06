@@ -1,0 +1,950 @@
+vslice/cost_model.py:11: arith: writes = sum(nblk(op) * S.nbl[op] * 2 * c.P for op in range(4 * c.L + 1))
+vslice/cost_model.py:11: arith: writes = sum(nblk(op) * S.nbl[op] * 2 * c.P for op in range(4 * c.L + 1))
+vslice/cost_model.py:11: arith: writes = sum(nblk(op) * S.nbl[op] * 2 * c.P for op in range(4 * c.L + 1))
+vslice/cost_model.py:11: arith: writes = sum(nblk(op) * S.nbl[op] * 2 * c.P for op in range(4 * c.L + 1))
+vslice/cost_model.py:11: arith: writes = sum(nblk(op) * S.nbl[op] * 2 * c.P for op in range(4 * c.L + 1))
+vslice/cost_model.py:12: arith: ctrl = c.L * (nblk(0) + 1 + nblk(1) + nblk(2) + 1 + nblk(3)) + nblk(4 * c.L) + 2
+vslice/cost_model.py:12: arith: ctrl = c.L * (nblk(0) + 1 + nblk(1) + nblk(2) + 1 + nblk(3)) + nblk(4 * c.L) + 2
+vslice/cost_model.py:12: arith: ctrl = c.L * (nblk(0) + 1 + nblk(1) + nblk(2) + 1 + nblk(3)) + nblk(4 * c.L) + 2
+vslice/cost_model.py:12: arith: ctrl = c.L * (nblk(0) + 1 + nblk(1) + nblk(2) + 1 + nblk(3)) + nblk(4 * c.L) + 2
+vslice/cost_model.py:12: arith: ctrl = c.L * (nblk(0) + 1 + nblk(1) + nblk(2) + 1 + nblk(3)) + nblk(4 * c.L) + 2
+vslice/cost_model.py:12: arith: ctrl = c.L * (nblk(0) + 1 + nblk(1) + nblk(2) + 1 + nblk(3)) + nblk(4 * c.L) + 2
+vslice/cost_model.py:12: arith: ctrl = c.L * (nblk(0) + 1 + nblk(1) + nblk(2) + 1 + nblk(3)) + nblk(4 * c.L) + 2
+vslice/cost_model.py:12: arith: ctrl = c.L * (nblk(0) + 1 + nblk(1) + nblk(2) + 1 + nblk(3)) + nblk(4 * c.L) + 2
+vslice/cost_model.py:12: arith: ctrl = c.L * (nblk(0) + 1 + nblk(1) + nblk(2) + 1 + nblk(3)) + nblk(4 * c.L) + 2
+vslice/cost_model.py:13: arith: return dict(D=S.D, outer_layers=len(plan), write_frames=writes, control_frames=ctrl, weights=sum(op_dims(c, op
+vslice/cost_model.py:13: arith: return dict(D=S.D, outer_layers=len(plan), write_frames=writes, control_frames=ctrl, weights=sum(op_dims(c, op
+vslice/cost_model.py:13: arith: return dict(D=S.D, outer_layers=len(plan), write_frames=writes, control_frames=ctrl, weights=sum(op_dims(c, op
+vslice/cost_model.py:29: arith: w = cnt['write_frames'] / tokens_per_pass          # weights streamed once per pass, shared by all tokens in t
+vslice/cost_model.py:32: arith: return ALPHA * w + BETA * ctrl * lay
+vslice/cost_model.py:32: arith: return ALPHA * w + BETA * ctrl * lay
+vslice/cost_model.py:32: arith: return ALPHA * w + BETA * ctrl * lay
+vslice/cost_model.py:32: arith: return ALPHA * w + BETA * ctrl * lay
+vslice/test_vs2.py:18: HF-INNER(Qwen3ForCausalLM): m = Qwen3ForCausalLM(cfg).float().eval()
+vslice/test_vs2.py:21: arith: if p.dim() == 2: p.normal_(0, 0.9 / math.sqrt(p.shape[1]) if 'embed' not in n else 1.0)
+vslice/test_vs2.py:21: HOT(sqrt): if p.dim() == 2: p.normal_(0, 0.9 / math.sqrt(p.shape[1]) if 'embed' not in n else 1.0)
+vslice/test_vs2.py:22: arith: else: p.copy_(1 + 0.2 * torch.randn_like(p))
+vslice/test_vs2.py:22: arith: else: p.copy_(1 + 0.2 * torch.randn_like(p))
+vslice/test_vs2.py:31: arith: Wd[4*l] = torch.cat([a.q_proj.weight, a.k_proj.weight, a.v_proj.weight]) * gi[None]
+vslice/test_vs2.py:31: arith: Wd[4*l] = torch.cat([a.q_proj.weight, a.k_proj.weight, a.v_proj.weight]) * gi[None]
+vslice/test_vs2.py:32: arith: Wd[4*l+1] = a.o_proj.weight.clone()
+vslice/test_vs2.py:32: arith: Wd[4*l+1] = a.o_proj.weight.clone()
+vslice/test_vs2.py:33: arith: Wd[4*l+2] = torch.cat([ml.gate_proj.weight, ml.up_proj.weight]) * gp[None]
+vslice/test_vs2.py:33: arith: Wd[4*l+2] = torch.cat([ml.gate_proj.weight, ml.up_proj.weight]) * gp[None]
+vslice/test_vs2.py:33: arith: Wd[4*l+2] = torch.cat([ml.gate_proj.weight, ml.up_proj.weight]) * gp[None]
+vslice/test_vs2.py:34: arith: Wd[4*l+3] = ml.down_proj.weight.clone()
+vslice/test_vs2.py:34: arith: Wd[4*l+3] = ml.down_proj.weight.clone()
+vslice/test_vs2.py:36: arith: Wd[4*c.L] = m.lm_head.weight[:c.V] * m.model.norm.weight[None]
+vslice/test_vs2.py:36: arith: Wd[4*c.L] = m.lm_head.weight[:c.V] * m.model.norm.weight[None]
+vslice/test_vs2.py:42: arith: with torch.no_grad(): nrm.weight.fill_(B / math.sqrt(D) - 1.0)
+vslice/test_vs2.py:42: arith: with torch.no_grad(): nrm.weight.fill_(B / math.sqrt(D) - 1.0)
+vslice/test_vs2.py:42: HOT(sqrt): with torch.no_grad(): nrm.weight.fill_(B / math.sqrt(D) - 1.0)
+vslice/test_vs2.py:55: arith: nsteps = len(prompt) + ngen - 1 if free else len(prompt) + ngen
+vslice/test_vs2.py:55: arith: nsteps = len(prompt) + ngen - 1 if free else len(prompt) + ngen
+vslice/test_vs2.py:55: arith: nsteps = len(prompt) + ngen - 1 if free else len(prompt) + ngen
+vslice/test_vs2.py:61: arith: with torch.no_grad(): rr = toy(torch.tensor([seq[:step + 1]])).logits[0, -1][:c.V]  [EXEMPT reference('HF inner Qwen3 forward on host: reference logits for the error metric only; never fed back')]
+vslice/test_vs2.py:65: READ/ARG(item): err = ((lg - rr).abs().max() / rr.abs().max()).item()
+vslice/test_vs2.py:65: arith: err = ((lg - rr).abs().max() / rr.abs().max()).item()
+vslice/test_vs2.py:65: READ/ARG(max): err = ((lg - rr).abs().max() / rr.abs().max()).item()
+vslice/test_vs2.py:65: arith: err = ((lg - rr).abs().max() / rr.abs().max()).item()
+vslice/test_vs2.py:65: READ/ARG(max): err = ((lg - rr).abs().max() / rr.abs().max()).item()
+vslice/test_vs2.py:72: READ/ARG(max): ref_blk = torch.stack([rr[b * c.O:(b + 1) * c.O].max() for b in range(c.nblk)])  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:72: arith: ref_blk = torch.stack([rr[b * c.O:(b + 1) * c.O].max() for b in range(c.nblk)])  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:72: arith: ref_blk = torch.stack([rr[b * c.O:(b + 1) * c.O].max() for b in range(c.nblk)])  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:72: arith: ref_blk = torch.stack([rr[b * c.O:(b + 1) * c.O].max() for b in range(c.nblk)])  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:73: READ/ARG(item): err = ((bestblk - ref_blk).abs().max() / rr.abs().max()).item()  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:73: arith: err = ((bestblk - ref_blk).abs().max() / rr.abs().max()).item()  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:73: READ/ARG(max): err = ((bestblk - ref_blk).abs().max() / rr.abs().max()).item()  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:73: arith: err = ((bestblk - ref_blk).abs().max() / rr.abs().max()).item()  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:73: READ/ARG(max): err = ((bestblk - ref_blk).abs().max() / rr.abs().max()).item()  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:74: arith: dd = (bestblk - ref_blk).abs(); wi = dd.argsort(descending=True)[:4]  [EXEMPT reference('error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)')]
+vslice/test_vs2.py:80: arith: bit = ((tt % c.O) >> j) & 1; codes[:, 2 * j] = bit; codes[:, 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:80: arith: bit = ((tt % c.O) >> j) & 1; codes[:, 2 * j] = bit; codes[:, 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:80: arith: bit = ((tt % c.O) >> j) & 1; codes[:, 2 * j] = bit; codes[:, 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:80: arith: bit = ((tt % c.O) >> j) & 1; codes[:, 2 * j] = bit; codes[:, 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:82: arith: bit = ((tt // c.O) >> j) & 1; codes[:, 16 + 2 * j] = bit; codes[:, 16 + 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:82: arith: bit = ((tt // c.O) >> j) & 1; codes[:, 16 + 2 * j] = bit; codes[:, 16 + 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:82: arith: bit = ((tt // c.O) >> j) & 1; codes[:, 16 + 2 * j] = bit; codes[:, 16 + 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:82: arith: bit = ((tt // c.O) >> j) & 1; codes[:, 16 + 2 * j] = bit; codes[:, 16 + 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:82: arith: bit = ((tt // c.O) >> j) & 1; codes[:, 16 + 2 * j] = bit; codes[:, 16 + 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:82: arith: bit = ((tt // c.O) >> j) & 1; codes[:, 16 + 2 * j] = bit; codes[:, 16 + 2 * j + 1] = 1 - bit  [EXEMPT transport('host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)')]
+vslice/test_vs2.py:83: MATMUL(@): lg = codes @ amo
+vslice/test_vs2.py:85: READ/ARG(tolist): print('  rails', [round(v, 3) for v in amo.tolist()[:8]], 'top code score', lg.max().item())  [EXEMPT validation_read('print first 8 rails + top code score (display only; the decode above is host-side, see audit report)')]
+vslice/test_vs2.py:85: READ/ARG(item): print('  rails', [round(v, 3) for v in amo.tolist()[:8]], 'top code score', lg.max().item())  [EXEMPT validation_read('print first 8 rails + top code score (display only; the decode above is host-side, see audit report)')]
+vslice/test_vs2.py:85: READ/ARG(max): print('  rails', [round(v, 3) for v in amo.tolist()[:8]], 'top code score', lg.max().item())  [EXEMPT validation_read('print first 8 rails + top code score (display only; the decode above is host-side, see audit report)')]
+vslice/test_vs2.py:86: arith: if step >= len(prompt) - 1 and len(seq) == step + 1: seq.append(int(lg.argmax()))
+vslice/test_vs2.py:86: arith: if step >= len(prompt) - 1 and len(seq) == step + 1: seq.append(int(lg.argmax()))
+vslice/test_vs2.py:86: READ/ARG(argmax): if step >= len(prompt) - 1 and len(seq) == step + 1: seq.append(int(lg.argmax()))
+vslice/test_vs2.py:87: arith: rec = dict(step=step, frames=pr.total, sec=time.time() - t0, build_s=rn.stats['build_s'], run_s=rn.stats['run_
+vslice/test_vs2.py:88: READ/ARG(argmax): maxrel=err, outer_argmax=int(lg.argmax()), hf_argmax=int(rr.argmax()))
+vslice/test_vs2.py:88: READ/ARG(argmax): maxrel=err, outer_argmax=int(lg.argmax()), hf_argmax=int(rr.argmax()))
+vslice/test_vs2.py:92: READ/ARG(tolist): hf = toy.generate(torch.tensor([list(prompt)]), max_new_tokens=ngen, do_sample=False)[0].tolist()
+vslice/test_vs2.py:92: HF-generate: hf = toy.generate(torch.tensor([list(prompt)]), max_new_tokens=ngen, do_sample=False)[0].tolist()
+vslice/test_vs2.py:93: arith: gen_outer = seq[len(prompt):len(prompt) + ngen]; gen_hf = hf[len(prompt):]
+vslice/test_vs2.py:97: READ/ARG(max): out['tokens'] = seq; out['maxrel_worst'] = max(s['maxrel'] for s in out['steps'])
+vslice/test_vs2.py:100: arith: json.dump(out, open(f'res_vs2_{tag}' + ('_free' if free else '') + '.json', 'w'), indent=1)
+vslice/test_vs2.py:100: arith: json.dump(out, open(f'res_vs2_{tag}' + ('_free' if free else '') + '.json', 'w'), indent=1)
+vslice/toy_test.py:12: HF-INNER(Qwen3ForCausalLM): m = Qwen3ForCausalLM(cfg).float().eval()
+vslice/toy_test.py:15: arith: if p.dim() == 2: p.normal_(0, 0.9 / math.sqrt(p.shape[1]) if 'embed' not in n else 1.0)
+vslice/toy_test.py:15: HOT(sqrt): if p.dim() == 2: p.normal_(0, 0.9 / math.sqrt(p.shape[1]) if 'embed' not in n else 1.0)
+vslice/toy_test.py:16: arith: else: p.copy_(1 + 0.2 * torch.randn_like(p))
+vslice/toy_test.py:16: arith: else: p.copy_(1 + 0.2 * torch.randn_like(p))
+vslice/toy_test.py:24: arith: Wd[4*l] = torch.cat([a.q_proj.weight, a.k_proj.weight, a.v_proj.weight]) * gi[None]
+vslice/toy_test.py:24: arith: Wd[4*l] = torch.cat([a.q_proj.weight, a.k_proj.weight, a.v_proj.weight]) * gi[None]
+vslice/toy_test.py:25: arith: Wd[4*l+1] = a.o_proj.weight.clone()
+vslice/toy_test.py:25: arith: Wd[4*l+1] = a.o_proj.weight.clone()
+vslice/toy_test.py:26: arith: Wd[4*l+2] = torch.cat([ml.gate_proj.weight, ml.up_proj.weight]) * gp[None]
+vslice/toy_test.py:26: arith: Wd[4*l+2] = torch.cat([ml.gate_proj.weight, ml.up_proj.weight]) * gp[None]
+vslice/toy_test.py:26: arith: Wd[4*l+2] = torch.cat([ml.gate_proj.weight, ml.up_proj.weight]) * gp[None]
+vslice/toy_test.py:27: arith: Wd[4*l+3] = ml.down_proj.weight.clone()
+vslice/toy_test.py:27: arith: Wd[4*l+3] = ml.down_proj.weight.clone()
+vslice/toy_test.py:29: arith: Wd[4*c.L] = m.lm_head.weight * m.model.norm.weight[None]
+vslice/toy_test.py:29: arith: Wd[4*c.L] = m.lm_head.weight * m.model.norm.weight[None]
+vslice/toy_test.py:40: READ/ARG(argmax): for _ in range(ngen): gen_ref.append(int(toy(torch.tensor([gen_ref])).logits[0, -1].argmax()))
+vslice/toy_test.py:43: arith: print('outer D', S.D, 'layers', len(m.model.layers), 'params', sum(p.numel() for p in m.parameters())/1e6, 'M'
+vslice/toy_test.py:50: arith: for step in range(len(prompt) + ngen):
+vslice/toy_test.py:56: arith: if step >= len(prompt) - 1 and len(seq) == step + 1: seq.append(int(lg.argmax()))
+vslice/toy_test.py:56: arith: if step >= len(prompt) - 1 and len(seq) == step + 1: seq.append(int(lg.argmax()))
+vslice/toy_test.py:56: READ/ARG(argmax): if step >= len(prompt) - 1 and len(seq) == step + 1: seq.append(int(lg.argmax()))
+vslice/toy_test.py:57: arith: rr = toy(torch.tensor([seq[:step+1]])).logits[0, -1]
+vslice/toy_test.py:58: READ/ARG(argmax): print(f'step {step} frames {fr.shape[0]} outer_argmax {int(lg.argmax())} hf_argmax {int(rr.argmax())} '
+vslice/toy_test.py:58: READ/ARG(argmax): print(f'step {step} frames {fr.shape[0]} outer_argmax {int(lg.argmax())} hf_argmax {int(rr.argmax())} '
+vslice/toy_test.py:59: READ/ARG(max): f'maxerr {(lg-rr).abs().max():.3e} /max|ref| {(lg-rr).abs().max()/rr.abs().max():.3e} t={time.time()-t0:.1f}s'
+vslice/toy_test.py:59: arith: f'maxerr {(lg-rr).abs().max():.3e} /max|ref| {(lg-rr).abs().max()/rr.abs().max():.3e} t={time.time()-t0:.1f}s'
+vslice/toy_test.py:59: arith: f'maxerr {(lg-rr).abs().max():.3e} /max|ref| {(lg-rr).abs().max()/rr.abs().max():.3e} t={time.time()-t0:.1f}s'
+vslice/toy_test.py:59: READ/ARG(max): f'maxerr {(lg-rr).abs().max():.3e} /max|ref| {(lg-rr).abs().max()/rr.abs().max():.3e} t={time.time()-t0:.1f}s'
+vslice/toy_test.py:59: arith: f'maxerr {(lg-rr).abs().max():.3e} /max|ref| {(lg-rr).abs().max()/rr.abs().max():.3e} t={time.time()-t0:.1f}s'
+vslice/toy_test.py:59: READ/ARG(max): f'maxerr {(lg-rr).abs().max():.3e} /max|ref| {(lg-rr).abs().max()/rr.abs().max():.3e} t={time.time()-t0:.1f}s'
+vslice/toy_test.py:59: arith: f'maxerr {(lg-rr).abs().max():.3e} /max|ref| {(lg-rr).abs().max()/rr.abs().max():.3e} t={time.time()-t0:.1f}s'
+vslice/vs2.py:27: arith: def sl(s): return s.start, s.stop - s.start
+vslice/vs2.py:34: arith: self.dk = 2 * P + 2; self.dv = 2 * LW + 2; self.O = 2 * LW
+vslice/vs2.py:34: arith: self.dk = 2 * P + 2; self.dv = 2 * LW + 2; self.O = 2 * LW
+vslice/vs2.py:34: arith: self.dk = 2 * P + 2; self.dv = 2 * LW + 2; self.O = 2 * LW
+vslice/vs2.py:34: arith: self.dk = 2 * P + 2; self.dv = 2 * LW + 2; self.O = 2 * LW
+vslice/vs2.py:34: arith: self.dk = 2 * P + 2; self.dv = 2 * LW + 2; self.O = 2 * LW
+vslice/vs2.py:35: arith: self.qkv_n = (nq + 2 * nkv) * hd
+vslice/vs2.py:35: arith: self.qkv_n = (nq + 2 * nkv) * hd
+vslice/vs2.py:35: arith: self.qkv_n = (nq + 2 * nkv) * hd
+vslice/vs2.py:49: arith: if op == 4 * L: return c.V, c.d
+vslice/vs2.py:51: arith: return [(c.qkv_n, c.d), (c.d, c.nq * c.hd), (2 * c.inter, c.d), (c.d, c.inter)][k]
+vslice/vs2.py:51: arith: return [(c.qkv_n, c.d), (c.d, c.nq * c.hd), (2 * c.inter, c.d), (c.d, c.inter)][k]
+vslice/vs2.py:57: arith: S.PAY = a('PAY', c.H * (c.O + 1)); S.SEL = a('SEL', c.dk); S.INIT = a('INIT', 1); S.RINIT = a('RINIT', 1)
+vslice/vs2.py:57: arith: S.PAY = a('PAY', c.H * (c.O + 1)); S.SEL = a('SEL', c.dk); S.INIT = a('INIT', 1); S.RINIT = a('RINIT', 1)
+vslice/vs2.py:58: arith: nops = 4 * L + 1
+vslice/vs2.py:58: arith: nops = 4 * L + 1
+vslice/vs2.py:59: arith: S.nbl = {op: -(-op_dims(c, op)[1] // (c.H * c.P)) for op in range(nops)}
+vslice/vs2.py:60: READ/ARG(max): Kmax = max(S.nbl[op] * c.H * c.P for op in range(nops))
+vslice/vs2.py:60: arith: Kmax = max(S.nbl[op] * c.H * c.P for op in range(nops))
+vslice/vs2.py:60: arith: Kmax = max(S.nbl[op] * c.H * c.P for op in range(nops))
+vslice/vs2.py:64: arith: for j in range(S.nbl[op]): S.wf_idx[(op, j)] = n; n += 1
+vslice/vs2.py:70: arith: S.ngkeys = [('n1', l) for l in range(L)] + [('n3', l) for l in range(L)] + [('nf', 0)]
+vslice/vs2.py:70: arith: S.ngkeys = [('n1', l) for l in range(L)] + [('n3', l) for l in range(L)] + [('nf', 0)]
+vslice/vs2.py:71: arith: S.ACTF = a('ACTF', 3 * L + len(S.ngkeys))                # per-layer activity flags (host control): A_l, NH_l,
+vslice/vs2.py:71: arith: S.ACTF = a('ACTF', 3 * L + len(S.ngkeys))                # per-layer activity flags (host control): A_l, NH_l,
+vslice/vs2.py:73: arith: for l in range(L): S.fl[('A', l)] = l; S.fl[('NH', l)] = L + l; S.fl[('S', l)] = 2 * L + l
+vslice/vs2.py:73: arith: for l in range(L): S.fl[('A', l)] = l; S.fl[('NH', l)] = L + l; S.fl[('S', l)] = 2 * L + l
+vslice/vs2.py:73: arith: for l in range(L): S.fl[('A', l)] = l; S.fl[('NH', l)] = L + l; S.fl[('S', l)] = 2 * L + l
+vslice/vs2.py:74: arith: for i, key in enumerate(S.ngkeys): S.fl[('NG',) + key] = 3 * L + i
+vslice/vs2.py:74: arith: for i, key in enumerate(S.ngkeys): S.fl[('NG',) + key] = 3 * L + i
+vslice/vs2.py:74: arith: for i, key in enumerate(S.ngkeys): S.fl[('NG',) + key] = 3 * L + i
+vslice/vs2.py:76: arith: for key in S.ngkeys: S.scal[key] = {nme: a(f's_{key[0]}{key[1]}_' + nme, 1) for nme in ('MS', 'R0', 'QQ', 'TT'
+vslice/vs2.py:78: arith: S.QKVR = a('QKVR', c.qkv_n); S.QN = a('QN', c.nq * c.hd); S.KN = a('KN', c.nkv * c.hd); S.AO = a('AO', c.nq * 
+vslice/vs2.py:78: arith: S.QKVR = a('QKVR', c.qkv_n); S.QN = a('QN', c.nq * c.hd); S.KN = a('KN', c.nkv * c.hd); S.AO = a('AO', c.nq * 
+vslice/vs2.py:78: arith: S.QKVR = a('QKVR', c.qkv_n); S.QN = a('QN', c.nq * c.hd); S.KN = a('KN', c.nkv * c.hd); S.AO = a('AO', c.nq * 
+vslice/vs2.py:80: arith: S.GU = a('GU', 2 * c.inter)
+vslice/vs2.py:86: arith: S.BL = {l: a(f'BL{l}', l * (c.O >> l)) for l in range(1, 9)}
+vslice/vs2.py:87: arith: S.SL = {l: a(f'SL{l}', c.O >> (l + 1)) for l in range(8)}
+vslice/vs2.py:95: arith: S.regs[name] = dict(heads=heads, nl=nl, RA=a(name + '_RA', nh), WA=a(name + '_WA', nh), nlayers=-(-nh // c.H))
+vslice/vs2.py:95: arith: S.regs[name] = dict(heads=heads, nl=nl, RA=a(name + '_RA', nh), WA=a(name + '_WA', nh), nlayers=-(-nh // c.H))
+vslice/vs2.py:96: arith: for l in range(L + 1):
+vslice/vs2.py:101: arith: reg(f'R3_{l}', c.nq * c.hd, [S.X], [(S.AO, 1.0, 'E')])
+vslice/vs2.py:103: arith: reg(f'R5_{l}', 2 * c.inter, [S.GU], [(S.Y, 1.0, 'Y')])
+vslice/vs2.py:119: arith: W(4 * l); R(f'R2_{l}'); [plan.append(('NH', l, jl)) for jl in range(-(-(c.nq + c.nkv) // c.H))]; plan.append((
+vslice/vs2.py:119: arith: W(4 * l); R(f'R2_{l}'); [plan.append(('NH', l, jl)) for jl in range(-(-(c.nq + c.nkv) // c.H))]; plan.append((
+vslice/vs2.py:119: arith: W(4 * l); R(f'R2_{l}'); [plan.append(('NH', l, jl)) for jl in range(-(-(c.nq + c.nkv) // c.H))]; plan.append((
+vslice/vs2.py:119: arith: W(4 * l); R(f'R2_{l}'); [plan.append(('NH', l, jl)) for jl in range(-(-(c.nq + c.nkv) // c.H))]; plan.append((
+vslice/vs2.py:122: arith: W(4 * l + 2); R(f'R5_{l}'); plan.append(('S', l, 0)); R(f'R6_{l}'); W(4 * l + 3)
+vslice/vs2.py:122: arith: W(4 * l + 2); R(f'R5_{l}'); plan.append(('S', l, 0)); R(f'R6_{l}'); W(4 * l + 3)
+vslice/vs2.py:122: arith: W(4 * l + 2); R(f'R5_{l}'); plan.append(('S', l, 0)); R(f'R6_{l}'); W(4 * l + 3)
+vslice/vs2.py:122: arith: W(4 * l + 2); R(f'R5_{l}'); plan.append(('S', l, 0)); R(f'R6_{l}'); W(4 * l + 3)
+vslice/vs2.py:125: arith: W(4 * L)
+vslice/vs2.py:136: arith: v = B / math.sqrt(D) - 1.0
+vslice/vs2.py:136: arith: v = B / math.sqrt(D) - 1.0
+vslice/vs2.py:136: HOT(sqrt): v = B / math.sqrt(D) - 1.0
+vslice/vs2.py:145: arith: g.in_proj_b.weight[:, 0] = 30.0 / B
+vslice/vs2.py:146: arith: g.in_proj_a.weight[:, 0] = -30.0 / B
+vslice/vs2.py:147: arith: g.in_proj_z.weight[:, 0] = 30.0 / B
+vslice/vs2.py:148: arith: g.norm.weight.fill_(1.0 / 30.0)
+vslice/vs2.py:153: arith: g = gdn_base(layer, D); heads = S.regs[name]['heads'][j * c.H:(j + 1) * c.H]; H0 = j * c.H
+vslice/vs2.py:153: arith: g = gdn_base(layer, D); heads = S.regs[name]['heads'][j * c.H:(j + 1) * c.H]; H0 = j * c.H
+vslice/vs2.py:153: arith: g = gdn_base(layer, D); heads = S.regs[name]['heads'][j * c.H:(j + 1) * c.H]; H0 = j * c.H
+vslice/vs2.py:153: arith: g = gdn_base(layer, D); heads = S.regs[name]['heads'][j * c.H:(j + 1) * c.H]; H0 = j * c.H
+vslice/vs2.py:154: arith: kd = c.H * c.dk; LW, dv = c.LW, c.dv; RA, WA = S.regs[name]['RA'], S.regs[name]['WA']
+vslice/vs2.py:155: arith: Gr = Rq * Bg / (30.0 * math.sqrt(dv)); i = torch.arange(LW, device=g.in_proj_qkv.weight.device)
+vslice/vs2.py:155: arith: Gr = Rq * Bg / (30.0 * math.sqrt(dv)); i = torch.arange(LW, device=g.in_proj_qkv.weight.device)
+vslice/vs2.py:155: arith: Gr = Rq * Bg / (30.0 * math.sqrt(dv)); i = torch.arange(LW, device=g.in_proj_qkv.weight.device)
+vslice/vs2.py:155: HOT(sqrt): Gr = Rq * Bg / (30.0 * math.sqrt(dv)); i = torch.arange(LW, device=g.in_proj_qkv.weight.device)
+vslice/vs2.py:159: arith: gh = H0 + lh
+vslice/vs2.py:160: arith: Wq[lh * c.dk + 0, RA.start + gh] = 30.0; Wq[lh * c.dk + 1, 0] = Rq / B
+vslice/vs2.py:160: arith: Wq[lh * c.dk + 0, RA.start + gh] = 30.0; Wq[lh * c.dk + 1, 0] = Rq / B
+vslice/vs2.py:160: arith: Wq[lh * c.dk + 0, RA.start + gh] = 30.0; Wq[lh * c.dk + 1, 0] = Rq / B
+vslice/vs2.py:160: arith: Wq[lh * c.dk + 0, RA.start + gh] = 30.0; Wq[lh * c.dk + 1, 0] = Rq / B
+vslice/vs2.py:160: arith: Wq[lh * c.dk + 0, RA.start + gh] = 30.0; Wq[lh * c.dk + 1, 0] = Rq / B
+vslice/vs2.py:160: arith: Wq[lh * c.dk + 0, RA.start + gh] = 30.0; Wq[lh * c.dk + 1, 0] = Rq / B
+vslice/vs2.py:161: arith: Wq[kd + lh * c.dk + 0, WA.start + gh] = 30.0; Wq[kd + lh * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vs2.py:161: arith: Wq[kd + lh * c.dk + 0, WA.start + gh] = 30.0; Wq[kd + lh * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vs2.py:161: arith: Wq[kd + lh * c.dk + 0, WA.start + gh] = 30.0; Wq[kd + lh * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vs2.py:161: arith: Wq[kd + lh * c.dk + 0, WA.start + gh] = 30.0; Wq[kd + lh * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vs2.py:161: arith: Wq[kd + lh * c.dk + 0, WA.start + gh] = 30.0; Wq[kd + lh * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vs2.py:161: arith: Wq[kd + lh * c.dk + 0, WA.start + gh] = 30.0; Wq[kd + lh * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vs2.py:161: arith: Wq[kd + lh * c.dk + 0, WA.start + gh] = 30.0; Wq[kd + lh * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vs2.py:164: arith: idx = (hd['lane'] % 2) * LW + i if mode == 'Y' else hd['lane'] * LW + i
+vslice/vs2.py:164: arith: idx = (hd['lane'] % 2) * LW + i if mode == 'Y' else hd['lane'] * LW + i
+vslice/vs2.py:164: arith: idx = (hd['lane'] % 2) * LW + i if mode == 'Y' else hd['lane'] * LW + i
+vslice/vs2.py:164: arith: idx = (hd['lane'] % 2) * LW + i if mode == 'Y' else hd['lane'] * LW + i
+vslice/vs2.py:166: arith: Wq[2 * kd + lh * dv + i[ok], s0 + idx[ok]] += coef
+vslice/vs2.py:166: arith: Wq[2 * kd + lh * dv + i[ok], s0 + idx[ok]] += coef
+vslice/vs2.py:166: arith: Wq[2 * kd + lh * dv + i[ok], s0 + idx[ok]] += coef
+vslice/vs2.py:166: arith: Wq[2 * kd + lh * dv + i[ok], s0 + idx[ok]] += coef
+vslice/vs2.py:166: arith: Wq[2 * kd + lh * dv + i[ok], s0 + idx[ok]] += coef
+vslice/vs2.py:166: arith: Wq[2 * kd + lh * dv + i[ok], s0 + idx[ok]] += coef
+vslice/vs2.py:167: arith: Wq[2 * kd + lh * dv + LW + i[ok], s0 + idx[ok]] -= coef
+vslice/vs2.py:167: arith: Wq[2 * kd + lh * dv + LW + i[ok], s0 + idx[ok]] -= coef
+vslice/vs2.py:167: arith: Wq[2 * kd + lh * dv + LW + i[ok], s0 + idx[ok]] -= coef
+vslice/vs2.py:167: arith: Wq[2 * kd + lh * dv + LW + i[ok], s0 + idx[ok]] -= coef
+vslice/vs2.py:167: arith: Wq[2 * kd + lh * dv + LW + i[ok], s0 + idx[ok]] -= coef
+vslice/vs2.py:167: arith: Wq[2 * kd + lh * dv + LW + i[ok], s0 + idx[ok]] -= coef
+vslice/vs2.py:167: arith: Wq[2 * kd + lh * dv + LW + i[ok], s0 + idx[ok]] -= coef
+vslice/vs2.py:168: arith: Wq[2 * kd + lh * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vs2.py:168: arith: Wq[2 * kd + lh * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vs2.py:168: arith: Wq[2 * kd + lh * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vs2.py:168: arith: Wq[2 * kd + lh * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vs2.py:168: arith: Wq[2 * kd + lh * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vs2.py:169: arith: d0, n = sl(hd['dst']); e = hd['lane'] * LW + i; ok = e < n
+vslice/vs2.py:169: arith: d0, n = sl(hd['dst']); e = hd['lane'] * LW + i; ok = e < n
+vslice/vs2.py:170: arith: Wo[d0 + e[ok], lh * dv + i[ok]] += Gr; Wo[d0 + e[ok], lh * dv + LW + i[ok]] -= Gr
+vslice/vs2.py:170: arith: Wo[d0 + e[ok], lh * dv + i[ok]] += Gr; Wo[d0 + e[ok], lh * dv + LW + i[ok]] -= Gr
+vslice/vs2.py:170: arith: Wo[d0 + e[ok], lh * dv + i[ok]] += Gr; Wo[d0 + e[ok], lh * dv + LW + i[ok]] -= Gr
+vslice/vs2.py:170: arith: Wo[d0 + e[ok], lh * dv + i[ok]] += Gr; Wo[d0 + e[ok], lh * dv + LW + i[ok]] -= Gr
+vslice/vs2.py:170: arith: Wo[d0 + e[ok], lh * dv + i[ok]] += Gr; Wo[d0 + e[ok], lh * dv + LW + i[ok]] -= Gr
+vslice/vs2.py:170: arith: Wo[d0 + e[ok], lh * dv + i[ok]] += Gr; Wo[d0 + e[ok], lh * dv + LW + i[ok]] -= Gr
+vslice/vs2.py:170: arith: Wo[d0 + e[ok], lh * dv + i[ok]] += Gr; Wo[d0 + e[ok], lh * dv + LW + i[ok]] -= Gr
+vslice/vs2.py:170: arith: Wo[d0 + e[ok], lh * dv + i[ok]] += Gr; Wo[d0 + e[ok], lh * dv + LW + i[ok]] -= Gr
+vslice/vs2.py:170: arith: Wo[d0 + e[ok], lh * dv + i[ok]] += Gr; Wo[d0 + e[ok], lh * dv + LW + i[ok]] -= Gr
+vslice/vs2.py:174: arith: g = gdn_base(layer, D); kd = c.H * c.dk; dv = c.dv; O = c.O; P = c.P; H = c.H
+vslice/vs2.py:175: arith: G = Bg * Rq / (math.sqrt(dv) * SILU_MIN); dev = g.in_proj_qkv.weight.device
+vslice/vs2.py:175: arith: G = Bg * Rq / (math.sqrt(dv) * SILU_MIN); dev = g.in_proj_qkv.weight.device
+vslice/vs2.py:175: arith: G = Bg * Rq / (math.sqrt(dv) * SILU_MIN); dev = g.in_proj_qkv.weight.device
+vslice/vs2.py:175: HOT(sqrt): G = Bg * Rq / (math.sqrt(dv) * SILU_MIN); dev = g.in_proj_qkv.weight.device
+vslice/vs2.py:178: arith: jj = torch.arange(P, device=dev); rr = torch.arange(c.dk, device=dev); cc = torch.arange(O + 1, device=dev); c
+vslice/vs2.py:180: arith: xi = j * H * P + h * P + jj
+vslice/vs2.py:180: arith: xi = j * H * P + h * P + jj
+vslice/vs2.py:180: arith: xi = j * H * P + h * P + jj
+vslice/vs2.py:180: arith: xi = j * H * P + h * P + jj
+vslice/vs2.py:180: arith: xi = j * H * P + h * P + jj
+vslice/vs2.py:181: arith: Wq[h * c.dk + jj, S.X.start + xi] = 1.0
+vslice/vs2.py:181: arith: Wq[h * c.dk + jj, S.X.start + xi] = 1.0
+vslice/vs2.py:181: arith: Wq[h * c.dk + jj, S.X.start + xi] = 1.0
+vslice/vs2.py:182: arith: Wq[h * c.dk + P + jj, S.X.start + xi] = -1.0
+vslice/vs2.py:182: arith: Wq[h * c.dk + P + jj, S.X.start + xi] = -1.0
+vslice/vs2.py:182: arith: Wq[h * c.dk + P + jj, S.X.start + xi] = -1.0
+vslice/vs2.py:182: arith: Wq[h * c.dk + P + jj, S.X.start + xi] = -1.0
+vslice/vs2.py:183: arith: Wq[h * c.dk + c.dk - 1, 0] = Rq / B
+vslice/vs2.py:183: arith: Wq[h * c.dk + c.dk - 1, 0] = Rq / B
+vslice/vs2.py:183: arith: Wq[h * c.dk + c.dk - 1, 0] = Rq / B
+vslice/vs2.py:183: arith: Wq[h * c.dk + c.dk - 1, 0] = Rq / B
+vslice/vs2.py:184: arith: Wq[kd + h * c.dk + rr, 0] = -KB / B
+vslice/vs2.py:184: arith: Wq[kd + h * c.dk + rr, 0] = -KB / B
+vslice/vs2.py:184: arith: Wq[kd + h * c.dk + rr, 0] = -KB / B
+vslice/vs2.py:184: arith: Wq[kd + h * c.dk + rr, 0] = -KB / B
+vslice/vs2.py:185: arith: Wq[kd + h * c.dk + rr, S.SEL.start + rr] = 2 * KB
+vslice/vs2.py:185: arith: Wq[kd + h * c.dk + rr, S.SEL.start + rr] = 2 * KB
+vslice/vs2.py:185: arith: Wq[kd + h * c.dk + rr, S.SEL.start + rr] = 2 * KB
+vslice/vs2.py:185: arith: Wq[kd + h * c.dk + rr, S.SEL.start + rr] = 2 * KB
+vslice/vs2.py:185: arith: Wq[kd + h * c.dk + rr, S.SEL.start + rr] = 2 * KB
+vslice/vs2.py:186: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vs2.py:186: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vs2.py:186: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vs2.py:186: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vs2.py:186: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vs2.py:186: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vs2.py:186: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vs2.py:186: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vs2.py:187: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vs2.py:187: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vs2.py:187: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vs2.py:187: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vs2.py:187: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vs2.py:188: arith: Wo[S.Y.start + co, h * dv + co] = G
+vslice/vs2.py:188: arith: Wo[S.Y.start + co, h * dv + co] = G
+vslice/vs2.py:188: arith: Wo[S.Y.start + co, h * dv + co] = G
+vslice/vs2.py:189: arith: Wo[S.Y.start + co, h * dv + O] = -G
+vslice/vs2.py:189: arith: Wo[S.Y.start + co, h * dv + O] = -G
+vslice/vs2.py:189: arith: Wo[S.Y.start + co, h * dv + O] = -G
+vslice/vs2.py:190: arith: g.in_proj_z.weight.zero_(); g.in_proj_z.weight[:, 0] = -40.0 / B; g.in_proj_z.weight[:, S.RF.start + op] = 40.
+vslice/vs2.py:190: arith: g.in_proj_z.weight.zero_(); g.in_proj_z.weight[:, 0] = -40.0 / B; g.in_proj_z.weight[:, S.RF.start + op] = 40.
+vslice/vs2.py:190: arith: g.in_proj_z.weight.zero_(); g.in_proj_z.weight[:, 0] = -40.0 / B; g.in_proj_z.weight[:, S.RF.start + op] = 40.
+vslice/vs2.py:191: arith: g.in_proj_b.weight.zero_(); g.in_proj_b.weight[:, 0] = -30.0 / B; g.in_proj_b.weight[:, S.WF.start + S.wf_idx[
+vslice/vs2.py:191: arith: g.in_proj_b.weight.zero_(); g.in_proj_b.weight[:, 0] = -30.0 / B; g.in_proj_b.weight[:, S.WF.start + S.wf_idx[
+vslice/vs2.py:197: arith: g = gdn_base(layer, D); kd = c.H * c.dk; dv = c.dv; hd = c.hd; eps_v = 1e-7
+vslice/vs2.py:198: arith: assert 2 * hd + 2 <= dv
+vslice/vs2.py:198: arith: assert 2 * hd + 2 <= dv
+vslice/vs2.py:200: arith: heads = [(S.QKVR.start + h * hd, S.QN.start + h * hd) for h in range(c.nq)] + \
+vslice/vs2.py:200: arith: heads = [(S.QKVR.start + h * hd, S.QN.start + h * hd) for h in range(c.nq)] + \
+vslice/vs2.py:200: arith: heads = [(S.QKVR.start + h * hd, S.QN.start + h * hd) for h in range(c.nq)] + \
+vslice/vs2.py:200: arith: heads = [(S.QKVR.start + h * hd, S.QN.start + h * hd) for h in range(c.nq)] + \
+vslice/vs2.py:200: arith: heads = [(S.QKVR.start + h * hd, S.QN.start + h * hd) for h in range(c.nq)] + \
+vslice/vs2.py:201: arith: [(S.QKVR.start + c.nq * hd + k * hd, S.KN.start + k * hd) for k in range(c.nkv)]
+vslice/vs2.py:201: arith: [(S.QKVR.start + c.nq * hd + k * hd, S.KN.start + k * hd) for k in range(c.nkv)]
+vslice/vs2.py:201: arith: [(S.QKVR.start + c.nq * hd + k * hd, S.KN.start + k * hd) for k in range(c.nkv)]
+vslice/vs2.py:201: arith: [(S.QKVR.start + c.nq * hd + k * hd, S.KN.start + k * hd) for k in range(c.nkv)]
+vslice/vs2.py:201: arith: [(S.QKVR.start + c.nq * hd + k * hd, S.KN.start + k * hd) for k in range(c.nkv)]
+vslice/vs2.py:201: arith: [(S.QKVR.start + c.nq * hd + k * hd, S.KN.start + k * hd) for k in range(c.nkv)]
+vslice/vs2.py:202: arith: heads = heads[jl * c.H:(jl + 1) * c.H]
+vslice/vs2.py:202: arith: heads = heads[jl * c.H:(jl + 1) * c.H]
+vslice/vs2.py:202: arith: heads = heads[jl * c.H:(jl + 1) * c.H]
+vslice/vs2.py:204: arith: g.in_proj_z.weight.zero_(); g.in_proj_z.weight[:, 0] = -40.0 / B; g.in_proj_z.weight[:, S.ACTF.start + S.fl[('
+vslice/vs2.py:204: arith: g.in_proj_z.weight.zero_(); g.in_proj_z.weight[:, 0] = -40.0 / B; g.in_proj_z.weight[:, S.ACTF.start + S.fl[('
+vslice/vs2.py:207: arith: Wq[h * c.dk + 0, 0] = 30.0 / B; Wq[kd + h * c.dk + 0, 0] = 30.0 / B
+vslice/vs2.py:207: arith: Wq[h * c.dk + 0, 0] = 30.0 / B; Wq[kd + h * c.dk + 0, 0] = 30.0 / B
+vslice/vs2.py:207: arith: Wq[h * c.dk + 0, 0] = 30.0 / B; Wq[kd + h * c.dk + 0, 0] = 30.0 / B
+vslice/vs2.py:207: arith: Wq[h * c.dk + 0, 0] = 30.0 / B; Wq[kd + h * c.dk + 0, 0] = 30.0 / B
+vslice/vs2.py:207: arith: Wq[h * c.dk + 0, 0] = 30.0 / B; Wq[kd + h * c.dk + 0, 0] = 30.0 / B
+vslice/vs2.py:207: arith: Wq[h * c.dk + 0, 0] = 30.0 / B; Wq[kd + h * c.dk + 0, 0] = 30.0 / B
+vslice/vs2.py:207: arith: Wq[h * c.dk + 0, 0] = 30.0 / B; Wq[kd + h * c.dk + 0, 0] = 30.0 / B
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:208: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v; Wq[2 * kd + h * dv + hd + i, s0 + i] = -eps_v
+vslice/vs2.py:209: arith: E = eps_v * math.sqrt(hd * c.eps)
+vslice/vs2.py:209: HOT(sqrt): E = eps_v * math.sqrt(hd * c.eps)
+vslice/vs2.py:209: arith: E = eps_v * math.sqrt(hd * c.eps)
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:210: arith: Wq[2 * kd + h * dv + 2 * hd, 0] = E / B; Wq[2 * kd + h * dv + 2 * hd + 1, 0] = -E / B
+vslice/vs2.py:211: HOT(sqrt): k = math.sqrt(hd / (2.0 * dv))
+vslice/vs2.py:211: arith: k = math.sqrt(hd / (2.0 * dv))
+vslice/vs2.py:211: arith: k = math.sqrt(hd / (2.0 * dv))
+vslice/vs2.py:212: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + hd + i] = -k
+vslice/vs2.py:212: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + hd + i] = -k
+vslice/vs2.py:212: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + hd + i] = -k
+vslice/vs2.py:212: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + hd + i] = -k
+vslice/vs2.py:212: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + hd + i] = -k
+vslice/vs2.py:212: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + hd + i] = -k
+vslice/vs2.py:212: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + hd + i] = -k
+vslice/vs2.py:217: arith: hd = c.hd; hdo = hd + 3; nq, nkv = c.nq, c.nkv; sa = layer.self_attn; R = hd; cc = 2.0 ** 23
+vslice/vs2.py:217: arith: hd = c.hd; hdo = hd + 3; nq, nkv = c.nq, c.nkv; sa = layer.self_attn; R = hd; cc = 2.0 ** 23
+vslice/vs2.py:219: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:219: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:219: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:219: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:219: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:219: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:219: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:219: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:224: arith: Wq[h, 0, j, S.QN.start + h * hd + j] = gq
+vslice/vs2.py:224: arith: Wq[h, 0, j, S.QN.start + h * hd + j] = gq
+vslice/vs2.py:224: arith: Wq[h, 0, j, S.QN.start + h * hd + j] = gq
+vslice/vs2.py:225: arith: Wq[h, 0, R, 0] = cc / B; Wq[h, 0, R + 2, 0] = cc / B; Wq[h, 1, j, 0] = -30.0 / B; Wq[h, 1, j, S.ACTF.start + S
+vslice/vs2.py:225: arith: Wq[h, 0, R, 0] = cc / B; Wq[h, 0, R + 2, 0] = cc / B; Wq[h, 1, j, 0] = -30.0 / B; Wq[h, 1, j, S.ACTF.start + S
+vslice/vs2.py:225: arith: Wq[h, 0, R, 0] = cc / B; Wq[h, 0, R + 2, 0] = cc / B; Wq[h, 1, j, 0] = -30.0 / B; Wq[h, 1, j, S.ACTF.start + S
+vslice/vs2.py:225: arith: Wq[h, 0, R, 0] = cc / B; Wq[h, 0, R + 2, 0] = cc / B; Wq[h, 1, j, 0] = -30.0 / B; Wq[h, 1, j, S.ACTF.start + S
+vslice/vs2.py:225: arith: Wq[h, 0, R, 0] = cc / B; Wq[h, 0, R + 2, 0] = cc / B; Wq[h, 1, j, 0] = -30.0 / B; Wq[h, 1, j, S.ACTF.start + S
+vslice/vs2.py:227: arith: Wk[g, j, S.KN.start + g * hd + j] = gk; Wk[g, R + 1, 0] = cc / B
+vslice/vs2.py:227: arith: Wk[g, j, S.KN.start + g * hd + j] = gk; Wk[g, R + 1, 0] = cc / B
+vslice/vs2.py:227: arith: Wk[g, j, S.KN.start + g * hd + j] = gk; Wk[g, R + 1, 0] = cc / B
+vslice/vs2.py:227: arith: Wk[g, j, S.KN.start + g * hd + j] = gk; Wk[g, R + 1, 0] = cc / B
+vslice/vs2.py:227: arith: Wk[g, j, S.KN.start + g * hd + j] = gk; Wk[g, R + 1, 0] = cc / B
+vslice/vs2.py:228: arith: Wk[g, R + 2, S.MASK[l].start] = -cc * 4
+vslice/vs2.py:228: arith: Wk[g, R + 2, S.MASK[l].start] = -cc * 4
+vslice/vs2.py:229: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vs2.py:229: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vs2.py:229: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vs2.py:229: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vs2.py:229: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vs2.py:229: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vs2.py:231: arith: for h in range(nq): Wo[S.AO.start + h * hd + j, h, j] = 1.0
+vslice/vs2.py:231: arith: for h in range(nq): Wo[S.AO.start + h * hd + j, h, j] = 1.0
+vslice/vs2.py:231: arith: for h in range(nq): Wo[S.AO.start + h * hd + j, h, j] = 1.0
+vslice/vs2.py:232: arith: sa.q_norm.weight.fill_(G - 1.0); sa.k_norm.weight.fill_(G - 1.0)
+vslice/vs2.py:232: arith: sa.q_norm.weight.fill_(G - 1.0); sa.k_norm.weight.fill_(G - 1.0)
+vslice/vs2.py:237: arith: mb = MLPBuilder(layer, D, ballast=B); n = c.inter; r = mb._alloc(n); i = torch.arange(n, device=mb.g.device); 
+vslice/vs2.py:239: arith: mb.g[nn_, S.GU.start + i] = 1.0; mb.g[nn_, 0] = -1e4 / B; mb.g[nn_, S.ACTF.start + S.fl[('S', l)]] = 1e4
+vslice/vs2.py:239: arith: mb.g[nn_, S.GU.start + i] = 1.0; mb.g[nn_, 0] = -1e4 / B; mb.g[nn_, S.ACTF.start + S.fl[('S', l)]] = 1e4
+vslice/vs2.py:239: arith: mb.g[nn_, S.GU.start + i] = 1.0; mb.g[nn_, 0] = -1e4 / B; mb.g[nn_, S.ACTF.start + S.fl[('S', l)]] = 1e4
+vslice/vs2.py:240: arith: mb.u[nn_, S.GU.start + n + i] = 1.0; mb.d[S.ACT.start + i, nn_] = 1.0
+vslice/vs2.py:240: arith: mb.u[nn_, S.GU.start + n + i] = 1.0; mb.d[S.ACT.start + i, nn_] = 1.0
+vslice/vs2.py:240: arith: mb.u[nn_, S.GU.start + n + i] = 1.0; mb.d[S.ACT.start + i, nn_] = 1.0
+vslice/vs2.py:246: arith: MS, R0, QQ, TT, ZZ, ZF = [S.scal[key][n].start for n in ('MS', 'R0', 'QQ', 'TT', 'ZZ', 'ZF')]; FL = S.ACTF.sta
+vslice/vs2.py:246: arith: MS, R0, QQ, TT, ZZ, ZF = [S.scal[key][n].start for n in ('MS', 'R0', 'QQ', 'TT', 'ZZ', 'ZF')]; FL = S.ACTF.sta
+vslice/vs2.py:251: arith: r = b._alloc(2 * d)
+vslice/vs2.py:253: arith: n = r.start + off + i; b.g[n, xi0 + i] = sg_; b.u[n, xi0 + i] = sg_; b.d[MS, n] = kappa / d
+vslice/vs2.py:253: arith: n = r.start + off + i; b.g[n, xi0 + i] = sg_; b.u[n, xi0 + i] = sg_; b.d[MS, n] = kappa / d
+vslice/vs2.py:253: arith: n = r.start + off + i; b.g[n, xi0 + i] = sg_; b.u[n, xi0 + i] = sg_; b.d[MS, n] = kappa / d
+vslice/vs2.py:253: arith: n = r.start + off + i; b.g[n, xi0 + i] = sg_; b.u[n, xi0 + i] = sg_; b.d[MS, n] = kappa / d
+vslice/vs2.py:253: arith: n = r.start + off + i; b.g[n, xi0 + i] = sg_; b.u[n, xi0 + i] = sg_; b.d[MS, n] = kappa / d
+vslice/vs2.py:255: arith: nk = int(math.log(m_max / eps_in) / math.log(rho)) + 2
+vslice/vs2.py:255: arith: nk = int(math.log(m_max / eps_in) / math.log(rho)) + 2
+vslice/vs2.py:255: HOT(log): nk = int(math.log(m_max / eps_in) / math.log(rho)) + 2
+vslice/vs2.py:255: arith: nk = int(math.log(m_max / eps_in) / math.log(rho)) + 2
+vslice/vs2.py:255: HOT(log): nk = int(math.log(m_max / eps_in) / math.log(rho)) + 2
+vslice/vs2.py:256: arith: t = eps_in * rho ** torch.arange(nk, dtype=torch.float64); f = t ** -0.5
+vslice/vs2.py:256: arith: t = eps_in * rho ** torch.arange(nk, dtype=torch.float64); f = t ** -0.5
+vslice/vs2.py:256: arith: t = eps_in * rho ** torch.arange(nk, dtype=torch.float64); f = t ** -0.5
+vslice/vs2.py:257: arith: sgm = (f[1:] - f[:-1]) / (t[1:] - t[:-1]); a_k = torch.cat([sgm[1:] - sgm[:-1], -sgm[-1:]]); tk = t[1:]
+vslice/vs2.py:257: arith: sgm = (f[1:] - f[:-1]) / (t[1:] - t[:-1]); a_k = torch.cat([sgm[1:] - sgm[:-1], -sgm[-1:]]); tk = t[1:]
+vslice/vs2.py:257: arith: sgm = (f[1:] - f[:-1]) / (t[1:] - t[:-1]); a_k = torch.cat([sgm[1:] - sgm[:-1], -sgm[-1:]]); tk = t[1:]
+vslice/vs2.py:257: arith: sgm = (f[1:] - f[:-1]) / (t[1:] - t[:-1]); a_k = torch.cat([sgm[1:] - sgm[:-1], -sgm[-1:]]); tk = t[1:]
+vslice/vs2.py:258: arith: r = b._alloc(len(tk) + 1); idx = (r.start + torch.arange(len(tk))).to(dev)
+vslice/vs2.py:258: arith: r = b._alloc(len(tk) + 1); idx = (r.start + torch.arange(len(tk))).to(dev)
+vslice/vs2.py:259: arith: b.g[idx, MS] = -lam / kappa; b.g[idx, 0] = ((lam * (tk - eps_in)) / B).float().to(dev)
+vslice/vs2.py:259: arith: b.g[idx, MS] = -lam / kappa; b.g[idx, 0] = ((lam * (tk - eps_in)) / B).float().to(dev)
+vslice/vs2.py:259: arith: b.g[idx, MS] = -lam / kappa; b.g[idx, 0] = ((lam * (tk - eps_in)) / B).float().to(dev)
+vslice/vs2.py:259: arith: b.g[idx, MS] = -lam / kappa; b.g[idx, 0] = ((lam * (tk - eps_in)) / B).float().to(dev)
+vslice/vs2.py:260: arith: b.u[idx, 0] = 1.0 / B; b.d[R0, idx] = (a_k / lam).float().to(dev)
+vslice/vs2.py:260: arith: b.u[idx, 0] = 1.0 / B; b.d[R0, idx] = (a_k / lam).float().to(dev)
+vslice/vs2.py:261: arith: n0 = r.start + len(tk); b.g[n0, 0] = 1.0 / B; b.u[n0, 0] = float(f[-1]) / (B * 0.7310585786300049); b.d[R0, n0
+vslice/vs2.py:261: arith: n0 = r.start + len(tk); b.g[n0, 0] = 1.0 / B; b.u[n0, 0] = float(f[-1]) / (B * 0.7310585786300049); b.d[R0, n0
+vslice/vs2.py:261: arith: n0 = r.start + len(tk); b.g[n0, 0] = 1.0 / B; b.u[n0, 0] = float(f[-1]) / (B * 0.7310585786300049); b.d[R0, n0
+vslice/vs2.py:261: arith: n0 = r.start + len(tk); b.g[n0, 0] = 1.0 / B; b.u[n0, 0] = float(f[-1]) / (B * 0.7310585786300049); b.d[R0, n0
+vslice/vs2.py:265: arith: n = r.start + j; b.g[n, R0] = sg_; b.u[n, R0] = sg_; b.d[QQ, n] = kappa
+vslice/vs2.py:269: arith: n = r.start + j; b.g[n, QQ] = sg_ / kappa; b.u[n, MS] += sg_ / kappa; b.u[n, 0] += sg_ * eps_in / B; b.d[TT, n
+vslice/vs2.py:269: arith: n = r.start + j; b.g[n, QQ] = sg_ / kappa; b.u[n, MS] += sg_ / kappa; b.u[n, 0] += sg_ * eps_in / B; b.d[TT, n
+vslice/vs2.py:269: arith: n = r.start + j; b.g[n, QQ] = sg_ / kappa; b.u[n, MS] += sg_ / kappa; b.u[n, 0] += sg_ * eps_in / B; b.d[TT, n
+vslice/vs2.py:269: arith: n = r.start + j; b.g[n, QQ] = sg_ / kappa; b.u[n, MS] += sg_ / kappa; b.u[n, 0] += sg_ * eps_in / B; b.d[TT, n
+vslice/vs2.py:269: arith: n = r.start + j; b.g[n, QQ] = sg_ / kappa; b.u[n, MS] += sg_ / kappa; b.u[n, 0] += sg_ * eps_in / B; b.d[TT, n
+vslice/vs2.py:269: arith: n = r.start + j; b.g[n, QQ] = sg_ / kappa; b.u[n, MS] += sg_ / kappa; b.u[n, 0] += sg_ * eps_in / B; b.d[TT, n
+vslice/vs2.py:269: arith: n = r.start + j; b.g[n, QQ] = sg_ / kappa; b.u[n, MS] += sg_ / kappa; b.u[n, 0] += sg_ * eps_in / B; b.d[TT, n
+vslice/vs2.py:273: arith: n = r.start + j; b.g[n, R0] = sg_; b.u[n, TT] = -0.5 * sg_; b.u[n, 0] += 1.5 * sg_ / B; b.d[ZZ, n] = 1.0
+vslice/vs2.py:273: arith: n = r.start + j; b.g[n, R0] = sg_; b.u[n, TT] = -0.5 * sg_; b.u[n, 0] += 1.5 * sg_ / B; b.d[ZZ, n] = 1.0
+vslice/vs2.py:273: arith: n = r.start + j; b.g[n, R0] = sg_; b.u[n, TT] = -0.5 * sg_; b.u[n, 0] += 1.5 * sg_ / B; b.d[ZZ, n] = 1.0
+vslice/vs2.py:273: arith: n = r.start + j; b.g[n, R0] = sg_; b.u[n, TT] = -0.5 * sg_; b.u[n, 0] += 1.5 * sg_ / B; b.d[ZZ, n] = 1.0
+vslice/vs2.py:273: arith: n = r.start + j; b.g[n, R0] = sg_; b.u[n, TT] = -0.5 * sg_; b.u[n, 0] += 1.5 * sg_ / B; b.d[ZZ, n] = 1.0
+vslice/vs2.py:277: arith: n = r.start + j; b.g[n, ZZ] = sg_; b.u[n, FL] = sg_; b.d[ZF, n] = 1.0
+vslice/vs2.py:279: arith: r = b._alloc(2 * d)
+vslice/vs2.py:281: arith: n = r.start + off + i; b.g[n, xi0 + i] = sg_; b.u[n, ZF] = sg_; b.d[o0 + i, n] = 1.0
+vslice/vs2.py:281: arith: n = r.start + off + i; b.g[n, xi0 + i] = sg_; b.u[n, ZF] = sg_; b.d[o0 + i, n] = 1.0
+vslice/vs2.py:281: arith: n = r.start + off + i; b.g[n, xi0 + i] = sg_; b.u[n, ZF] = sg_; b.d[o0 + i, n] = 1.0
+vslice/vs2.py:281: arith: n = r.start + off + i; b.g[n, xi0 + i] = sg_; b.u[n, ZF] = sg_; b.d[o0 + i, n] = 1.0
+vslice/vs2.py:285: arith: n = r.start + j; b.g[n, slot] = sg_; b.u[n, 0] = sg_ / B; b.d[slot, n] = -1.0
+vslice/vs2.py:285: arith: n = r.start + j; b.g[n, slot] = sg_; b.u[n, 0] = sg_ / B; b.d[slot, n] = -1.0
+vslice/vs2.py:296: arith: assert self.n < self.cap, 'MLP too small'; self.n += 1; return self.n - 1
+vslice/vs2.py:296: arith: assert self.n < self.cap, 'MLP too small'; self.n += 1; return self.n - 1
+vslice/vs2.py:298: arith: for (i, cf) in terms: W[n, i] += mul * cf
+vslice/vs2.py:298: arith: for (i, cf) in terms: W[n, i] += mul * cf
+vslice/vs2.py:299: arith: def const(self, v): return [(0, v / B)]
+vslice/vs2.py:303: arith: for (i, cf) in out_terms: self.d[i, n] += scale * cf
+vslice/vs2.py:303: arith: for (i, cf) in out_terms: self.d[i, n] += scale * cf
+vslice/vs2.py:306: arith: n = self._a(); self._row(self.g, n, a_terms, sg); self.u[n, 0] += sg / B
+vslice/vs2.py:306: arith: n = self._a(); self._row(self.g, n, a_terms, sg); self.u[n, 0] += sg / B
+vslice/vs2.py:307: arith: for (i, cf) in out_terms: self.d[i, n] += scale * cf
+vslice/vs2.py:307: arith: for (i, cf) in out_terms: self.d[i, n] += scale * cf
+vslice/vs2.py:310: arith: n = self._a(); self._row(self.g, n, z_terms, lam); self.u[n, 0] += 1.0 / B
+vslice/vs2.py:310: arith: n = self._a(); self._row(self.g, n, z_terms, lam); self.u[n, 0] += 1.0 / B
+vslice/vs2.py:311: arith: for (i, cf) in out_terms: self.d[i, n] += cf / lam
+vslice/vs2.py:311: arith: for (i, cf) in out_terms: self.d[i, n] += cf / lam
+vslice/vs2.py:315: arith: if l == 0: return [(S.Y.start + k, 1.0), (S.PAD.start + k, -1e4)]
+vslice/vs2.py:315: arith: if l == 0: return [(S.Y.start + k, 1.0), (S.PAD.start + k, -1e4)]
+vslice/vs2.py:316: arith: return [(S.VL[l].start + k, 1.0)]
+vslice/vs2.py:317: arith: def _bt(c, S, l, j, k): return [(S.BL[l].start + j * (c.O >> l) + k, 1.0)]
+vslice/vs2.py:317: arith: def _bt(c, S, l, j, k): return [(S.BL[l].start + j * (c.O >> l) + k, 1.0)]
+vslice/vs2.py:317: arith: def _bt(c, S, l, j, k): return [(S.BL[l].start + j * (c.O >> l) + k, 1.0)]
+vslice/vs2.py:322: arith: nw = NW(layer, D); n_next = c.O >> (l + 1)
+vslice/vs2.py:324: arith: a = _vt(c, S, l, 2 * k); b = _vt(c, S, l, 2 * k + 1)
+vslice/vs2.py:324: arith: a = _vt(c, S, l, 2 * k); b = _vt(c, S, l, 2 * k + 1)
+vslice/vs2.py:324: arith: a = _vt(c, S, l, 2 * k); b = _vt(c, S, l, 2 * k + 1)
+vslice/vs2.py:325: arith: zt = [(i, cf / TW) for (i, cf) in a] + [(i, -cf / TW) for (i, cf) in b]
+vslice/vs2.py:325: arith: zt = [(i, cf / TW) for (i, cf) in a] + [(i, -cf / TW) for (i, cf) in b]
+vslice/vs2.py:325: arith: zt = [(i, cf / TW) for (i, cf) in a] + [(i, -cf / TW) for (i, cf) in b]
+vslice/vs2.py:326: arith: out = [(S.SL[l].start + k, 1.0)]
+vslice/vs2.py:327: arith: nw.hinge(zt + nw.const(0.5), out); nw.hinge(zt + nw.const(-0.5), [(i, -cf) for (i, cf) in out])
+vslice/vs2.py:327: arith: nw.hinge(zt + nw.const(0.5), out); nw.hinge(zt + nw.const(-0.5), [(i, -cf) for (i, cf) in out])
+vslice/vs2.py:331: arith: nw = NW(layer, D); n_next = c.O >> (l + 1)
+vslice/vs2.py:333: arith: s_ = [(S.SL[l].start + k, 1.0)]
+vslice/vs2.py:334: arith: a = _vt(c, S, l, 2 * k); b = _vt(c, S, l, 2 * k + 1)
+vslice/vs2.py:334: arith: a = _vt(c, S, l, 2 * k); b = _vt(c, S, l, 2 * k + 1)
+vslice/vs2.py:334: arith: a = _vt(c, S, l, 2 * k); b = _vt(c, S, l, 2 * k + 1)
+vslice/vs2.py:335: arith: diff = a + [(i, -cf) for (i, cf) in b]; out = [(S.VL[l + 1].start + k, 1.0)]
+vslice/vs2.py:335: arith: diff = a + [(i, -cf) for (i, cf) in b]; out = [(S.VL[l + 1].start + k, 1.0)]
+vslice/vs2.py:335: arith: diff = a + [(i, -cf) for (i, cf) in b]; out = [(S.VL[l + 1].start + k, 1.0)]
+vslice/vs2.py:338: arith: aj = _bt(c, S, l, j, 2 * k); bj = _bt(c, S, l, j, 2 * k + 1)
+vslice/vs2.py:338: arith: aj = _bt(c, S, l, j, 2 * k); bj = _bt(c, S, l, j, 2 * k + 1)
+vslice/vs2.py:338: arith: aj = _bt(c, S, l, j, 2 * k); bj = _bt(c, S, l, j, 2 * k + 1)
+vslice/vs2.py:339: arith: oj = [(S.BL[l + 1].start + j * n_next + k, 1.0)]
+vslice/vs2.py:339: arith: oj = [(S.BL[l + 1].start + j * n_next + k, 1.0)]
+vslice/vs2.py:339: arith: oj = [(S.BL[l + 1].start + j * n_next + k, 1.0)]
+vslice/vs2.py:339: arith: oj = [(S.BL[l + 1].start + j * n_next + k, 1.0)]
+vslice/vs2.py:340: arith: nw.product(s_, aj + [(i, -cf) for (i, cf) in bj], oj); nw.copy(bj, oj)
+vslice/vs2.py:342: arith: ob = [(S.BL[l + 1].start + l * n_next + k, 1.0)]
+vslice/vs2.py:342: arith: ob = [(S.BL[l + 1].start + l * n_next + k, 1.0)]
+vslice/vs2.py:342: arith: ob = [(S.BL[l + 1].start + l * n_next + k, 1.0)]
+vslice/vs2.py:342: arith: ob = [(S.BL[l + 1].start + l * n_next + k, 1.0)]
+vslice/vs2.py:348: arith: hd = c.hd; hdo = hd + 3; nq, nkv = c.nq, c.nkv; sa = layer.self_attn; R = hd; cc = 2.0 ** 23; beta = 1e5
+vslice/vs2.py:348: arith: hd = c.hd; hdo = hd + 3; nq, nkv = c.nq, c.nkv; sa = layer.self_attn; R = hd; cc = 2.0 ** 23; beta = 1e5
+vslice/vs2.py:350: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:350: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:350: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:350: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:350: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:350: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:350: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:350: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))
+vslice/vs2.py:353: arith: Wq[0, 0, 0, 0] = beta * math.sqrt(hd) / B
+vslice/vs2.py:353: arith: Wq[0, 0, 0, 0] = beta * math.sqrt(hd) / B
+vslice/vs2.py:353: HOT(sqrt): Wq[0, 0, 0, 0] = beta * math.sqrt(hd) / B
+vslice/vs2.py:354: arith: Wq[0, 0, R, 0] = cc / B; Wq[0, 0, R + 2, 0] = cc / B; Wq[0, 1, :, 0] = 30.0 / B
+vslice/vs2.py:354: arith: Wq[0, 0, R, 0] = cc / B; Wq[0, 0, R + 2, 0] = cc / B; Wq[0, 1, :, 0] = 30.0 / B
+vslice/vs2.py:354: arith: Wq[0, 0, R, 0] = cc / B; Wq[0, 0, R + 2, 0] = cc / B; Wq[0, 1, :, 0] = 30.0 / B
+vslice/vs2.py:354: arith: Wq[0, 0, R, 0] = cc / B; Wq[0, 0, R + 2, 0] = cc / B; Wq[0, 1, :, 0] = 30.0 / B
+vslice/vs2.py:355: arith: for h in range(1, nq): Wq[h, 1, :, 0] = 30.0 / B
+vslice/vs2.py:356: arith: Wk[0, 0, S.VL[8].start] = 1.0; Wk[0, R + 1, 0] = cc / B; Wk[0, R + 2, S.MASKM.start] = -cc * 4
+vslice/vs2.py:356: arith: Wk[0, 0, S.VL[8].start] = 1.0; Wk[0, R + 1, 0] = cc / B; Wk[0, R + 2, S.MASKM.start] = -cc * 4
+vslice/vs2.py:356: arith: Wk[0, 0, S.VL[8].start] = 1.0; Wk[0, R + 1, 0] = cc / B; Wk[0, R + 2, S.MASKM.start] = -cc * 4
+vslice/vs2.py:356: arith: Wk[0, 0, S.VL[8].start] = 1.0; Wk[0, R + 1, 0] = cc / B; Wk[0, R + 2, S.MASKM.start] = -cc * 4
+vslice/vs2.py:358: arith: Wv[0, 2 * j, S.BL[8].start + j * 1] = 1.0                      # rail bit
+vslice/vs2.py:358: arith: Wv[0, 2 * j, S.BL[8].start + j * 1] = 1.0                      # rail bit
+vslice/vs2.py:358: arith: Wv[0, 2 * j, S.BL[8].start + j * 1] = 1.0                      # rail bit
+vslice/vs2.py:359: arith: Wv[0, 2 * j + 1, S.BL[8].start + j] = -1.0; Wv[0, 2 * j + 1, 0] = 1.0 / B   # rail 1-bit
+vslice/vs2.py:359: arith: Wv[0, 2 * j + 1, S.BL[8].start + j] = -1.0; Wv[0, 2 * j + 1, 0] = 1.0 / B   # rail 1-bit
+vslice/vs2.py:359: arith: Wv[0, 2 * j + 1, S.BL[8].start + j] = -1.0; Wv[0, 2 * j + 1, 0] = 1.0 / B   # rail 1-bit
+vslice/vs2.py:359: arith: Wv[0, 2 * j + 1, S.BL[8].start + j] = -1.0; Wv[0, 2 * j + 1, 0] = 1.0 / B   # rail 1-bit
+vslice/vs2.py:359: arith: Wv[0, 2 * j + 1, S.BL[8].start + j] = -1.0; Wv[0, 2 * j + 1, 0] = 1.0 / B   # rail 1-bit
+vslice/vs2.py:359: arith: Wv[0, 2 * j + 1, S.BL[8].start + j] = -1.0; Wv[0, 2 * j + 1, 0] = 1.0 / B   # rail 1-bit
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:361: arith: Wv[0, 16 + 2 * j, S.BLKCODE.start + 2 * j] = 1.0; Wv[0, 16 + 2 * j + 1, S.BLKCODE.start + 2 * j + 1] = 1.0
+vslice/vs2.py:363: arith: for j in range(36): Wo[S.AMO.start + j, 0, j] = 1.0
+vslice/vs2.py:364: arith: sa.q_norm.weight.fill_(G - 1.0); sa.k_norm.weight.fill_(G - 1.0)
+vslice/vs2.py:364: arith: sa.q_norm.weight.fill_(G - 1.0); sa.k_norm.weight.fill_(G - 1.0)
+vslice/vs2.py:389: arith: Wb = W[o0:o0 + O, j * H * P:(j + 1) * H * P].to(dev).to(torch.float64)
+vslice/vs2.py:389: arith: Wb = W[o0:o0 + O, j * H * P:(j + 1) * H * P].to(dev).to(torch.float64)
+vslice/vs2.py:389: arith: Wb = W[o0:o0 + O, j * H * P:(j + 1) * H * P].to(dev).to(torch.float64)
+vslice/vs2.py:389: arith: Wb = W[o0:o0 + O, j * H * P:(j + 1) * H * P].to(dev).to(torch.float64)
+vslice/vs2.py:389: arith: Wb = W[o0:o0 + O, j * H * P:(j + 1) * H * P].to(dev).to(torch.float64)
+vslice/vs2.py:389: arith: Wb = W[o0:o0 + O, j * H * P:(j + 1) * H * P].to(dev).to(torch.float64)
+vslice/vs2.py:390: arith: Wp = torch.zeros(O, H * P, dtype=torch.float64, device=dev); Wp[:Wb.shape[0], :Wb.shape[1]] = Wb
+vslice/vs2.py:393: arith: s = (-0.27 - rows.min(dim=2).values).clamp(min=0)
+vslice/vs2.py:393: READ/ARG(min): s = (-0.27 - rows.min(dim=2).values).clamp(min=0)
+vslice/vs2.py:394: arith: v = silu_inv(rows + s[:, :, None]); ref = silu_inv(s)
+vslice/vs2.py:395: arith: return torch.cat([v, ref[:, :, None]], 2).reshape(2 * P, H * (O + 1)).float().cpu()
+vslice/vs2.py:395: arith: return torch.cat([v, ref[:, :, None]], 2).reshape(2 * P, H * (O + 1)).float().cpu()
+vslice/vs2.py:395: arith: return torch.cat([v, ref[:, :, None]], 2).reshape(2 * P, H * (O + 1)).float().cpu()
+vslice/vs2.py:414: arith: self.jobs.append(dict(li=kind, dense=f[None])); self.timeline.append(('w', len(self.jobs) - 1))
+vslice/vs2.py:415: arith: self.total += 1
+vslice/vs2.py:417: arith: self.jobs.append(dict(li=li, pay=pay, wf=wf_slot)); self.timeline.append(('w', len(self.jobs) - 1)); self.tota
+vslice/vs2.py:417: arith: self.jobs.append(dict(li=li, pay=pay, wf=wf_slot)); self.timeline.append(('w', len(self.jobs) - 1)); self.tota
+vslice/vs2.py:424: arith: def fl(self, f, key): f[self.S.ACTF.start + self.S.fl[key]] = 1.0
+vslice/vs2.py:426: arith: for gh in self.heads(name, **kw): f[self.S.regs[name]['RA'].start + gh] = 1.0
+vslice/vs2.py:428: arith: for gh in self.heads(name, **kw): f[self.S.regs[name]['WA'].start + gh] = 1.0
+vslice/vs2.py:435: arith: ar = torch.arange(m, device=dev); F[ar, S.SEL.start + ar] = 1.0
+vslice/vs2.py:436: arith: F[:, S.WF.start + job['wf']] = 1.0; F[:, S.PAY.start:S.PAY.stop] = pay
+vslice/vs2.py:443: arith: f = pr.new(); f[S.SEL.start + c.dk - 1] = 1.0; f[S.WF.start + S.wf_idx[(op, j)]] = 1.0; f[S.INIT.start] = 1.0;
+vslice/vs2.py:443: arith: f = pr.new(); f[S.SEL.start + c.dk - 1] = 1.0; f[S.WF.start + S.wf_idx[(op, j)]] = 1.0; f[S.INIT.start] = 1.0;
+vslice/vs2.py:443: arith: f = pr.new(); f[S.SEL.start + c.dk - 1] = 1.0; f[S.WF.start + S.wf_idx[(op, j)]] = 1.0; f[S.INIT.start] = 1.0;
+vslice/vs2.py:450: arith: pr.jobs.append(dict(li=pr.bank_li[(op, j)], W=W, o0=blk * c.O, j=j, m=2 * c.P, wf=S.wf_idx[(op, j)]))
+vslice/vs2.py:450: arith: pr.jobs.append(dict(li=pr.bank_li[(op, j)], W=W, o0=blk * c.O, j=j, m=2 * c.P, wf=S.wf_idx[(op, j)]))
+vslice/vs2.py:451: arith: pr.timeline.append(('w', len(pr.jobs) - 1)); pr.total += 2 * c.P
+vslice/vs2.py:451: arith: pr.timeline.append(('w', len(pr.jobs) - 1)); pr.total += 2 * c.P
+vslice/vs2.py:451: arith: pr.timeline.append(('w', len(pr.jobs) - 1)); pr.total += 2 * c.P
+vslice/vs2.py:460: arith: op = 4 * l
+vslice/vs2.py:463: arith: pr.mark(f'qkv{l}_{b}'); f = pr.new(); f[S.RF.start + op] = 1; pr.ra(f, f'R1_{l}', port=0); pr.fl(f, ('NG', 'n1
+vslice/vs2.py:464: arith: pr.wa(f, f'R2_{l}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:464: arith: pr.wa(f, f'R2_{l}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:464: arith: pr.wa(f, f'R2_{l}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:466: arith: op = 4 * l + 1
+vslice/vs2.py:466: arith: op = 4 * l + 1
+vslice/vs2.py:469: arith: pr.mark(f'o{l}_{b}'); f = pr.new(); f[S.RF.start + op] = 1; pr.ra(f, f'R3_{l}'); pr.ra(f, f'R1_{l}', port=1)
+vslice/vs2.py:470: arith: pr.wa(f, f'R4_{l}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:470: arith: pr.wa(f, f'R4_{l}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:470: arith: pr.wa(f, f'R4_{l}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:471: arith: op = 4 * l + 2
+vslice/vs2.py:471: arith: op = 4 * l + 2
+vslice/vs2.py:474: arith: pr.mark(f'gu{l}_{b}'); f = pr.new(); f[S.RF.start + op] = 1; pr.ra(f, f'R4_{l}', port=0); pr.fl(f, ('NG', 'n3'
+vslice/vs2.py:475: arith: pr.wa(f, f'R5_{l}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:475: arith: pr.wa(f, f'R5_{l}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:475: arith: pr.wa(f, f'R5_{l}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:477: arith: op = 4 * l + 3
+vslice/vs2.py:477: arith: op = 4 * l + 3
+vslice/vs2.py:480: arith: pr.mark(f'down{l}_{b}'); f = pr.new(); f[S.RF.start + op] = 1; pr.ra(f, f'R6_{l}'); pr.ra(f, f'R4_{l}', port=1
+vslice/vs2.py:481: arith: pr.wa(f, f'R1_{l + 1}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:481: arith: pr.wa(f, f'R1_{l + 1}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:481: arith: pr.wa(f, f'R1_{l + 1}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:481: arith: pr.wa(f, f'R1_{l + 1}', lanes=(2 * b, 2 * b + 1)); pr.push(f)
+vslice/vs2.py:482: arith: op = 4 * L
+vslice/vs2.py:485: arith: pr.mark(f'lm{b}'); f = pr.new(); f[S.RF.start + op] = 1; pr.ra(f, f'R1_{L}', port=0); pr.fl(f, ('NG', 'nf', 0)
+vslice/vs2.py:486: arith: if not c.tourn: pr.wa(f, 'Rlg', lanes=(2 * b, 2 * b + 1))
+vslice/vs2.py:486: arith: if not c.tourn: pr.wa(f, 'Rlg', lanes=(2 * b, 2 * b + 1))
+vslice/vs2.py:486: arith: if not c.tourn: pr.wa(f, 'Rlg', lanes=(2 * b, 2 * b + 1))
+vslice/vs2.py:488: READ/ARG(min): nv = min(c.O, c.V - b * c.O); f[S.PAD.start + nv:S.PAD.start + c.O] = 1.0
+vslice/vs2.py:488: arith: nv = min(c.O, c.V - b * c.O); f[S.PAD.start + nv:S.PAD.start + c.O] = 1.0
+vslice/vs2.py:488: arith: nv = min(c.O, c.V - b * c.O); f[S.PAD.start + nv:S.PAD.start + c.O] = 1.0
+vslice/vs2.py:488: arith: nv = min(c.O, c.V - b * c.O); f[S.PAD.start + nv:S.PAD.start + c.O] = 1.0
+vslice/vs2.py:488: arith: nv = min(c.O, c.V - b * c.O); f[S.PAD.start + nv:S.PAD.start + c.O] = 1.0
+vslice/vs2.py:490: arith: bit = (b >> j) & 1; f[S.BLKCODE.start + 2 * j] = bit; f[S.BLKCODE.start + 2 * j + 1] = 1 - bit
+vslice/vs2.py:490: arith: bit = (b >> j) & 1; f[S.BLKCODE.start + 2 * j] = bit; f[S.BLKCODE.start + 2 * j + 1] = 1 - bit
+vslice/vs2.py:490: arith: bit = (b >> j) & 1; f[S.BLKCODE.start + 2 * j] = bit; f[S.BLKCODE.start + 2 * j + 1] = 1 - bit
+vslice/vs2.py:490: arith: bit = (b >> j) & 1; f[S.BLKCODE.start + 2 * j] = bit; f[S.BLKCODE.start + 2 * j + 1] = 1 - bit
+vslice/vs2.py:490: arith: bit = (b >> j) & 1; f[S.BLKCODE.start + 2 * j] = bit; f[S.BLKCODE.start + 2 * j + 1] = 1 - bit
+vslice/vs2.py:490: arith: bit = (b >> j) & 1; f[S.BLKCODE.start + 2 * j] = bit; f[S.BLKCODE.start + 2 * j + 1] = 1 - bit
+vslice/vs2.py:496: arith: return len(pr.ctrl) - 1
+vslice/vs2.py:503: arith: hdo = c.hd + 3; rot = c.hd
+vslice/vs2.py:504: arith: rp = dict(rope_type='default', rope_theta=c.theta, partial_rotary_factor=(rot + 0.5) / hdo,
+vslice/vs2.py:504: arith: rp = dict(rope_type='default', rope_theta=c.theta, partial_rotary_factor=(rot + 0.5) / hdo,
+vslice/vs2.py:505: arith: mrope_section=[rot // 2 // 3 + (1 if rot // 2 % 3 > i else 0) for i in range(3)])
+vslice/vs2.py:538: arith: self.stats['build_s'] += time.time() - t0; t0 = time.time()
+vslice/vs2.py:538: arith: self.stats['build_s'] += time.time() - t0; t0 = time.time()
+vslice/vs2.py:551: arith: while j < len(buf) and buf[j][0] == 'c': j += 1
+vslice/vs2.py:553: arith: rows.append(Hs[ids]); cidx.append((pos_, ids)); pids += [pr.cpos[q_] for q_ in il]; pos_ += len(ids); i = j
+vslice/vs2.py:553: arith: rows.append(Hs[ids]); cidx.append((pos_, ids)); pids += [pr.cpos[q_] for q_ in il]; pos_ += len(ids); i = j
+vslice/vs2.py:555: arith: F = pr.dense_job(pr.jobs[buf[i][1]], dev); rows.append(F); pids += [pr.cur_pos] * F.shape[0]; pos_ += F.shape[
+vslice/vs2.py:555: arith: F = pr.dense_job(pr.jobs[buf[i][1]], dev); rows.append(F); pids += [pr.cur_pos] * F.shape[0]; pos_ += F.shape[
+vslice/vs2.py:555: arith: F = pr.dense_job(pr.jobs[buf[i][1]], dev); rows.append(F); pids += [pr.cur_pos] * F.shape[0]; pos_ += F.shape[
+vslice/vs2.py:555: arith: F = pr.dense_job(pr.jobs[buf[i][1]], dev); rows.append(F); pids += [pr.cur_pos] * F.shape[0]; pos_ += F.shape[
+vslice/vs2.py:557: arith: cp = torch.arange(off, off + n, device=dev); pid = torch.tensor(pids, device=dev)[None]
+vslice/vs2.py:561: arith: mask = (torch.arange(off + n, device=dev)[None, :] <= (torch.arange(n, device=dev)[:, None] + off))[None, None  [EXEMPT transport('causal mask from position indices (token-independent addresses)')]
+vslice/vs2.py:561: arith: mask = (torch.arange(off + n, device=dev)[None, :] <= (torch.arange(n, device=dev)[:, None] + off))[None, None  [EXEMPT transport('causal mask from position indices (token-independent addresses)')]
+vslice/vs2.py:564: arith: for (p0, ids) in cidx: Hs[ids] = y[0, p0:p0 + len(ids)].float()
+vslice/vs2.py:565: arith: off += n; self.stats['rows'] += n; buf = []; nbuf = 0
+vslice/vs2.py:565: arith: off += n; self.stats['rows'] += n; buf = []; nbuf = 0
+vslice/vs2.py:568: arith: if nbuf + m > seg: flush()
+vslice/vs2.py:569: arith: buf.append(it); nbuf += m
+vslice/vs2.py:573: arith: self.stats['run_s'] += time.time() - t0
+vslice/vs2.py:573: arith: self.stats['run_s'] += time.time() - t0
+vslice/vslice.py:27: arith: def sl(s): return s.start, s.stop - s.start
+vslice/vslice.py:34: arith: O = dv - 2                           # outputs per W-bank block
+vslice/vslice.py:35: arith: P = (dk - 2) // 2                    # contraction elements per head tile (63)
+vslice/vslice.py:48: arith: S.PAY = a('PAY', c.HW * (c.O + 1)); S.SEL = a('SEL', c.dk); S.INIT = a('INIT', 1); S.RINIT = a('RINIT', 1)
+vslice/vslice.py:48: arith: S.PAY = a('PAY', c.HW * (c.O + 1)); S.SEL = a('SEL', c.dk); S.INIT = a('INIT', 1); S.RINIT = a('RINIT', 1)
+vslice/vslice.py:49: arith: S.X = a('X', c.HW * c.P); S.Y = a('Y', c.O)
+vslice/vslice.py:50: arith: nbank = 4 * c.L + 1
+vslice/vslice.py:50: arith: nbank = 4 * c.L + 1
+vslice/vslice.py:57: arith: S.QKVR = a('QKVR', (c.nq + 2 * c.nkv) * c.hd)
+vslice/vslice.py:57: arith: S.QKVR = a('QKVR', (c.nq + 2 * c.nkv) * c.hd)
+vslice/vslice.py:57: arith: S.QKVR = a('QKVR', (c.nq + 2 * c.nkv) * c.hd)
+vslice/vslice.py:58: arith: S.QN = a('QN', c.nq * c.hd); S.KN = a('KN', c.nkv * c.hd); S.GQ = a('GQ', c.nq * c.hd); S.GK = a('GK', c.nkv *
+vslice/vslice.py:58: arith: S.QN = a('QN', c.nq * c.hd); S.KN = a('KN', c.nkv * c.hd); S.GQ = a('GQ', c.nq * c.hd); S.GK = a('GK', c.nkv *
+vslice/vslice.py:58: arith: S.QN = a('QN', c.nq * c.hd); S.KN = a('KN', c.nkv * c.hd); S.GQ = a('GQ', c.nq * c.hd); S.GK = a('GK', c.nkv *
+vslice/vslice.py:58: arith: S.QN = a('QN', c.nq * c.hd); S.KN = a('KN', c.nkv * c.hd); S.GQ = a('GQ', c.nq * c.hd); S.GK = a('GK', c.nkv *
+vslice/vslice.py:59: arith: S.QG = a('QG', c.nq * c.hd); S.KG = a('KG', c.nkv * c.hd); S.AO = [a(f'AO{l}', c.nq * c.hd) for l in range(c.L
+vslice/vslice.py:59: arith: S.QG = a('QG', c.nq * c.hd); S.KG = a('KG', c.nkv * c.hd); S.AO = [a(f'AO{l}', c.nq * c.hd) for l in range(c.L
+vslice/vslice.py:59: arith: S.QG = a('QG', c.nq * c.hd); S.KG = a('KG', c.nkv * c.hd); S.AO = [a(f'AO{l}', c.nq * c.hd) for l in range(c.L
+vslice/vslice.py:61: arith: S.GU = a('GU', 2 * c.inter); S.ACT = a('ACT', c.inter); S.LOG = a('LOG', c.V)
+vslice/vslice.py:73: arith: rot = c.hd; hdo = c.hd + 3
+vslice/vslice.py:74: arith: rp = dict(rope_type='default', rope_theta=c.theta, partial_rotary_factor=(rot + 0.5) / hdo,
+vslice/vslice.py:74: arith: rp = dict(rope_type='default', rope_theta=c.theta, partial_rotary_factor=(rot + 0.5) / hdo,
+vslice/vslice.py:75: arith: mrope_section=[rot // 2 // 3 + (1 if rot // 2 % 3 > i else 0) for i in range(3)])
+vslice/vslice.py:90: arith: v = B / math.sqrt(D) - 1.0
+vslice/vslice.py:90: arith: v = B / math.sqrt(D) - 1.0
+vslice/vslice.py:90: HOT(sqrt): v = B / math.sqrt(D) - 1.0
+vslice/vslice.py:103: arith: g.in_proj_b.weight.zero_(); g.in_proj_b.weight[:, 0] = 30.0 / B
+vslice/vslice.py:104: arith: g.in_proj_a.weight.zero_(); g.in_proj_a.weight[:, 0] = -30.0 / B
+vslice/vslice.py:105: arith: g.in_proj_z.weight.zero_(); g.in_proj_z.weight[:, 0] = 30.0 / B
+vslice/vslice.py:106: arith: g.norm.weight.fill_(1.0 / 30.0)
+vslice/vslice.py:113: arith: g = gdn_base(layer, D, c); H = len(heads); kd = c.H * c.dk; LW = c.LW; dv = c.dv
+vslice/vslice.py:114: arith: assert H <= c.H and 2 * LW + 1 <= dv
+vslice/vslice.py:114: arith: assert H <= c.H and 2 * LW + 1 <= dv
+vslice/vslice.py:116: arith: Gr = Rq * Bg / (30.0 * math.sqrt(dv))
+vslice/vslice.py:116: arith: Gr = Rq * Bg / (30.0 * math.sqrt(dv))
+vslice/vslice.py:116: arith: Gr = Rq * Bg / (30.0 * math.sqrt(dv))
+vslice/vslice.py:116: HOT(sqrt): Gr = Rq * Bg / (30.0 * math.sqrt(dv))
+vslice/vslice.py:121: arith: Wq[h * c.dk + 0, RA.start + h] = 30.0
+vslice/vslice.py:121: arith: Wq[h * c.dk + 0, RA.start + h] = 30.0
+vslice/vslice.py:121: arith: Wq[h * c.dk + 0, RA.start + h] = 30.0
+vslice/vslice.py:122: arith: Wq[h * c.dk + 1, 0] = Rq / B
+vslice/vslice.py:122: arith: Wq[h * c.dk + 1, 0] = Rq / B
+vslice/vslice.py:122: arith: Wq[h * c.dk + 1, 0] = Rq / B
+vslice/vslice.py:124: arith: Wq[kd + h * c.dk + 0, WA.start + h] = 30.0
+vslice/vslice.py:124: arith: Wq[kd + h * c.dk + 0, WA.start + h] = 30.0
+vslice/vslice.py:124: arith: Wq[kd + h * c.dk + 0, WA.start + h] = 30.0
+vslice/vslice.py:124: arith: Wq[kd + h * c.dk + 0, WA.start + h] = 30.0
+vslice/vslice.py:125: arith: Wq[kd + h * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vslice.py:125: arith: Wq[kd + h * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vslice.py:125: arith: Wq[kd + h * c.dk + 1, S.RINIT.start] = 30.0
+vslice/vslice.py:130: arith: idx = (hd['lane'] % 2) * LW + i if mode == 'Y' else hd['lane'] * LW + i
+vslice/vslice.py:130: arith: idx = (hd['lane'] % 2) * LW + i if mode == 'Y' else hd['lane'] * LW + i
+vslice/vslice.py:130: arith: idx = (hd['lane'] % 2) * LW + i if mode == 'Y' else hd['lane'] * LW + i
+vslice/vslice.py:130: arith: idx = (hd['lane'] % 2) * LW + i if mode == 'Y' else hd['lane'] * LW + i
+vslice/vslice.py:132: arith: Wq[2 * kd + h * dv + i, s0 + idx] += coef
+vslice/vslice.py:132: arith: Wq[2 * kd + h * dv + i, s0 + idx] += coef
+vslice/vslice.py:132: arith: Wq[2 * kd + h * dv + i, s0 + idx] += coef
+vslice/vslice.py:132: arith: Wq[2 * kd + h * dv + i, s0 + idx] += coef
+vslice/vslice.py:132: arith: Wq[2 * kd + h * dv + i, s0 + idx] += coef
+vslice/vslice.py:132: arith: Wq[2 * kd + h * dv + i, s0 + idx] += coef
+vslice/vslice.py:133: arith: Wq[2 * kd + h * dv + LW + i, s0 + idx] -= coef
+vslice/vslice.py:133: arith: Wq[2 * kd + h * dv + LW + i, s0 + idx] -= coef
+vslice/vslice.py:133: arith: Wq[2 * kd + h * dv + LW + i, s0 + idx] -= coef
+vslice/vslice.py:133: arith: Wq[2 * kd + h * dv + LW + i, s0 + idx] -= coef
+vslice/vslice.py:133: arith: Wq[2 * kd + h * dv + LW + i, s0 + idx] -= coef
+vslice/vslice.py:133: arith: Wq[2 * kd + h * dv + LW + i, s0 + idx] -= coef
+vslice/vslice.py:133: arith: Wq[2 * kd + h * dv + LW + i, s0 + idx] -= coef
+vslice/vslice.py:134: arith: Wq[2 * kd + h * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vslice.py:134: arith: Wq[2 * kd + h * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vslice.py:134: arith: Wq[2 * kd + h * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vslice.py:134: arith: Wq[2 * kd + h * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vslice.py:134: arith: Wq[2 * kd + h * dv + dv - 1, S.RINIT.start] = Bg
+vslice/vslice.py:139: arith: e = hd['lane'] * LW + i
+vslice/vslice.py:139: arith: e = hd['lane'] * LW + i
+vslice/vslice.py:141: arith: Wo[d0 + e, h * dv + i] += Gr; Wo[d0 + e, h * dv + LW + i] -= Gr
+vslice/vslice.py:141: arith: Wo[d0 + e, h * dv + i] += Gr; Wo[d0 + e, h * dv + LW + i] -= Gr
+vslice/vslice.py:141: arith: Wo[d0 + e, h * dv + i] += Gr; Wo[d0 + e, h * dv + LW + i] -= Gr
+vslice/vslice.py:141: arith: Wo[d0 + e, h * dv + i] += Gr; Wo[d0 + e, h * dv + LW + i] -= Gr
+vslice/vslice.py:141: arith: Wo[d0 + e, h * dv + i] += Gr; Wo[d0 + e, h * dv + LW + i] -= Gr
+vslice/vslice.py:141: arith: Wo[d0 + e, h * dv + i] += Gr; Wo[d0 + e, h * dv + LW + i] -= Gr
+vslice/vslice.py:141: arith: Wo[d0 + e, h * dv + i] += Gr; Wo[d0 + e, h * dv + LW + i] -= Gr
+vslice/vslice.py:141: arith: Wo[d0 + e, h * dv + i] += Gr; Wo[d0 + e, h * dv + LW + i] -= Gr
+vslice/vslice.py:141: arith: Wo[d0 + e, h * dv + i] += Gr; Wo[d0 + e, h * dv + LW + i] -= Gr
+vslice/vslice.py:146: arith: g = gdn_base(layer, D, c); kd = c.H * c.dk; dv = c.dv
+vslice/vslice.py:151: arith: s0, d = sl(hd['src']); d0, dd = sl(hd['dst']); assert d == dd and 2 * d + 2 <= dv
+vslice/vslice.py:151: arith: s0, d = sl(hd['src']); d0, dd = sl(hd['dst']); assert d == dd and 2 * d + 2 <= dv
+vslice/vslice.py:152: arith: Wq[h * c.dk + 0, 0] = 30.0 / B           # q = e0
+vslice/vslice.py:152: arith: Wq[h * c.dk + 0, 0] = 30.0 / B           # q = e0
+vslice/vslice.py:152: arith: Wq[h * c.dk + 0, 0] = 30.0 / B           # q = e0
+vslice/vslice.py:153: arith: Wq[kd + h * c.dk + 0, 0] = 30.0 / B      # k = e0
+vslice/vslice.py:153: arith: Wq[kd + h * c.dk + 0, 0] = 30.0 / B      # k = e0
+vslice/vslice.py:153: arith: Wq[kd + h * c.dk + 0, 0] = 30.0 / B      # k = e0
+vslice/vslice.py:153: arith: Wq[kd + h * c.dk + 0, 0] = 30.0 / B      # k = e0
+vslice/vslice.py:155: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v
+vslice/vslice.py:155: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v
+vslice/vslice.py:155: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v
+vslice/vslice.py:155: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v
+vslice/vslice.py:155: arith: Wq[2 * kd + h * dv + i, s0 + i] = eps_v
+vslice/vslice.py:156: arith: Wq[2 * kd + h * dv + d + i, s0 + i] = -eps_v
+vslice/vslice.py:156: arith: Wq[2 * kd + h * dv + d + i, s0 + i] = -eps_v
+vslice/vslice.py:156: arith: Wq[2 * kd + h * dv + d + i, s0 + i] = -eps_v
+vslice/vslice.py:156: arith: Wq[2 * kd + h * dv + d + i, s0 + i] = -eps_v
+vslice/vslice.py:156: arith: Wq[2 * kd + h * dv + d + i, s0 + i] = -eps_v
+vslice/vslice.py:156: arith: Wq[2 * kd + h * dv + d + i, s0 + i] = -eps_v
+vslice/vslice.py:157: arith: E = eps_v * math.sqrt(d * EPS_IN)
+vslice/vslice.py:157: HOT(sqrt): E = eps_v * math.sqrt(d * EPS_IN)
+vslice/vslice.py:157: arith: E = eps_v * math.sqrt(d * EPS_IN)
+vslice/vslice.py:158: arith: Wq[2 * kd + h * dv + 2 * d, 0] = E / B
+vslice/vslice.py:158: arith: Wq[2 * kd + h * dv + 2 * d, 0] = E / B
+vslice/vslice.py:158: arith: Wq[2 * kd + h * dv + 2 * d, 0] = E / B
+vslice/vslice.py:158: arith: Wq[2 * kd + h * dv + 2 * d, 0] = E / B
+vslice/vslice.py:158: arith: Wq[2 * kd + h * dv + 2 * d, 0] = E / B
+vslice/vslice.py:158: arith: Wq[2 * kd + h * dv + 2 * d, 0] = E / B
+vslice/vslice.py:159: arith: Wq[2 * kd + h * dv + 2 * d + 1, 0] = -E / B
+vslice/vslice.py:159: arith: Wq[2 * kd + h * dv + 2 * d + 1, 0] = -E / B
+vslice/vslice.py:159: arith: Wq[2 * kd + h * dv + 2 * d + 1, 0] = -E / B
+vslice/vslice.py:159: arith: Wq[2 * kd + h * dv + 2 * d + 1, 0] = -E / B
+vslice/vslice.py:159: arith: Wq[2 * kd + h * dv + 2 * d + 1, 0] = -E / B
+vslice/vslice.py:159: arith: Wq[2 * kd + h * dv + 2 * d + 1, 0] = -E / B
+vslice/vslice.py:159: arith: Wq[2 * kd + h * dv + 2 * d + 1, 0] = -E / B
+vslice/vslice.py:161: HOT(sqrt): k = math.sqrt(d / (2.0 * dv))
+vslice/vslice.py:161: arith: k = math.sqrt(d / (2.0 * dv))
+vslice/vslice.py:161: arith: k = math.sqrt(d / (2.0 * dv))
+vslice/vslice.py:163: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + d + i] = -k
+vslice/vslice.py:163: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + d + i] = -k
+vslice/vslice.py:163: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + d + i] = -k
+vslice/vslice.py:163: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + d + i] = -k
+vslice/vslice.py:163: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + d + i] = -k
+vslice/vslice.py:163: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + d + i] = -k
+vslice/vslice.py:163: arith: Wo[d0 + i, h * dv + i] = k; Wo[d0 + i, h * dv + d + i] = -k
+vslice/vslice.py:168: arith: g = gdn_base(layer, D, c); kd = c.H * c.dk; dv = c.dv; O = c.O; P = c.P
+vslice/vslice.py:169: arith: G = Bg * Rq / (math.sqrt(dv) * SILU_MIN)
+vslice/vslice.py:169: arith: G = Bg * Rq / (math.sqrt(dv) * SILU_MIN)
+vslice/vslice.py:169: arith: G = Bg * Rq / (math.sqrt(dv) * SILU_MIN)
+vslice/vslice.py:169: HOT(sqrt): G = Bg * Rq / (math.sqrt(dv) * SILU_MIN)
+vslice/vslice.py:174: arith: xi = h * P + j
+vslice/vslice.py:174: arith: xi = h * P + j
+vslice/vslice.py:175: arith: Wq[h * c.dk + j, S.X.start + xi] = 1.0
+vslice/vslice.py:175: arith: Wq[h * c.dk + j, S.X.start + xi] = 1.0
+vslice/vslice.py:175: arith: Wq[h * c.dk + j, S.X.start + xi] = 1.0
+vslice/vslice.py:176: arith: Wq[h * c.dk + P + j, S.X.start + xi] = -1.0
+vslice/vslice.py:176: arith: Wq[h * c.dk + P + j, S.X.start + xi] = -1.0
+vslice/vslice.py:176: arith: Wq[h * c.dk + P + j, S.X.start + xi] = -1.0
+vslice/vslice.py:176: arith: Wq[h * c.dk + P + j, S.X.start + xi] = -1.0
+vslice/vslice.py:177: arith: Wq[h * c.dk + c.dk - 1, 0] = Rq / B
+vslice/vslice.py:177: arith: Wq[h * c.dk + c.dk - 1, 0] = Rq / B
+vslice/vslice.py:177: arith: Wq[h * c.dk + c.dk - 1, 0] = Rq / B
+vslice/vslice.py:177: arith: Wq[h * c.dk + c.dk - 1, 0] = Rq / B
+vslice/vslice.py:179: arith: Wq[kd + h * c.dk + r, 0] = -KB / B
+vslice/vslice.py:179: arith: Wq[kd + h * c.dk + r, 0] = -KB / B
+vslice/vslice.py:179: arith: Wq[kd + h * c.dk + r, 0] = -KB / B
+vslice/vslice.py:179: arith: Wq[kd + h * c.dk + r, 0] = -KB / B
+vslice/vslice.py:180: arith: Wq[kd + h * c.dk + r, S.SEL.start + r] = 2 * KB
+vslice/vslice.py:180: arith: Wq[kd + h * c.dk + r, S.SEL.start + r] = 2 * KB
+vslice/vslice.py:180: arith: Wq[kd + h * c.dk + r, S.SEL.start + r] = 2 * KB
+vslice/vslice.py:180: arith: Wq[kd + h * c.dk + r, S.SEL.start + r] = 2 * KB
+vslice/vslice.py:180: arith: Wq[kd + h * c.dk + r, S.SEL.start + r] = 2 * KB
+vslice/vslice.py:181: arith: for cc in range(O + 1):
+vslice/vslice.py:182: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vslice.py:182: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vslice.py:182: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vslice.py:182: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vslice.py:182: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vslice.py:182: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vslice.py:182: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vslice.py:182: arith: Wq[2 * kd + h * dv + cc, S.PAY.start + h * (O + 1) + cc] = 1.0
+vslice/vslice.py:183: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vslice.py:183: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vslice.py:183: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vslice.py:183: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vslice.py:183: arith: Wq[2 * kd + h * dv + dv - 1, S.INIT.start] = Bg
+vslice/vslice.py:185: arith: Wo[S.Y.start + cc, h * dv + cc] = G
+vslice/vslice.py:185: arith: Wo[S.Y.start + cc, h * dv + cc] = G
+vslice/vslice.py:185: arith: Wo[S.Y.start + cc, h * dv + cc] = G
+vslice/vslice.py:186: arith: Wo[S.Y.start + cc, h * dv + O] = -G
+vslice/vslice.py:186: arith: Wo[S.Y.start + cc, h * dv + O] = -G
+vslice/vslice.py:186: arith: Wo[S.Y.start + cc, h * dv + O] = -G
+vslice/vslice.py:187: arith: g.in_proj_z.weight.zero_(); g.in_proj_z.weight[:, 0] = -40.0 / B; g.in_proj_z.weight[:, S.RF.start + l] = 40.0
+vslice/vslice.py:187: arith: g.in_proj_z.weight.zero_(); g.in_proj_z.weight[:, 0] = -40.0 / B; g.in_proj_z.weight[:, S.RF.start + l] = 40.0
+vslice/vslice.py:187: arith: g.in_proj_z.weight.zero_(); g.in_proj_z.weight[:, 0] = -40.0 / B; g.in_proj_z.weight[:, S.RF.start + l] = 40.0
+vslice/vslice.py:188: arith: g.in_proj_b.weight.zero_(); g.in_proj_b.weight[:, 0] = -30.0 / B; g.in_proj_b.weight[:, S.WF.start + l] = 60.0
+vslice/vslice.py:188: arith: g.in_proj_b.weight.zero_(); g.in_proj_b.weight[:, 0] = -30.0 / B; g.in_proj_b.weight[:, S.WF.start + l] = 60.0
+vslice/vslice.py:195: arith: hd = c.hd; hdo = hd + 3; nq, nkv = c.nq, c.nkv; sa = layer.self_attn; R = hd; cc = 2.0 ** 23
+vslice/vslice.py:195: arith: hd = c.hd; hdo = hd + 3; nq, nkv = c.nq, c.nkv; sa = layer.self_attn; R = hd; cc = 2.0 ** 23
+vslice/vslice.py:198: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))   # outer attn applies hdo^-1/2 its
+vslice/vslice.py:198: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))   # outer attn applies hdo^-1/2 its
+vslice/vslice.py:198: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))   # outer attn applies hdo^-1/2 its
+vslice/vslice.py:198: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))   # outer attn applies hdo^-1/2 its
+vslice/vslice.py:198: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))   # outer attn applies hdo^-1/2 its
+vslice/vslice.py:198: arith: G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))   # outer attn applies hdo^-1/2 its
+vslice/vslice.py:198: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))   # outer attn applies hdo^-1/2 its
+vslice/vslice.py:198: HOT(sqrt): G = math.sqrt(math.sqrt(2.0) * cc * cc / (math.sqrt(hdo) * math.sqrt(hd)))   # outer attn applies hdo^-1/2 its
+vslice/vslice.py:203: arith: Wq[h, 0, j, S.QG.start + h * hd + j] = 1.0
+vslice/vslice.py:203: arith: Wq[h, 0, j, S.QG.start + h * hd + j] = 1.0
+vslice/vslice.py:203: arith: Wq[h, 0, j, S.QG.start + h * hd + j] = 1.0
+vslice/vslice.py:204: arith: Wq[h, 0, R, 0] = cc / B
+vslice/vslice.py:205: arith: Wq[h, 0, R + 2, 0] = cc / B
+vslice/vslice.py:205: arith: Wq[h, 0, R + 2, 0] = cc / B
+vslice/vslice.py:206: arith: Wq[h, 1, j, 0] = 30.0 / B
+vslice/vslice.py:208: arith: Wk[g, j, S.KG.start + g * hd + j] = 1.0; Wk[g, R + 1, 0] = cc / B
+vslice/vslice.py:208: arith: Wk[g, j, S.KG.start + g * hd + j] = 1.0; Wk[g, R + 1, 0] = cc / B
+vslice/vslice.py:208: arith: Wk[g, j, S.KG.start + g * hd + j] = 1.0; Wk[g, R + 1, 0] = cc / B
+vslice/vslice.py:208: arith: Wk[g, j, S.KG.start + g * hd + j] = 1.0; Wk[g, R + 1, 0] = cc / B
+vslice/vslice.py:208: arith: Wk[g, j, S.KG.start + g * hd + j] = 1.0; Wk[g, R + 1, 0] = cc / B
+vslice/vslice.py:209: arith: Wk[g, R + 2, S.MASK[l].start] = -cc * 4
+vslice/vslice.py:209: arith: Wk[g, R + 2, S.MASK[l].start] = -cc * 4
+vslice/vslice.py:210: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vslice.py:210: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vslice.py:210: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vslice.py:210: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vslice.py:210: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vslice.py:210: arith: Wv[g, j, S.QKVR.start + (nq + nkv) * hd + g * hd + j] = 1.0
+vslice/vslice.py:212: arith: for h in range(nq): Wo[S.AO[l].start + h * hd + j, h, j] = 1.0
+vslice/vslice.py:212: arith: for h in range(nq): Wo[S.AO[l].start + h * hd + j, h, j] = 1.0
+vslice/vslice.py:212: arith: for h in range(nq): Wo[S.AO[l].start + h * hd + j, h, j] = 1.0
+vslice/vslice.py:213: arith: sa.q_norm.weight.fill_(G - 1.0); sa.k_norm.weight.fill_(G - 1.0)
+vslice/vslice.py:213: arith: sa.q_norm.weight.fill_(G - 1.0); sa.k_norm.weight.fill_(G - 1.0)
+vslice/vslice.py:221: arith: for l in range(L + 1): reg_slots(S, f'R1_{l}', 2 if l < L else 1)
+vslice/vslice.py:229: arith: plan += [('R1', l), ('N1', l), ('W', 4 * l + 0), ('R2', l), ('N2', l), ('A', l), ('R3', l), ('W', 4 * l + 1),
+vslice/vslice.py:229: arith: plan += [('R1', l), ('N1', l), ('W', 4 * l + 0), ('R2', l), ('N2', l), ('A', l), ('R3', l), ('W', 4 * l + 1),
+vslice/vslice.py:229: arith: plan += [('R1', l), ('N1', l), ('W', 4 * l + 0), ('R2', l), ('N2', l), ('A', l), ('R3', l), ('W', 4 * l + 1),
+vslice/vslice.py:229: arith: plan += [('R1', l), ('N1', l), ('W', 4 * l + 0), ('R2', l), ('N2', l), ('A', l), ('R3', l), ('W', 4 * l + 1),
+vslice/vslice.py:229: arith: plan += [('R1', l), ('N1', l), ('W', 4 * l + 0), ('R2', l), ('N2', l), ('A', l), ('R3', l), ('W', 4 * l + 1),
+vslice/vslice.py:230: arith: ('R4', l), ('N3', l), ('W', 4 * l + 2), ('R5', l), ('S', l), ('R6', l), ('W', 4 * l + 3)]
+vslice/vslice.py:230: arith: ('R4', l), ('N3', l), ('W', 4 * l + 2), ('R5', l), ('S', l), ('R6', l), ('W', 4 * l + 3)]
+vslice/vslice.py:230: arith: ('R4', l), ('N3', l), ('W', 4 * l + 2), ('R5', l), ('S', l), ('R6', l), ('W', 4 * l + 3)]
+vslice/vslice.py:230: arith: ('R4', l), ('N3', l), ('W', 4 * l + 2), ('R5', l), ('S', l), ('R6', l), ('W', 4 * l + 3)]
+vslice/vslice.py:231: arith: plan += [('R1', L), ('NF', 0), ('W', 4 * L), ('Rlg', 0)]
+vslice/vslice.py:231: arith: plan += [('R1', L), ('NF', 0), ('W', 4 * L), ('Rlg', 0)]
+vslice/vslice.py:260: arith: gdn_dst = slice(S.X.start, S.X.start + d)
+vslice/vslice.py:263: arith: build_norm(layer, D, c, S, [dict(src=S.NIN[('n3', l)], dst=slice(S.X.start, S.X.start + d))])
+vslice/vslice.py:265: arith: build_norm(layer, D, c, S, [dict(src=S.NIN[('nf', 0)], dst=slice(S.X.start, S.X.start + d))])
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:269: arith: heads.append(dict(src=slice(S.QKVR.start + h * hd, S.QKVR.start + (h + 1) * hd), dst=slice(S.QN.start + h * hd
+vslice/vslice.py:271: arith: o = S.QKVR.start + c.nq * hd + g * hd
+vslice/vslice.py:271: arith: o = S.QKVR.start + c.nq * hd + g * hd
+vslice/vslice.py:271: arith: o = S.QKVR.start + c.nq * hd + g * hd
+vslice/vslice.py:271: arith: o = S.QKVR.start + c.nq * hd + g * hd
+vslice/vslice.py:272: arith: heads.append(dict(src=slice(o, o + hd), dst=slice(S.KN.start + g * hd, S.KN.start + (g + 1) * hd)))
+vslice/vslice.py:272: arith: heads.append(dict(src=slice(o, o + hd), dst=slice(S.KN.start + g * hd, S.KN.start + (g + 1) * hd)))
+vslice/vslice.py:272: arith: heads.append(dict(src=slice(o, o + hd), dst=slice(S.KN.start + g * hd, S.KN.start + (g + 1) * hd)))
+vslice/vslice.py:272: arith: heads.append(dict(src=slice(o, o + hd), dst=slice(S.KN.start + g * hd, S.KN.start + (g + 1) * hd)))
+vslice/vslice.py:272: arith: heads.append(dict(src=slice(o, o + hd), dst=slice(S.KN.start + g * hd, S.KN.start + (g + 1) * hd)))
+vslice/vslice.py:272: arith: heads.append(dict(src=slice(o, o + hd), dst=slice(S.KN.start + g * hd, S.KN.start + (g + 1) * hd)))
+vslice/vslice.py:282: arith: mb.swiglu(slice(S.GU.start, S.GU.start + c.inter), slice(S.GU.start + c.inter, S.GU.start + 2 * c.inter), S.AC
+vslice/vslice.py:282: arith: mb.swiglu(slice(S.GU.start, S.GU.start + c.inter), slice(S.GU.start + c.inter, S.GU.start + 2 * c.inter), S.AC
+vslice/vslice.py:282: arith: mb.swiglu(slice(S.GU.start, S.GU.start + c.inter), slice(S.GU.start + c.inter, S.GU.start + 2 * c.inter), S.AC
+vslice/vslice.py:282: arith: mb.swiglu(slice(S.GU.start, S.GU.start + c.inter), slice(S.GU.start + c.inter, S.GU.start + 2 * c.inter), S.AC
+vslice/vslice.py:284: arith: m.model.norm.weight.fill_(B / math.sqrt(D) - 1.0)
+vslice/vslice.py:284: arith: m.model.norm.weight.fill_(B / math.sqrt(D) - 1.0)
+vslice/vslice.py:284: HOT(sqrt): m.model.norm.weight.fill_(B / math.sqrt(D) - 1.0)
+vslice/vslice.py:302: arith: for h in heads: f[self.S.REG[name]['RA'].start + h] = 1.0
+vslice/vslice.py:304: arith: for h in heads: f[self.S.REG[name]['WA'].start + h] = 1.0
+vslice/vslice.py:310: arith: Wb = W[o0:o0 + O].to(torch.float64)
+vslice/vslice.py:311: arith: if Wb.shape[0] < O: Wb = torch.cat([Wb, torch.zeros(O - Wb.shape[0], Wb.shape[1], dtype=torch.float64)])
+vslice/vslice.py:312: arith: Wp = torch.zeros(O, HW * P, dtype=torch.float64); Wp[:, :Wb.shape[1]] = Wb
+vslice/vslice.py:315: arith: s = (-0.27 - rows.min(dim=2).values).clamp(min=0)
+vslice/vslice.py:315: READ/ARG(min): s = (-0.27 - rows.min(dim=2).values).clamp(min=0)
+vslice/vslice.py:316: arith: v = silu_inv(rows + s[:, :, None]); ref = silu_inv(s)
+vslice/vslice.py:317: arith: return torch.cat([v, ref[:, :, None]], 2).reshape(2 * P, HW * (O + 1))
+vslice/vslice.py:317: arith: return torch.cat([v, ref[:, :, None]], 2).reshape(2 * P, HW * (O + 1))
+vslice/vslice.py:317: arith: return torch.cat([v, ref[:, :, None]], 2).reshape(2 * P, HW * (O + 1))
+vslice/vslice.py:323: arith: for r in range(2 * c.P):
+vslice/vslice.py:324: arith: f = pr.new(); f[S.SEL.start + r] = 1.0; f[S.WF.start + bank] = 1.0
+vslice/vslice.py:324: arith: f = pr.new(); f[S.SEL.start + r] = 1.0; f[S.WF.start + bank] = 1.0
+vslice/vslice.py:330: arith: for bank in range(4 * c.L + 1):
+vslice/vslice.py:330: arith: for bank in range(4 * c.L + 1):
+vslice/vslice.py:331: arith: f = pr.new(); f[S.SEL.start + c.dk - 1] = 1.0; f[S.WF.start + bank] = 1.0; f[S.INIT.start] = 1.0; pr.push(f)
+vslice/vslice.py:331: arith: f = pr.new(); f[S.SEL.start + c.dk - 1] = 1.0; f[S.WF.start + bank] = 1.0; f[S.INIT.start] = 1.0; pr.push(f)
+vslice/vslice.py:331: arith: f = pr.new(); f[S.SEL.start + c.dk - 1] = 1.0; f[S.WF.start + bank] = 1.0; f[S.INIT.start] = 1.0; pr.push(f)
+vslice/vslice.py:341: arith: b = 4 * l
+vslice/vslice.py:343: arith: pr.mark(f'qkv{l}'); f = pr.new(); f[S.RF.start + b] = 1; pr.ra(f, f'R1_{l}', [0]); pr.wa(f, f'R2_{l}', [0, 1])
+vslice/vslice.py:347: arith: write_steps(pr, b + 1, Wd[b + 1], 0)
+vslice/vslice.py:347: arith: write_steps(pr, b + 1, Wd[b + 1], 0)
+vslice/vslice.py:348: arith: pr.mark(f'o{l}'); f = pr.new(); f[S.RF.start + b + 1] = 1; pr.ra(f, f'R3_{l}', [0]); pr.ra(f, f'R1_{l}', [1]);
+vslice/vslice.py:348: arith: pr.mark(f'o{l}'); f = pr.new(); f[S.RF.start + b + 1] = 1; pr.ra(f, f'R3_{l}', [0]); pr.ra(f, f'R1_{l}', [1]);
+vslice/vslice.py:350: arith: write_steps(pr, b + 2, Wd[b + 2], blk * c.O)
+vslice/vslice.py:350: arith: write_steps(pr, b + 2, Wd[b + 2], blk * c.O)
+vslice/vslice.py:350: arith: write_steps(pr, b + 2, Wd[b + 2], blk * c.O)
+vslice/vslice.py:351: arith: pr.mark(f'gu{l}_{blk}'); f = pr.new(); f[S.RF.start + b + 2] = 1; pr.ra(f, f'R4_{l}', [0]); pr.wa(f, f'R5_{l}'
+vslice/vslice.py:351: arith: pr.mark(f'gu{l}_{blk}'); f = pr.new(); f[S.RF.start + b + 2] = 1; pr.ra(f, f'R4_{l}', [0]); pr.wa(f, f'R5_{l}'
+vslice/vslice.py:351: arith: pr.mark(f'gu{l}_{blk}'); f = pr.new(); f[S.RF.start + b + 2] = 1; pr.ra(f, f'R4_{l}', [0]); pr.wa(f, f'R5_{l}'
+vslice/vslice.py:351: arith: pr.mark(f'gu{l}_{blk}'); f = pr.new(); f[S.RF.start + b + 2] = 1; pr.ra(f, f'R4_{l}', [0]); pr.wa(f, f'R5_{l}'
+vslice/vslice.py:351: arith: pr.mark(f'gu{l}_{blk}'); f = pr.new(); f[S.RF.start + b + 2] = 1; pr.ra(f, f'R4_{l}', [0]); pr.wa(f, f'R5_{l}'
+vslice/vslice.py:353: arith: write_steps(pr, b + 3, Wd[b + 3], 0)
+vslice/vslice.py:353: arith: write_steps(pr, b + 3, Wd[b + 3], 0)
+vslice/vslice.py:354: arith: pr.mark(f'down{l}'); f = pr.new(); f[S.RF.start + b + 3] = 1; pr.ra(f, f'R6_{l}', [0, 1]); pr.ra(f, f'R4_{l}',
+vslice/vslice.py:354: arith: pr.mark(f'down{l}'); f = pr.new(); f[S.RF.start + b + 3] = 1; pr.ra(f, f'R6_{l}', [0, 1]); pr.ra(f, f'R4_{l}',
+vslice/vslice.py:355: arith: pr.wa(f, f'R1_{l + 1}', [0, 1] if l + 1 < L else [0]); pr.push(f)
+vslice/vslice.py:355: arith: pr.wa(f, f'R1_{l + 1}', [0, 1] if l + 1 < L else [0]); pr.push(f)
+vslice/vslice.py:357: arith: write_steps(pr, 4 * L, Wd[4 * L], blk * c.O)
+vslice/vslice.py:357: arith: write_steps(pr, 4 * L, Wd[4 * L], blk * c.O)
+vslice/vslice.py:357: arith: write_steps(pr, 4 * L, Wd[4 * L], blk * c.O)
+vslice/vslice.py:358: arith: pr.mark(f'lm{blk}'); f = pr.new(); f[S.RF.start + 4 * L] = 1; pr.ra(f, f'R1_{L}', [0]); pr.wa(f, 'Rlg', [2 * b
+vslice/vslice.py:358: arith: pr.mark(f'lm{blk}'); f = pr.new(); f[S.RF.start + 4 * L] = 1; pr.ra(f, f'R1_{L}', [0]); pr.wa(f, 'Rlg', [2 * b
+vslice/vslice.py:358: arith: pr.mark(f'lm{blk}'); f = pr.new(); f[S.RF.start + 4 * L] = 1; pr.ra(f, f'R1_{L}', [0]); pr.wa(f, 'Rlg', [2 * b
+vslice/vslice.py:358: arith: pr.mark(f'lm{blk}'); f = pr.new(); f[S.RF.start + 4 * L] = 1; pr.ra(f, f'R1_{L}', [0]); pr.wa(f, 'Rlg', [2 * b
+vslice/vslice.py:358: arith: pr.mark(f'lm{blk}'); f = pr.new(); f[S.RF.start + 4 * L] = 1; pr.ra(f, f'R1_{L}', [0]); pr.wa(f, 'Rlg', [2 * b
+vslice/vslice.py:360: arith: return len(pr.frames) - 1
+vslice/vslice.py:367: arith: fb = frames[a:a + seg].to(dev).float()
+vslice/vslice.py:368: arith: cp = torch.arange(off + a, off + a + fb.shape[0], device=dev)
+vslice/vslice.py:368: arith: cp = torch.arange(off + a, off + a + fb.shape[0], device=dev)
+vslice/vslice.py:368: arith: cp = torch.arange(off + a, off + a + fb.shape[0], device=dev)
+vslice/vslice.py:369: arith: pid = torch.tensor(pos[a:a + seg], device=dev)[None] if pos is not None else cp[None]
+vslice/vslice.py:372: arith: return out, off + frames.shape[0]
+949 findings, 33 non-exempt HOT/MATMUL/HF

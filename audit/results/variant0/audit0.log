@@ -1,0 +1,199 @@
+Current Python version 3.10 is below the recommended 3.11 version. It is recommended to upgrade to Python 3.11 or higher for the best experience.
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]Loading weights:   1%|          | 2/311 [00:00<00:15, 19.81it/s]Loading weights:  21%|██        | 65/311 [00:00<00:00, 288.74it/s]Loading weights:  29%|██▉       | 91/311 [00:00<00:02, 109.16it/s]Loading weights:  35%|███▍      | 108/311 [00:01<00:02, 78.36it/s]Loading weights:  39%|███▊      | 120/311 [00:01<00:02, 68.04it/s]Loading weights:  41%|████▏     | 129/311 [00:01<00:02, 61.09it/s]Loading weights:  44%|████▍     | 137/311 [00:01<00:03, 54.01it/s]Loading weights:  47%|████▋     | 147/311 [00:02<00:03, 53.68it/s]Loading weights:  49%|████▉     | 153/311 [00:02<00:03, 52.65it/s]Loading weights:  51%|█████     | 159/311 [00:02<00:03, 49.71it/s]Loading weights:  53%|█████▎    | 165/311 [00:02<00:02, 51.29it/s]Loading weights:  55%|█████▍    | 171/311 [00:02<00:03, 45.92it/s]Loading weights:  57%|█████▋    | 178/311 [00:02<00:02, 48.90it/s]Loading weights:  60%|█████▉    | 186/311 [00:02<00:02, 55.38it/s]Loading weights:  62%|██████▏   | 192/311 [00:03<00:02, 42.00it/s]Loading weights:  64%|██████▍   | 200/311 [00:03<00:02, 48.97it/s]Loading weights:  66%|██████▌   | 206/311 [00:03<00:02, 46.08it/s]Loading weights:  69%|██████▉   | 214/311 [00:03<00:02, 43.00it/s]Loading weights:  71%|███████▏  | 222/311 [00:03<00:01, 49.55it/s]Loading weights:  73%|███████▎  | 228/311 [00:03<00:01, 47.47it/s]Loading weights:  75%|███████▌  | 234/311 [00:03<00:01, 48.43it/s]Loading weights:  77%|███████▋  | 240/311 [00:04<00:01, 48.54it/s]Loading weights:  79%|███████▉  | 246/311 [00:04<00:01, 43.69it/s]Loading weights:  81%|████████  | 252/311 [00:04<00:01, 44.56it/s]Loading weights:  83%|████████▎ | 258/311 [00:04<00:01, 40.63it/s]Loading weights:  86%|████████▌ | 268/311 [00:04<00:00, 49.55it/s]Loading weights:  88%|████████▊ | 274/311 [00:04<00:00, 51.18it/s]Loading weights:  90%|█████████ | 280/311 [00:04<00:00, 40.13it/s]Loading weights:  93%|█████████▎| 290/311 [00:05<00:00, 49.51it/s]Loading weights:  95%|█████████▌| 296/311 [00:05<00:00, 50.50it/s]Loading weights:  97%|█████████▋| 302/311 [00:05<00:00, 43.88it/s]Loading weights: 100%|██████████| 311/311 [00:05<00:00, 56.79it/s]
+prompt [785, 6722, 315, 9625, 374]
+[real151936_L28] d=1024 D=40775 outer_layers=1006 I_MLP=8192
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+  [progress] layer 0/1006 R build_s=0.1 run_s=0.6 rows=1
+  [progress] layer 50/1006 W build_s=2.7 run_s=1.2 rows=60
+  [progress] layer 100/1006 R build_s=5.8 run_s=1.7 rows=119
+  [progress] layer 150/1006 R build_s=8.8 run_s=2.3 rows=180
+  [progress] layer 200/1006 W build_s=11.8 run_s=2.8 rows=240
+  [progress] layer 250/1006 NG build_s=14.9 run_s=3.4 rows=300
+  [progress] layer 300/1006 NG build_s=17.9 run_s=3.9 rows=360
+  [progress] layer 350/1006 R build_s=21.0 run_s=4.4 rows=421
+  [progress] layer 400/1006 W build_s=23.9 run_s=5.0 rows=480
+  [progress] layer 450/1006 R build_s=27.0 run_s=5.6 rows=539
+  [progress] layer 500/1006 R build_s=30.1 run_s=6.1 rows=600
+  [progress] layer 550/1006 W build_s=33.0 run_s=6.7 rows=660
+  [progress] layer 600/1006 NG build_s=36.1 run_s=7.2 rows=720
+  [progress] layer 650/1006 NG build_s=39.1 run_s=7.8 rows=780
+  [progress] layer 700/1006 R build_s=42.2 run_s=8.3 rows=841
+  [progress] layer 750/1006 W build_s=45.2 run_s=8.9 rows=900
+  [progress] layer 800/1006 R build_s=48.3 run_s=9.4 rows=959
+  [progress] layer 850/1006 R build_s=51.4 run_s=10.0 rows=1020
+  [progress] layer 900/1006 W build_s=54.4 run_s=10.6 rows=1080
+  [progress] layer 950/1006 NG build_s=57.4 run_s=11.1 rows=1140
+  [progress] layer 1000/1006 TM build_s=62.3 run_s=11.8 rows=1198
+  [progress] layer 0/1006 R build_s=0.1 run_s=0.2 rows=1996
+  [progress] layer 50/1006 W build_s=2.0 run_s=13.6 rows=112036
+  [progress] layer 100/1006 R build_s=4.2 run_s=27.6 rows=223100
+  [progress] layer 150/1006 R build_s=6.4 run_s=41.7 rows=334164
+  [progress] layer 200/1006 W build_s=8.6 run_s=56.3 rows=445740
+  [progress] layer 250/1006 NG build_s=10.9 run_s=69.8 rows=554756
+  [progress] layer 300/1006 NG build_s=13.1 run_s=83.6 rows=665308
+  [progress] layer 350/1006 R build_s=15.6 run_s=98.2 rows=777396
+  [progress] layer 400/1006 W build_s=17.8 run_s=112.0 rows=887436
+  [progress] layer 450/1006 R build_s=20.0 run_s=126.5 rows=998500
+  [progress] layer 500/1006 R build_s=22.2 run_s=140.8 rows=1109564
+  [progress] layer 550/1006 W build_s=24.4 run_s=155.0 rows=1221140
+  [progress] layer 600/1006 NG build_s=26.9 run_s=168.8 rows=1330156
+  [progress] layer 650/1006 NG build_s=29.2 run_s=182.6 rows=1440708
+  [progress] layer 700/1006 R build_s=31.4 run_s=196.7 rows=1552796
+  [progress] layer 750/1006 W build_s=33.7 run_s=211.0 rows=1662836
+  [progress] layer 800/1006 R build_s=35.9 run_s=225.2 rows=1773900
+  [progress] layer 850/1006 R build_s=38.1 run_s=239.2 rows=1884964
+  [progress] layer 900/1006 W build_s=40.5 run_s=254.0 rows=1996540
+  [progress] layer 950/1006 NG build_s=42.7 run_s=267.4 rows=2105556
+  [progress] layer 1000/1006 TM build_s=47.3 run_s=302.9 rows=2289068
+  worst blocks [(351, 6.0219, 6.2511), (13, 8.8351, 9.0086), (563, 6.2918, 6.4452), (418, 4.0583, 3.9074)] nblk 594
+  rails [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0] top code score 17.999149322509766
+{'step': 0, 'frames': 293068, 'sec': 368.5002279281616, 'build_s': 47.4667854309082, 'run_s': 304.0244345664978, 'maxrel': 0.01771765574812889, 'outer_argmax': 15846, 'hf_argmax': 15846}
+  [progress] layer 0/1006 R build_s=0.1 run_s=0.2 rows=1996
+  [progress] layer 50/1006 W build_s=2.4 run_s=14.7 rows=112036
+  [progress] layer 100/1006 R build_s=4.7 run_s=28.7 rows=223100
+  [progress] layer 150/1006 R build_s=6.9 run_s=43.2 rows=334164
+  [progress] layer 200/1006 W build_s=9.1 run_s=57.4 rows=445740
+  [progress] layer 250/1006 NG build_s=11.3 run_s=70.8 rows=554756
+  [progress] layer 300/1006 NG build_s=13.8 run_s=84.9 rows=665308
+  [progress] layer 350/1006 R build_s=16.1 run_s=99.1 rows=777396
+  [progress] layer 400/1006 W build_s=18.3 run_s=113.2 rows=887436
+  [progress] layer 450/1006 R build_s=20.6 run_s=127.6 rows=998500
+  [progress] layer 500/1006 R build_s=22.9 run_s=141.9 rows=1109564
+  [progress] layer 550/1006 W build_s=25.2 run_s=156.2 rows=1221140
+  [progress] layer 600/1006 NG build_s=27.5 run_s=169.6 rows=1330156
+  [progress] layer 650/1006 NG build_s=29.7 run_s=183.9 rows=1440708
+  [progress] layer 700/1006 R build_s=32.1 run_s=198.7 rows=1552796
+  [progress] layer 750/1006 W build_s=34.3 run_s=212.5 rows=1662836
+  [progress] layer 800/1006 R build_s=36.6 run_s=226.9 rows=1773900
+  [progress] layer 850/1006 R build_s=38.9 run_s=241.2 rows=1884964
+  [progress] layer 900/1006 W build_s=41.0 run_s=255.3 rows=1996540
+  [progress] layer 950/1006 NG build_s=43.4 run_s=269.3 rows=2105556
+  [progress] layer 1000/1006 TM build_s=47.8 run_s=304.9 rows=2289068
+  worst blocks [(94, 6.7474, 12.7668), (37, 8.1141, 13.9964), (21, 9.2518, 14.2298), (12, 12.0308, 16.8172)] nblk 594
+  rails [1.0, 0.0, 1.0, -0.0, -0.0, 1.0, 1.0, -0.0] top code score 18.000455856323242
+{'step': 1, 'frames': 293068, 'sec': 373.0208685398102, 'build_s': 47.977914571762085, 'run_s': 306.4377279281616, 'maxrel': 0.33217117190361023, 'outer_argmax': 315, 'hf_argmax': 315}
+  [progress] layer 0/1006 R build_s=0.1 run_s=0.2 rows=1996
+  [progress] layer 50/1006 W build_s=2.3 run_s=14.2 rows=112036
+  [progress] layer 100/1006 R build_s=4.6 run_s=28.6 rows=223100
+  [progress] layer 150/1006 R build_s=6.9 run_s=43.1 rows=334164
+  [progress] layer 200/1006 W build_s=9.0 run_s=57.3 rows=445740
+  [progress] layer 250/1006 NG build_s=11.5 run_s=71.3 rows=554756
+  [progress] layer 300/1006 NG build_s=13.7 run_s=85.3 rows=665308
+  [progress] layer 350/1006 R build_s=16.2 run_s=99.8 rows=777396
+  [progress] layer 400/1006 W build_s=18.4 run_s=113.7 rows=887436
+  [progress] layer 450/1006 R build_s=20.6 run_s=128.0 rows=998500
+  [progress] layer 500/1006 R build_s=23.1 run_s=142.6 rows=1109564
+  [progress] layer 550/1006 W build_s=25.2 run_s=156.8 rows=1221140
+  [progress] layer 600/1006 NG build_s=27.6 run_s=170.6 rows=1330156
+  [progress] layer 650/1006 NG build_s=29.9 run_s=184.6 rows=1440708
+  [progress] layer 700/1006 R build_s=32.6 run_s=199.6 rows=1552796
+  [progress] layer 750/1006 W build_s=34.9 run_s=214.6 rows=1662836
+  [progress] layer 800/1006 R build_s=37.2 run_s=228.9 rows=1773900
+  [progress] layer 850/1006 R build_s=39.5 run_s=243.3 rows=1884964
+  [progress] layer 900/1006 W build_s=41.7 run_s=257.8 rows=1996540
+  [progress] layer 950/1006 NG build_s=44.4 run_s=272.3 rows=2105556
+  [progress] layer 1000/1006 TM build_s=50.3 run_s=313.1 rows=2289068
+  worst blocks [(337, 6.699, 9.633), (26, 11.8257, 14.4443), (269, 8.3962, 5.9957), (65, 8.6356, 11.0351)] nblk 594
+  rails [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, -0.0, 1.0] top code score 17.99964714050293
+{'step': 2, 'frames': 293068, 'sec': 384.4480493068695, 'build_s': 50.482943058013916, 'run_s': 314.3046717643738, 'maxrel': 0.1742028146982193, 'outer_argmax': 279, 'hf_argmax': 279}
+  [progress] layer 0/1006 R build_s=0.1 run_s=0.2 rows=1996
+  [progress] layer 50/1006 W build_s=2.8 run_s=15.6 rows=112036
+  [progress] layer 100/1006 R build_s=5.7 run_s=30.9 rows=223100
+  [progress] layer 150/1006 R build_s=8.6 run_s=46.1 rows=334164
+  [progress] layer 200/1006 W build_s=11.4 run_s=61.7 rows=445740
+  [progress] layer 250/1006 NG build_s=14.3 run_s=76.5 rows=554756
+  [progress] layer 300/1006 NG build_s=17.2 run_s=91.0 rows=665308
+  [progress] layer 350/1006 R build_s=20.1 run_s=106.7 rows=777396
+  [progress] layer 400/1006 W build_s=22.9 run_s=121.4 rows=887436
+  [progress] layer 450/1006 R build_s=25.8 run_s=136.8 rows=998500
+  [progress] layer 500/1006 R build_s=28.5 run_s=152.0 rows=1109564
+  [progress] layer 550/1006 W build_s=31.2 run_s=167.2 rows=1221140
+  [progress] layer 600/1006 NG build_s=34.1 run_s=181.8 rows=1330156
+  [progress] layer 650/1006 NG build_s=36.9 run_s=196.5 rows=1440708
+  [progress] layer 700/1006 R build_s=39.8 run_s=212.1 rows=1552796
+  [progress] layer 750/1006 W build_s=42.6 run_s=227.5 rows=1662836
+  [progress] layer 800/1006 R build_s=45.4 run_s=243.1 rows=1773900
+  [progress] layer 850/1006 R build_s=48.2 run_s=257.9 rows=1884964
+  [progress] layer 900/1006 W build_s=51.0 run_s=274.2 rows=1996540
+  [progress] layer 950/1006 NG build_s=53.7 run_s=289.2 rows=2105556
+  [progress] layer 1000/1006 TM build_s=59.0 run_s=331.7 rows=2289068
+  worst blocks [(7, 11.2606, 13.6199), (15, 11.359, 13.2684), (59, 8.5304, 6.7162), (1, 17.1821, 18.9632)] nblk 594
+  rails [-0.0, 1.0, 1.0, 0.0, 1.0, 0.0, -0.0, 1.0] top code score 17.999723434448242
+{'step': 3, 'frames': 293068, 'sec': 412.0491943359375, 'build_s': 59.201796770095825, 'run_s': 332.8131146430969, 'maxrel': 0.1244160607457161, 'outer_argmax': 374, 'hf_argmax': 374}
+  [progress] layer 0/1006 R build_s=0.1 run_s=0.2 rows=1996
+  [progress] layer 50/1006 W build_s=2.2 run_s=14.1 rows=112036
+  [progress] layer 100/1006 R build_s=4.5 run_s=28.7 rows=223100
+  [progress] layer 150/1006 R build_s=6.9 run_s=42.9 rows=334164
+  [progress] layer 200/1006 W build_s=9.0 run_s=57.2 rows=445740
+  [progress] layer 250/1006 NG build_s=11.8 run_s=71.5 rows=554756
+  [progress] layer 300/1006 NG build_s=14.0 run_s=85.4 rows=665308
+  [progress] layer 350/1006 R build_s=16.4 run_s=100.3 rows=777396
+  [progress] layer 400/1006 W build_s=18.6 run_s=114.8 rows=887436
+  [progress] layer 450/1006 R build_s=20.7 run_s=129.0 rows=998500
+  [progress] layer 500/1006 R build_s=23.2 run_s=143.6 rows=1109564
+  [progress] layer 550/1006 W build_s=25.3 run_s=157.9 rows=1221140
+  [progress] layer 600/1006 NG build_s=27.8 run_s=171.7 rows=1330156
+  [progress] layer 650/1006 NG build_s=30.1 run_s=185.7 rows=1440708
+  [progress] layer 700/1006 R build_s=32.4 run_s=200.0 rows=1552796
+  [progress] layer 750/1006 W build_s=34.6 run_s=214.5 rows=1662836
+  [progress] layer 800/1006 R build_s=36.9 run_s=228.8 rows=1773900
+  [progress] layer 850/1006 R build_s=39.2 run_s=243.2 rows=1884964
+  [progress] layer 900/1006 W build_s=41.4 run_s=257.6 rows=1996540
+  [progress] layer 950/1006 NG build_s=43.7 run_s=271.1 rows=2105556
+  [progress] layer 1000/1006 TM build_s=48.1 run_s=306.7 rows=2289068
+  worst blocks [(47, 14.7434, 17.4989), (215, 10.23, 12.9015), (145, 9.3302, 11.6433), (355, 4.4762, 6.7484)] nblk 594
+  rails [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0] top code score 17.999156951904297
+{'step': 4, 'frames': 293068, 'sec': 375.25419902801514, 'build_s': 48.26773715019226, 'run_s': 308.00563645362854, 'maxrel': 0.1574624478816986, 'outer_argmax': 12095, 'hf_argmax': 12095}
+  [progress] layer 0/1006 R build_s=0.1 run_s=0.2 rows=1996
+  [progress] layer 50/1006 W build_s=2.3 run_s=14.3 rows=112036
+  [progress] layer 100/1006 R build_s=4.5 run_s=28.6 rows=223100
+  [progress] layer 150/1006 R build_s=6.9 run_s=43.3 rows=334164
+  [progress] layer 200/1006 W build_s=9.1 run_s=57.8 rows=445740
+  [progress] layer 250/1006 NG build_s=11.4 run_s=72.3 rows=554756
+  [progress] layer 300/1006 NG build_s=13.7 run_s=86.4 rows=665308
+  [progress] layer 350/1006 R build_s=16.0 run_s=100.7 rows=777396
+  [progress] layer 400/1006 W build_s=18.3 run_s=115.2 rows=887436
+  [progress] layer 450/1006 R build_s=20.5 run_s=129.5 rows=998500
+  [progress] layer 500/1006 R build_s=22.7 run_s=143.6 rows=1109564
+  [progress] layer 550/1006 W build_s=25.0 run_s=159.1 rows=1221140
+  [progress] layer 600/1006 NG build_s=27.3 run_s=172.7 rows=1330156
+  [progress] layer 650/1006 NG build_s=29.5 run_s=186.5 rows=1440708
+  [progress] layer 700/1006 R build_s=32.0 run_s=201.5 rows=1552796
+  [progress] layer 750/1006 W build_s=34.2 run_s=215.4 rows=1662836
+  [progress] layer 800/1006 R build_s=36.5 run_s=229.8 rows=1773900
+  [progress] layer 850/1006 R build_s=38.8 run_s=244.3 rows=1884964
+  [progress] layer 900/1006 W build_s=40.9 run_s=258.5 rows=1996540
+  [progress] layer 950/1006 NG build_s=43.4 run_s=273.1 rows=2105556
+  [progress] layer 1000/1006 TM build_s=48.0 run_s=307.8 rows=2289068
+  worst blocks [(511, 4.71, 3.3974), (551, 3.5929, 2.331), (293, 5.8868, 7.14), (203, 5.2638, 6.4698)] nblk 594
+  rails [1.0, 0.0, 1.0, -0.0, -0.0, 1.0, 1.0, -0.0] top code score 18.0008544921875
+{'step': 5, 'frames': 293068, 'sec': 376.51712465286255, 'build_s': 48.12958598136902, 'run_s': 308.94099521636963, 'maxrel': 0.0680987685918808, 'outer_argmax': 11, 'hf_argmax': 13}
+{"tag": "real151936_L28", "d": 1024, "D": 40775, "layers": 1006, "tokens": [785, 6722, 315, 9625, 374, 12095, 11], "maxrel_worst": 0.33217117190361023, "params_per_layer_M": null}
+=== HostGuard report [test_vs2.py] mode=log -> FAIL ===
+outer rounds=17444 steps=27590982 bytes streamed=4,503,007,824,701 {'0': 4500089164200, '1': 331091784, 'position_ids': 110363928, 'cache_position': 110363928, 'attention_mask': 2366840861}
+stock-module calls driven by host: {'Qwen3_5TextRotaryEmbedding': 8722, 'Qwen3_5DecoderLayer': 8722}
+ATen ops INSIDE outer forward: 1,166,487 (top: view:182147, mul:106085, slice:96957, add:70791, _unsafe_view:70588, t:69573, mm:69573, select:52332)
+host ops allowed: {'move:lift_fresh': 1155833, 'move:_local_scalar_dense': 414, 'move:cat': 36465, 'move:unsqueeze': 53708, 'move:clone': 118, 'move:detach': 56, 'move:slice': 52446, 'move:zeros': 39462, 'move:select': 1648922, 'move:copy': 986883, 'move:stack': 7, 'move:_to_copy': 70830, 'move:zero': 101129, 'move:fill': 68519, 'move:arange': 34224, 'move:index': 417208, 'move:index_put': 363506, 'move:expand': 8722, 'move:view': 41574, 'move:permute': 13644, 'move:full_like': 27288, 'forbidden!:mv': 6, 'forbidden!:max': 6, 'argmax!:argmax': 14}
+host readbacks: 0 (non-logits: 0)
+EXEMPT scope reference: 'load the real HF Qwen3-0.6B inner weights (weights + reference model)' entries=1 ops=945  <-- reviewer must read
+EXEMPT scope build: 'construct stock Qwen3_5TextRotaryEmbedding (inv_freq from rope_theta config constant)' entries=1 ops=10  <-- reviewer must read
+EXEMPT scope build: 'construct a stock Qwen3_5DecoderLayer (random init, all params zeroed by compile_entry)' entries=7042 ops=111657  <-- reviewer must read
+EXEMPT scope transport: 'causal mask from position indices (token-independent addresses)' entries=203 ops=1624  <-- reviewer must read
+EXEMPT scope reference: 'HF inner Qwen3 forward on host: reference logits for the error metric only; never fed back' entries=6 ops=14442  <-- reviewer must read
+EXEMPT scope reference: 'error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)' entries=6 ops=7374  <-- reviewer must read
+EXEMPT scope transport: 'host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)' entries=6 ops=876  <-- reviewer must read
+EXEMPT scope validation: 'print first 8 rails + top code score (display only; the decode above is host-side, see audit report)' entries=6 ops=6  <-- reviewer must read
+WARNING non-outer HF model forwards executed: {'Qwen3ForCausalLM': 6, 'Qwen3Model': 6}
+EXEMPT (declared via --scope) build frame engine.py:<module> ops=4  <-- reviewer must read
+EXEMPT (declared via --scope) weight_prep frame test_vs2.py:weights ops=57  <-- reviewer must read
+EXEMPT (declared via --scope) build frame vs2.py:compile_entry ops=962815  <-- reviewer must read
+EXEMPT (declared via --scope) weight_prep frame vs2.py:tile_payload ops=4843620  <-- reviewer must read
+EXEMPT (declared via --scope) transport frame vs2.py:dense_job ops=13644  <-- reviewer must read
+VIOLATION x12 argmax-on-non-logits: op=argmax at test_vs2.py:88 in run
+VIOLATION x6 host-math-on-outer-output: op=mv at test_vs2.py:83 in run
+VIOLATION x6 host-math: op=mv at test_vs2.py:83 in run
+VIOLATION x6 host-math: op=max at test_vs2.py:85 in run
+VIOLATION x2 argmax-on-non-logits: op=argmax at test_vs2.py:86 in run
+sources hashed: 7
+WARNING: no Qwen3_5ForCausalLM forward observed -> nothing was run on an outer model
+AUDIT RESULT: FAIL
