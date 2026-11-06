@@ -1,0 +1,55 @@
+{
+ "inj_file": "injF",
+ "ramimg": true,
+ "injections": [
+  887904,
+  970597,
+  899713
+ ],
+ "ram_injections": [
+  0,
+  0,
+  0
+ ],
+ "chunks": [
+  0,
+  1,
+  2
+ ],
+ "rows": 3,
+ "steps_per_row": [
+  2097151,
+  2097152,
+  2097152
+ ],
+ "steps_run": 2097152,
+ "seconds": 445.4054594039917,
+ "agg_tok_per_s": 14125.233201182953,
+ "forced_kinds": [],
+ "free_tokens": [
+  2094207,
+  2093440,
+  2093696
+ ],
+ "forced_tokens": [
+  2944,
+  3712,
+  3456
+ ],
+ "free_mismatches": [
+  0,
+  0,
+  0
+ ],
+ "first_free_mismatch": [
+  null,
+  null,
+  null
+ ],
+ "forced_raw_disagreements": [
+  2930,
+  3689,
+  3442
+ ],
+ "gpu": "NVIDIA A100-SXM4-40GB"
+}

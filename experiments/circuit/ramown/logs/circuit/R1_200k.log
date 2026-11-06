@@ -1,0 +1,13 @@
+injections per row [84985]... (RAM-type [0]), inj file injF, ramimg True, unaddressable-WROM VDOTs forced [640]...
+rows 1, steps/row 200,000, forced kinds [], forced fraction [0.0031999999191612005]
+step 20,000/200,000 4s 5,331 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 128 of 128
+step 40,000/200,000 7s 5,430 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 256 of 256
+step 60,000/200,000 11s 5,463 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 507 of 512
+step 80,000/200,000 15s 5,481 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 633 of 640
+step 100,000/200,000 18s 5,493 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 633 of 640
+step 120,000/200,000 22s 5,501 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 633 of 640
+step 140,000/200,000 25s 5,505 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 633 of 640
+step 160,000/200,000 29s 5,509 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 633 of 640
+step 180,000/200,000 33s 5,512 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 633 of 640
+step 200,000/200,000 36s 5,515 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 633 of 640
+{"inj_file": "injF", "ramimg": true, "injections": [84985], "ram_injections": [0], "chunks": [1], "rows": 1, "steps_per_row": [200000], "steps_run": 200000, "seconds": 36.267054080963135, "agg_tok_per_s": 5514.646864041785, "forced_kinds": [], "free_tokens": [199360], "forced_tokens": [640], "free_mismatches": [0], "first_free_mismatch": [null], "forced_raw_disagreements": [633], "gpu": "NVIDIA A100-SXM4-40GB"}

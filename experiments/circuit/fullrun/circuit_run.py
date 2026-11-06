@@ -309,6 +309,10 @@ while done < N:
     msg = f'step {done:,}/{N:,} {el:.0f}s {done*B/el:,.0f} agg tok/s; free-token mismatches {int(nbad_free.sum())} (rows with any: {sum(x is not None for x in first_bad)}), forced-token raw disagreements {int(nbad_forced.sum())} of {int(n_forced.sum()):,}'
     print(msg, flush=True); log.write(msg + '\n'); log.flush()
     if all(x is not None for x in first_bad): print('all rows diverged; stop', flush=True); break
+if os.environ.get('DUMPSLOT'):   # debug: print the circuit's current RAM head state for slots (comma list), row 0
+    for sl_ in (int(x) for x in os.environ['DUMPSLOT'].split(',')):
+        sid_, jb, row_ = (int(v) for v in lut_ram[sl_]); vec = Ss[sid_][0].reshape(-1)[jb: jb + 128] if False else Ss[sid_][0].reshape(-1)[jb * 16384 + row_ * 128: jb * 16384 + row_ * 128 + 128].cpu().numpy()
+        print('SLOT', sl_, 'ballast', vec[:2].tolist(), 'blockA', hex(sum(int(round(vec[2 + i] / 128)) << i for i in range(32)) & 0xFFFFFFFF), 'blockB', hex(sum(int(round(vec[34 + i] / 128)) << i for i in range(32)) & 0xFFFFFFFF), 'raw A[0:6]', vec[2:8].tolist(), flush=True)
 for r in range(B):
     if first_bad[r] is not None:
         fb = first_bad[r]; print(f'row {r} (chunk {chunks[r]}) first free mismatch at step {fb}: ' + ' | '.join(f'{j}:{S.name(int(TREF[r,j]))}/{S.name(int(RAW[r,j]))}/f{int(MASK[r,j])}' for j in range(max(0, fb - 16), fb + 2)), flush=True)
