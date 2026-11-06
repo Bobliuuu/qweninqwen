@@ -1,0 +1,48 @@
+{
+ "fmul": {
+  "AND": 1086,
+  "OR": 351,
+  "XOR": 729,
+  "NOT": 4,
+  "gates2": 2166,
+  "depth": 124,
+  "neurons": 4332,
+  "wires": 2170,
+  "max_rel_err": 4.0220460409643376e-07,
+  "mean_rel_err": 1.1191924084862326e-07,
+  "frac_bit_exact": 0.02923,
+  "n_samples": 200000,
+  "sim_sec": 0.20857787132263184
+ },
+ "fadd": {
+  "AND": 505,
+  "OR": 122,
+  "XOR": 708,
+  "NOT": 54,
+  "gates2": 1335,
+  "depth": 176,
+  "neurons": 2670,
+  "wires": 1389,
+  "max_rel_err": 1.1920765532489272e-07,
+  "mean_rel_err": 3.143215986485797e-08,
+  "frac_bit_exact": 0.63536,
+  "n_samples": 200000,
+  "sim_sec": 0.1421041488647461
+ },
+ "fsub": {
+  "AND": 506,
+  "OR": 122,
+  "XOR": 708,
+  "NOT": 55,
+  "gates2": 1336,
+  "depth": 176,
+  "neurons": 2672,
+  "wires": 1391,
+  "max_rel_err": 1.192084226949472e-07,
+  "mean_rel_err": 3.1671318701671904e-08,
+  "frac_bit_exact": 0.63278,
+  "n_samples": 200000,
+  "sim_sec": 0.09952306747436523
+ },
+ "fadd_cancel_abs_err_over_max_operand": 0.0
+}
