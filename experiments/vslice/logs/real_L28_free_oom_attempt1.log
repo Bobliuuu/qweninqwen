@@ -1,0 +1,32 @@
+prompt [785, 6722, 315, 9625, 374]
+[real151936_L28] d=1024 D=40775 outer_layers=1006 I_MLP=8192
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[W1106 07:37:23.269755511 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 327155712 bytes (free: 170917888, total: 42405855232).
+[W1106 07:37:23.271034577 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 327155712 bytes (free: 170917888, total: 42405855232).
+Traceback (most recent call last):
+  File "~/qiq/true/vs_pkg/trueqiq/test_vs2.py", line 108, in <module>
+    run(c, prompt, ngen, dev, scale, toy)
+  File "~/qiq/true/vs_pkg/trueqiq/test_vs2.py", line 62, in run
+    Hs, tr = rn.run(pr, trace_rows={'lm': lmrows}, trace_layers={tm7})
+  File "~/qiq/v/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+  File "~/qiq/true/vs_pkg/trueqiq/vs2.py", line 558, in run
+    flush()
+  File "~/qiq/true/vs_pkg/trueqiq/vs2.py", line 550, in flush
+    y = layer(x, position_embeddings=pe, attention_mask=mask, position_ids=pid, past_key_values=self.cache, cache_position=cp, use_cache=True)
+  File "~/qiq/v/lib/python3.10/site-packages/transformers/modeling_layers.py", line 111, in __call__
+    return super().__call__(*args, **kwargs)
+  File "~/qiq/v/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "~/qiq/v/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "~/qiq/v/lib/python3.10/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py", line 896, in forward
+    hidden_states = self.post_attention_layernorm(hidden_states)
+  File "~/qiq/v/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "~/qiq/v/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "~/qiq/v/lib/python3.10/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py", line 840, in forward
+    output = output * (1.0 + self.weight.float())
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 312.00 MiB. GPU 0 has a total capacity of 39.49 GiB of which 163.00 MiB is free. Including non-PyTorch memory, this process has 6.72 GiB memory in use. Process 4078229 has 32.60 GiB memory in use. Of the allocated memory 5.55 GiB is allocated by PyTorch, and 693.82 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)

@@ -24,4 +24,6 @@ In the outer weights and state: all norms, 197 matvecs, registers, RoPE, softmax
 Multi-position run (teacher-forced prompt-plus-continuation tokens [785, 6722, 315, 9625, 374, 12095, 13]; positions 0-5, so positions 1-5 use the KV cache): outer argmax == HF argmax at all 6 positions (15846, 315, 279, 374, 12095, 13).
 Block-best logit max relative error per position: 5.8e-5, 6.9e-6, 1.8e-5, 1.4e-5, 3.2e-5, 1.05e-5. Each position took 264-301 s (first 300.7 s incl. 26 s build). Log: `logs/real_L28_gen.log`. These are teacher-forced positions of one prompt, not free-running generation.
 
+Free-running mode: `FREE=1 python test_vs2.py real151936_L28 6` (added to `test_vs2.py`, commit bc1315c) feeds back only the outer argmax and compares 6 new tokens with `generate()` of HF greedy. The compiled-route run was NOT completed (OOM from a co-tenant, then stopped on request while queued/early); no free-running result exists, see `logs/real_L28_free_*.log`. The only feedback so far is the single appended token (position 5) in the run above.
+
 Pending: HostGuard audit of this driver (running), the L=2 error bump.
