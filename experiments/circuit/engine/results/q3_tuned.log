@@ -1,0 +1,2 @@
+reference: 708,921 tokens, 529,035 instructions (4 s): bytearray(b"W3c\t.x\'n#Z0a\x07\\`3")
+{"elf": "q3.elf", "steps": 708920, "instructions": 529035, "seconds": 141.92200350761414, "ms_per_step": 0.20019466725104967, "tok_per_s": 4995.138051034957, "exact": true, "first_mismatch": null, "gpu": "NVIDIA A10G"}

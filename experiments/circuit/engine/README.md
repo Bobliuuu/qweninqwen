@@ -31,3 +31,7 @@ Implied: 2.0e5 positions per Qwen3-0.6B token for the MACs (MEMORY_DESIGN s.7) x
 ## Batch scaling with tuned warps (ffn 4, head 8), results/exec_batch_wh8.log
 Aggregate tok/s, all rows exact: B=4 11.9k, B=16 19.0k, B=64 **21.95k** (343 tok/s per row). B=1 per-sublayer tuned: 4,963.
 Not done: megakernel (timeline shows every kernel at its ~4.5 us floor with zero inter-kernel gaps in the graph, so fusing launches saves at most ~2 us x 21 = ~40 us of 201 us; not attempted), q3 firmware on the A10G (no riscv64 gcc / q3.elf on gpuB; e2e agent's A100 run: 4,225 tok/s untuned), HF-path check.
+
+## q3.elf (e2e agent's tiny Qwen3 firmware, 16 tokens) on gpuB with the tuned executor, results/q3_tuned.{json,log}
+`run_tuned.py q3.elf`: 708,920 trace steps (529,035 instructions) in 141.9 s = **4,995 tok/s (0.2002 ms/step), exact token-for-token vs ref.Machine** (first_mismatch null).
+The e2e agent's untuned A100 run was 4,225 tok/s. => 14.2 s per tiny-model token (45,056 int4 weights) at 44.3k trace tokens/token.

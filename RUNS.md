@@ -38,3 +38,4 @@
 | 2026-11-06 10:10 UTC | gpuB (A10G) | `mac_exec_bench.py --dense` (ROM+MAC pipelines, structure of memory/mac_layer.py K=230) | sparse 0.543 ms/step (1,842 tok/s) incl chip step; stage-batched 0.425 ms; dense HF >=17.4 ms (52 MLPs, 6.9 GB); timing-only |
 | 2026-11-06 | Lambda A100 / CPU bf16 | experiments/circuit/memory acc_stage.py (digit accumulation), rom_select.py (full-width ROM + slot select) | exact on CPU: acc 7 layers (Pg=5), 11 layers (Pg=14); select exact; A100 rerun of acc_stage queued |
 | 2026-11-06 10:20 UTC | gpuB (A10G) | bench_exec.py --wf 4 --wh 8 --batch 4,16,64 | exact; aggregate 11.9k / 19.0k / 21.95k tok/s |
+| 2026-11-06 11:00 UTC | gpuB (A10G) | `run_tuned.py q3.elf` (e2e firmware, 16 tokens, per-sublayer tuned fused executor) | exact, 708,920 steps, 141.9 s = 4,995 tok/s |

@@ -68,4 +68,5 @@ def main():
              grid_kernel_sum_us={f"{k[0]},{k[1]}": float(v.sum()) for k, v in res.items()})
     print(json.dumps(r)); 
     if a.out: json.dump(r, open(a.out, "w"), indent=1)
-main()
+if __name__ == '__main__':
+    main()
