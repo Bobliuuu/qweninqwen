@@ -1,0 +1,90 @@
+{
+ "0": {
+  "steps": 2097151,
+  "free": 2097151,
+  "mism": 0,
+  "first": null,
+  "ram_inj": 150881,
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "total_inj": 150881,
+  "ref_blob_loads_injected": 0,
+  "ref_ram_loads_injected": 150881
+ },
+ "1": {
+  "steps": 2097152,
+  "free": 2097152,
+  "mism": 0,
+  "first": null,
+  "ram_inj": 121619,
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "total_inj": 121619,
+  "ref_blob_loads_injected": 0,
+  "ref_ram_loads_injected": 121619
+ },
+ "2": {
+  "steps": 2097152,
+  "free": 2097152,
+  "mism": 0,
+  "first": null,
+  "ram_inj": 143609,
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "total_inj": 143609,
+  "ref_blob_loads_injected": 0,
+  "ref_ram_loads_injected": 143609
+ },
+ "3": {
+  "steps": 2097152,
+  "free": 2097152,
+  "mism": 0,
+  "first": null,
+  "ram_inj": 150852,
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "total_inj": 150852,
+  "ref_blob_loads_injected": 0,
+  "ref_ram_loads_injected": 150852
+ },
+ "4": {
+  "steps": 2097152,
+  "free": 2097152,
+  "mism": 0,
+  "first": null,
+  "ram_inj": 133151,
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "total_inj": 133151,
+  "ref_blob_loads_injected": 0,
+  "ref_ram_loads_injected": 133151
+ },
+ "5": {
+  "steps": 2097152,
+  "free": 2097152,
+  "mism": 0,
+  "first": null,
+  "ram_inj": 148921,
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "total_inj": 148921,
+  "ref_blob_loads_injected": 0,
+  "ref_ram_loads_injected": 148921
+ },
+ "6": {
+  "steps": 2097152,
+  "free": 2097152,
+  "mism": 0,
+  "first": null,
+  "ram_inj": 124394,
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "total_inj": 124394,
+  "ref_blob_loads_injected": 0,
+  "ref_ram_loads_injected": 124394
+ },
+ "7": {
+  "steps": 2097153,
+  "free": 2097153,
+  "mism": 0,
+  "first": null,
+  "ram_inj": 148710,
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "total_inj": 148710,
+  "ref_blob_loads_injected": 0,
+  "ref_ram_loads_injected": 148710
+ }
+}

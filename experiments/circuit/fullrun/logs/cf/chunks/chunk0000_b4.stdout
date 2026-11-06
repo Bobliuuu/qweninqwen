@@ -1,0 +1,7 @@
+
+--STDERR--
+Traceback (most recent call last):
+  File "/data/circuit_wf/fullrun/circuit_run.py", line 117, in <module>
+    toks.append(t.astype(np.int64)); kinds.append(k); states.append(pickle.load(open(f'{a.refdir}/state_{ch:04d}.pkl', 'rb')))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/ref785cf/state_0003.pkl'

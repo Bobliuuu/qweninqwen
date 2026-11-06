@@ -1,0 +1,29 @@
+ROW table slice materialised for this run: rows 0..16493 of 156396
+injections per row [150881, 121619, 143609, 150852]... (RAM-type [150881, 121619, 143609, 150852]), inj file inj, ramimg False, unaddressable-WROM VDOTs forced [0, 0, 0, 0]...
+rows 8, steps/row 2,097,153, forced kinds [], forced fraction [0.0, 0.0, 0.0, 0.0]
+step 100,000/2,097,153 54s 14,891 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 200,000/2,097,153 107s 14,893 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 300,000/2,097,153 161s 14,916 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 400,000/2,097,153 214s 14,935 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 500,000/2,097,153 268s 14,933 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 600,000/2,097,153 321s 14,931 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 700,000/2,097,153 375s 14,936 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 800,000/2,097,153 428s 14,941 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 900,000/2,097,153 482s 14,938 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,000,000/2,097,153 536s 14,935 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,100,000/2,097,153 589s 14,934 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,200,000/2,097,153 643s 14,936 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,300,000/2,097,153 696s 14,938 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,400,000/2,097,153 750s 14,938 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,500,000/2,097,153 803s 14,937 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,600,000/2,097,153 857s 14,938 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,700,000/2,097,153 910s 14,938 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,800,000/2,097,153 964s 14,936 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,900,000/2,097,153 1018s 14,934 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 2,000,000/2,097,153 1071s 14,934 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 2,097,153/2,097,153 1123s 14,933 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+{"wf_mode": true, "inj_file": "inj", "ramimg": false, "injections": [150881, 121619, 143609, 150852, 133151, 148921, 124394, 148710], "ram_injections": [150881, 121619, 143609, 150852, 133151, 148921, 124394, 148710], "chunks": [0, 1, 2, 3, 4, 5, 6, 7], "rows": 8, "steps_per_row": [2097151, 2097152, 2097152, 2097152, 2097152, 2097152, 2097152, 2097153], "steps_run": 2097153, "seconds": 1123.4656264781952, "agg_tok_per_s": 14933.455541805104, "forced_kinds": [], "free_tokens": [2097151, 2097152, 2097152, 2097152, 2097152, 2097152, 2097152, 2097153], "forced_tokens": [0, 0, 0, 0, 0, 0, 0, 0], "free_mismatches": [0, 0, 0, 0, 0, 0, 0, 0], "first_free_mismatch": [null, null, null, null, null, null, null, null], "forced_raw_disagreements": [0, 0, 0, 0, 0, 0, 0, 0], "gpu": "NVIDIA A100-SXM4-40GB"}
+
+--STDERR--
+/usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
+  warn_once(FP_FUSION_DEFAULT_WARNING)
