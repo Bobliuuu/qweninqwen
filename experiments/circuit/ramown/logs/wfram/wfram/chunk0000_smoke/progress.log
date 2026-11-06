@@ -1,0 +1,6 @@
+step 100,000/600,000 18s 5,679 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 200,000/600,000 35s 5,699 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 300,000/600,000 53s 5,705 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 400,000/600,000 70s 5,707 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 500,000/600,000 88s 5,709 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 600,000/600,000 105s 5,710 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
