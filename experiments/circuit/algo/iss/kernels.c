@@ -11,7 +11,7 @@ typedef signed char i8; typedef int i32; typedef unsigned u32; typedef unsigned 
 #ifndef UNR
 #define UNR 2
 #endif
-__attribute__((naked, section(".text.start"))) void _start(void) { __asm__ volatile("call main\n ecall"); }
+__attribute__((naked, section(".text.startup"))) void _start(void) { __asm__ volatile("call main\n ecall"); }
 int main(void) {
   volatile u32 *hdr = (u32 *)0x100000; u32 R = hdr[0], K = hdr[1];
   const i8 *x = (const i8 *)0x100100; const u8 *W = (const u8 *)0x110000; i32 *y = (i32 *)0x400000;

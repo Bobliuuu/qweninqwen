@@ -24,7 +24,7 @@ int main(int argc, char **argv){
     int32_t imi = (int32_t)i >> 20, ims = ((int32_t)(i & 0xfe000000) >> 20) | ((i>>7)&31);
     int32_t imb = ((int32_t)(i & 0x80000000) >> 19) | ((i&0x80)<<4) | ((i>>20)&0x7e0) | ((i>>7)&0x1e);
     int32_t imj = ((int32_t)(i & 0x80000000) >> 11) | (i & 0xff000) | ((i>>9)&0x800) | ((i>>20)&0x7fe);
-    uint32_t a = x[r1], b = x[r2]; n_tot++;
+    uint32_t a = x[r1], b = x[r2]; if (++n_tot > 2000000000ull) { fprintf(stderr, "instruction cap\n"); return 2; }
     switch (op) {
     case 0x37: v = i & 0xfffff000; x[rd] = v; n_alu++; break;
     case 0x17: x[rd] = pc + (i & 0xfffff000); n_alu++; break;
