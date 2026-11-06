@@ -26,6 +26,8 @@ class QLinear(nn.Module):
             q = torch.round(x / s).clamp(-qm - 1, qm); x = q * s
             self.stats.setdefault('azero', {}).setdefault(self.name, []).append((q == 0).float().mean().item())
             # bit density of |q| (sign-magnitude): average fraction of 1 bits over the ab-1 magnitude bits
+            for bs in (8, 32):
+                if q.shape[-1] % bs == 0: self.stats.setdefault('blk%d' % bs, {}).setdefault(self.name, []).append((q.reshape(-1, q.shape[-1] // bs, bs) == 0).all(-1).float().mean().item())
             m = q.abs().long(); bits = sum(((m >> b) & 1).float().mean().item() for b in range(self.ab - 1)) / max(self.ab - 1, 1)
             self.stats.setdefault('abit', {}).setdefault(self.name, []).append(bits)
         return nn.functional.linear(x, self.w)
@@ -68,7 +70,8 @@ def run(grid=None, gs_list=(128,)):
         t = time.time(); st = quantize(m, wb, ab, gs, hwb); r = evaluate(m, base, ids_list)
         wz = sum(a * n for a, n, _ in st['wzero']) / sum(n for _, n, _ in st['wzero'])
         az = {k: sum(v) / len(v) for k, v in st.get('azero', {}).items()}; ab_ = {k: sum(v) / len(v) for k, v in st.get('abit', {}).items()}
-        rec = dict(wb=wb, ab=ab, group=gs, head_wb=hwb, weight_zero_frac=wz, act_zero_frac=az, act_bit_density=ab_, **r)
-        print('QUANT ' + json.dumps({k: v for k, v in rec.items() if k not in ('act_zero_frac', 'act_bit_density')}), flush=True)
+        bz = {b: {k: sum(v) / len(v) for k, v in st.get(b, {}).items()} for b in ('blk8', 'blk32')}
+        rec = dict(block_zero=bz, wb=wb, ab=ab, group=gs, head_wb=hwb, weight_zero_frac=wz, act_zero_frac=az, act_bit_density=ab_, **r)
+        print('QUANT ' + json.dumps({k: v for k, v in rec.items() if k not in ('act_zero_frac', 'act_bit_density', 'block_zero')}), flush=True)
         out.append(rec); del m; torch.cuda.empty_cache()
     return dict(quant=out, prompts=len(PROMPTS))
