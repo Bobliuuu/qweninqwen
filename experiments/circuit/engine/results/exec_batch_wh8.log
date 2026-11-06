@@ -1,0 +1,3 @@
+{"B": 4, "K": 1, "seconds": 6.729237794876099, "ms_per_step": 0.3364618897438049, "agg_tok_per_s": 11888.419229428197, "per_row_tok_per_s": 2972.104807357049, "exact_all_rows": true}
+{"B": 16, "K": 1, "seconds": 16.863133668899536, "ms_per_step": 0.8431566834449767, "agg_tok_per_s": 18976.306912052292, "per_row_tok_per_s": 1186.0191820032683, "exact_all_rows": true}
+{"B": 64, "K": 1, "seconds": 58.312979221343994, "ms_per_step": 2.9156489610671996, "agg_tok_per_s": 21950.51628457166, "per_row_tok_per_s": 342.97681694643217, "exact_all_rows": true}

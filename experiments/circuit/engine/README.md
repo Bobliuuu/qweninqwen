@@ -27,3 +27,7 @@ PRODUCT 1840, DIGITIZE 5152, LOSUM 368 units; new Triton kernel `_ffn_mo` (multi
 | dense HF bf16 (stock Qwen3_5MLP x 52, no DN layers: lower bound) | **17.4 ms** | >17.6 ms | <57 |
 Per-pipeline kernels: ROM 7.3 us, PRODUCT 4.3, DIGITIZE 4.9, LOSUM 4.4 (floor ~4.4 us per kernel). Memory: sparse ROM+MAC state 231 MB for 13 pipelines (CSR fp32/int32); dense 52 MLPs 6.9 GB bf16 (3.68 B params) + the 13 DN layers + the 4B base 8.4 GB: tight on 23 GB.
 Implied: 2.0e5 positions per Qwen3-0.6B token for the MACs (MEMORY_DESIGN s.7) x 0.543 ms = **~108 s** (sparse) / ~85 s (stage-batched) versus >= 3,500 s dense; nonlinear glue not included. Caveat: the 13 pipelines share one residual in the real circuit, so the stage-batched number assumes independent residual regions (not designed).
+
+## Batch scaling with tuned warps (ffn 4, head 8), results/exec_batch_wh8.log
+Aggregate tok/s, all rows exact: B=4 11.9k, B=16 19.0k, B=64 **21.95k** (343 tok/s per row). B=1 per-sublayer tuned: 4,963.
+Not done: megakernel (timeline shows every kernel at its ~4.5 us floor with zero inter-kernel gaps in the graph, so fusing launches saves at most ~2 us x 21 = ~40 us of 201 us; not attempted), q3 firmware on the A10G (no riscv64 gcc / q3.elf on gpuB; e2e agent's A100 run: 4,225 tok/s untuned), HF-path check.
