@@ -212,6 +212,8 @@ Reported in a findings file but without a result file in the repository (treat a
 
 ## Status by tier (detail)
 
+Circuit-route speed tiers (S0 naive to S6 multi-GPU) and verification ladder (C0 to C4): see [`docs/CIRCUIT_ROUTE_PLAN.md`](docs/CIRCUIT_ROUTE_PLAN.md).
+
 | Tier | What runs inside the outer Qwen's weights | Status |
 |---|---|---|
 | T0 | A single signed MAC / gadget (state write + read, SwiGLU multiplier, norm, product) | **Verified** in isolation, teacher-forced inputs (errors in the table above) |
