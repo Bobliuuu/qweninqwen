@@ -2,6 +2,12 @@ import os
 import sys, time, json, torch, os, math
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vs2 import *
+try:  # honesty-audit scope declarations: no-ops unless run under audit/run_audit.py (HostGuard)
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'audit'))
+    from hostguard import reference, validation_read
+except Exception:
+    import contextlib
+    reference = validation_read = lambda *a, **k: contextlib.nullcontext()
 from transformers import Qwen3Config, Qwen3ForCausalLM
 
 def make_toy(c, seed=0):
@@ -51,7 +57,8 @@ def run(c, prompt, ngen, dev, tag, toy=None):
         pr = Prog(S, c, plan, dev); token_program(pr, seq[step], step, Wd, emb)
         t0 = time.time()
         rn.stats.update(rows=0, build_s=0.0, run_s=0.0)
-        with torch.no_grad(): rr = toy(torch.tensor([seq[:step + 1]])).logits[0, -1][:c.V]
+        with reference("HF inner Qwen3 forward on host: reference logits for the error metric only; never fed back"):
+            with torch.no_grad(): rr = toy(torch.tensor([seq[:step + 1]])).logits[0, -1][:c.V]
         if not c.tourn:
             Hs, _ = rn.run(pr)
             lg = logits_from(Hs[pr.marks['emit']], S, c, dev)
@@ -61,18 +68,21 @@ def run(c, prompt, ngen, dev, tag, toy=None):
             tm7 = [i for i, e in enumerate(plan) if e == ('TM', 7, 0)][0]
             Hs, tr = rn.run(pr, trace_rows={'lm': lmrows}, trace_layers={tm7})
             bestblk = tr[('lm', tm7)][:, S.VL[8].start]                       # in-model block maxima
-            ref_blk = torch.stack([rr[b * c.O:(b + 1) * c.O].max() for b in range(c.nblk)])
-            err = ((bestblk - ref_blk).abs().max() / rr.abs().max()).item()
-            dd = (bestblk - ref_blk).abs(); wi = dd.argsort(descending=True)[:4]
-            print('  worst blocks', [(int(b), round(float(bestblk[b]), 4), round(float(ref_blk[b]), 4)) for b in wi], 'nblk', c.nblk)
+            with reference("error metric: in-model block maxima vs HF block maxima (reporting only, never fed back)"):
+                ref_blk = torch.stack([rr[b * c.O:(b + 1) * c.O].max() for b in range(c.nblk)])
+                err = ((bestblk - ref_blk).abs().max() / rr.abs().max()).item()
+                dd = (bestblk - ref_blk).abs(); wi = dd.argsort(descending=True)[:4]
+                print('  worst blocks', [(int(b), round(float(bestblk[b]), 4), round(float(ref_blk[b]), 4)) for b in wi], 'nblk', c.nblk)
             amo = Hs[pr.marks['emit']][S.AMO.start:S.AMO.stop]
-            tt = torch.arange(c.V); codes = torch.zeros(c.V, 36)
-            for j in range(8):
-                bit = ((tt % c.O) >> j) & 1; codes[:, 2 * j] = bit; codes[:, 2 * j + 1] = 1 - bit
-            for j in range(10):
-                bit = ((tt // c.O) >> j) & 1; codes[:, 16 + 2 * j] = bit; codes[:, 16 + 2 * j + 1] = 1 - bit
+            with transport("host decode codebook: binary rail code of every vocab id (index arithmetic only, no model data)"):
+                tt = torch.arange(c.V); codes = torch.zeros(c.V, 36)
+                for j in range(8):
+                    bit = ((tt % c.O) >> j) & 1; codes[:, 2 * j] = bit; codes[:, 2 * j + 1] = 1 - bit
+                for j in range(10):
+                    bit = ((tt // c.O) >> j) & 1; codes[:, 16 + 2 * j] = bit; codes[:, 16 + 2 * j + 1] = 1 - bit
             lg = codes @ amo
-            print('  rails', [round(v, 3) for v in amo.tolist()[:8]], 'top code score', lg.max().item())
+            with validation_read("print first 8 rails + top code score (display only; the decode above is host-side, see audit report)"):
+                print('  rails', [round(v, 3) for v in amo.tolist()[:8]], 'top code score', lg.max().item())
         if step >= len(prompt) - 1 and len(seq) == step + 1: seq.append(int(lg.argmax()))
         rec = dict(step=step, frames=pr.total, sec=time.time() - t0, build_s=rn.stats['build_s'], run_s=rn.stats['run_s'],
                    maxrel=err, outer_argmax=int(lg.argmax()), hf_argmax=int(rr.argmax()))
@@ -102,7 +112,8 @@ if __name__ == '__main__':
         parts = scale[4:].split('_L'); Vt = int(parts[0]) if parts[0] else 4096
         nl = int(parts[1]) if len(parts) > 1 else 1
         c = Cfg(1024, 16, 8, 128, 3072, nl, Vt, theta=1e6, I_MLP=8192)
-        toy = Qwen3ForCausalLM.from_pretrained('Qwen/Qwen3-0.6B', num_hidden_layers=nl, torch_dtype=torch.float32).eval()
+        with reference("load the real HF Qwen3-0.6B inner weights (weights + reference model)"):
+            toy = Qwen3ForCausalLM.from_pretrained('Qwen/Qwen3-0.6B', num_hidden_layers=nl, torch_dtype=torch.float32).eval()
         prompt = AutoTokenizer.from_pretrained('Qwen/Qwen3-0.6B')('The capital of France is')['input_ids']
         print('prompt', prompt)
     run(c, prompt, ngen, dev, scale, toy)

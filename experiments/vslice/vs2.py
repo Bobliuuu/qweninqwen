@@ -14,6 +14,12 @@ sys.path[:0]=[os.path.join(_h,'..','..','qweninqwen'), os.path.join(_h,'..','sta
 from machine import Layout, BALLAST
 from engine import silu_inv, ZSTAR, SILU_MIN
 from ops import MLPBuilder
+try:  # honesty-audit scope declarations: no-ops unless run under audit/run_audit.py (HostGuard)
+    sys.path.insert(0, os.path.join(_h, '..', '..', 'audit'))
+    from hostguard import transport, build
+except Exception:
+    import contextlib
+    transport = build = lambda *a, **k: contextlib.nullcontext()
 
 B = BALLAST; Rq, Bg, KB = 100.0, 1e8, 60.0
 
@@ -513,7 +519,8 @@ class Runner:
                      'gdn': mk(intermediate_size=16), 'attn': mk(intermediate_size=16)}
         self.kind_cfg = {'NG': 'mlp', 'S': 'mlp', 'TS': 'mlp', 'TM': 'mlp', 'R': 'gdn', 'W': 'gdn', 'NH': 'gdn', 'A': 'attn', 'AM': 'attn'}
         self.cache = DynamicCache(config=self.cfg)
-        self.rot = Qwen3_5TextRotaryEmbedding(config=self.cfg).to(dev)
+        with build("construct stock Qwen3_5TextRotaryEmbedding (inv_freq from rope_theta config constant)"):
+            self.rot = Qwen3_5TextRotaryEmbedding(config=self.cfg).to(dev)
         self.offs = {}; self.stats = dict(rows=0, build_s=0.0, run_s=0.0)
 
     @torch.no_grad()
@@ -524,7 +531,8 @@ class Runner:
                 self.cache.layers[li].reset(); self.offs[li] = 0
         for li, entry in enumerate(self.plan):
             t0 = time.time()
-            with torch.device(dev): layer = Qwen3_5DecoderLayer(self.cfgv[self.kind_cfg[entry[0]]], li).eval()
+            with build("construct a stock Qwen3_5DecoderLayer (random init, all params zeroed by compile_entry)"), torch.device(dev):
+                layer = Qwen3_5DecoderLayer(self.cfgv[self.kind_cfg[entry[0]]], li).eval()
             compile_entry(layer, entry, self.D, self.c, self.S, self.P)
             if dev == 'cuda': torch.cuda.synchronize()
             self.stats['build_s'] += time.time() - t0; t0 = time.time()
@@ -541,15 +549,16 @@ class Runner:
                     if buf[i][0] == 'c':
                         j = i
                         while j < len(buf) and buf[j][0] == 'c': j += 1
-                        ids = torch.tensor([b_[1] for b_ in buf[i:j]], device=dev)
-                        rows.append(Hs[ids]); cidx.append((pos_, ids)); pids += posT[ids.cpu()].tolist(); pos_ += len(ids); i = j
+                        il = [b_[1] for b_ in buf[i:j]]; ids = torch.tensor(il, device=dev)
+                        rows.append(Hs[ids]); cidx.append((pos_, ids)); pids += [pr.cpos[q_] for q_ in il]; pos_ += len(ids); i = j
                     else:
                         F = pr.dense_job(pr.jobs[buf[i][1]], dev); rows.append(F); pids += [pr.cur_pos] * F.shape[0]; pos_ += F.shape[0]; i += 1
                 x = torch.cat(rows)[None]; n = x.shape[1]
                 cp = torch.arange(off, off + n, device=dev); pid = torch.tensor(pids, device=dev)[None]
                 pe = self.rot(x, pid[None].expand(3, 1, -1)); mask = None
                 if entry[0] in ('A', 'AM'):
-                    mask = (torch.arange(off + n, device=dev)[None, :] <= (torch.arange(n, device=dev)[:, None] + off))[None, None]
+                    with transport("causal mask from position indices (token-independent addresses)"):
+                        mask = (torch.arange(off + n, device=dev)[None, :] <= (torch.arange(n, device=dev)[:, None] + off))[None, None]
                 y = layer(x, position_embeddings=pe, attention_mask=mask, position_ids=pid, past_key_values=self.cache, cache_position=cp, use_cache=True)
                 if isinstance(y, tuple): y = y[0]
                 for (p0, ids) in cidx: Hs[ids] = y[0, p0:p0 + len(ids)].float()
