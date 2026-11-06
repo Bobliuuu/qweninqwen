@@ -55,6 +55,23 @@ Reconciliation of q4v 1.7 days with the T3 projection of 6-12 h: the q4v build h
 
 Fidelity flag: `res_full_q4v.json` records `argmax_fw` [13, 315, 279, 374] vs `argmax_hf` [15846, 315, 279, 374] on the 4-token prompt: the q4v firmware differs from HF at position 0 (agrees at 1-3). Argmax vs HF is not yet a pass; this belongs under R4 (numeric contract).
 
+## Merged integer-only build (MEASURED instructions on real weights; seconds computed)
+
+Compiler, aa7b367 / 3011004, `experiments/circuit/compiler/RESULTS.md` (emulated RV32IM firmware, real Qwen3-0.6B weights, nonlinear agent's EXP2/RSQ/SIGM/AMX/ROT16 merged as `-DEXT`, plain RV32IM fallback available). This is the first build that approaches the PROJECTED builds above, and it is measured as instructions.
+
+| Build | ctx | instr/token [M] | s/token (computed: 1.4 tok/instr, 5,500 tok/s) | at our measured 4,225 tok/s |
+|---|---|---|---|---|
+| fp32 soft-float (T0 literal) | 1 | ~1.18e11 [extrapolated at 198 instr/MAC from tiny; full measurement still running] | 3.0e7 s (0.95 yr) | not run |
+| int4 VDOT + soft-float glue (q4v) | 1 | 5.87e8 | 1.49e5 | |
+| int4 VDOT, integer-only, EXT | 1 | 1.34e8 | 3.4e4 (9.5 h) | 4.4e4 (12.3 h) |
+| same, plain RV32IM fallback | 1 | 1.38e8 | | |
+| int8 weights (2 int4 planes), EXT | 1 | 2.41e8 | | |
+| int4 EXT | 129 | 1.55e8 | about 4.0e4 (11 h) | about 5.1e4 (14 h) |
+
+- Attention is now SMAQA int8 KV with EXP2: 1.6e5 instr per context token (was 2.3e7), matching my 1.5e5 estimate; the ctx 1024 value is not measured (extrapolation: about 2.9e8).
+- Versus my combined projection A (1.10e8 tokens at ctx 1, 5.5-7.2 h): measured instruction count is 1.34e8, and at 1.4 tok/instr that is 1.9e8 tokens, so 9.5-12 h. The gap is the compiler's firmware (acc spills 1.0e8/token in the VDOT kernels, 64-bit dequant epilogue 5e7, RMSNorm 2.4e7, quantize 1.2e7) versus the kernels agent's register-blocked kernel. EXT saves only 2.6 % once merged. Next lever is the blocked kernels (algo commit 158a8f6, kernels K6/K7), which should bring ctx 1 toward 1e8 tokens and 5-7 h. Using the kernels agent's ~1.02 tok/instr for the VDOT part instead of 1.4 lowers the token count further; the build's true trace tokens must be measured with the token-accurate harness.
+- Fidelity (R4): int4 per-row RTN agrees with HF on 120/130 positions (92.3 %; float weight-only int4 91.5 %, so the firmware adds little); position 0 (attention sink, logit gap 0.136) and some low-margin positions fail. int8 weights match positions 1-3 but position 0 is wrong even in a float weight-only int8 model; a 12-bit last-layer MLP does not fix it. Per-group scales would cost more than 2x on the VDOT kernel. Argmax-vs-HF is therefore NOT exact for any current build; remedies (QAT/GPTQ, fp activations at the sink, skipping BOS) are unbuilt. Any measured run must be compared to the pinned integer emulator, with HF agreement reported separately (92 % at best today).
+
 ## Combined projection (PROJECTED): blocked or W4A4 matvec + merged nonlinear kernels + attention
 
 Built from measured per-op token costs, nothing run end to end. Components, tokens per inner token:
