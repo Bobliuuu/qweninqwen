@@ -177,8 +177,9 @@ for r in range(B):
         si, j = loc[f'wrom{hh[n_]}']
         I_kind[r, i2[n_]] = (2 << 3) | sidx[si]; I_base[r, i2[n_]] = (j + xx[n_]) * 16384 + pp[n_] * 128; I_cc[r, i2[n_]] = 8 * slot[n_]; I_dat[r, i2[n_]] = packed[n_]
     n_inj[r] = len(inj); n_ramin[r] = int((inj[:, 1] == 1).sum()); n_zone[r] = int((~ok).sum())
+    fin_idx = np.nonzero(isfinal[toks[r]])[0]      # (computed once per row: was recomputed per forced word, quadratic for long chained rows)
     for n_ in np.nonzero(~ok)[0]:      # unaddressable WROM words (WP mod 2^15 >= 32640): force the whole record
-        st0 = int(i2[n_]); en0 = int(np.searchsorted(np.nonzero(isfinal[toks[r]])[0], st0)); MASK[r, st0:int(np.nonzero(isfinal[toks[r]])[0][en0]) + 1] = 1
+        st0 = int(i2[n_]); en0 = int(np.searchsorted(fin_idx, st0)); MASK[r, st0:int(fin_idx[en0]) + 1] = 1
 if os.environ.get('NOVD'): I_kind[I_kind >> 3 == 2] = 0
 I_kind, I_base, I_cc, I_dat = (torch.from_numpy(x).to('cuda') for x in (I_kind, I_base, I_cc, I_dat)); ICTR = torch.zeros(B, dtype=torch.int32, device='cuda')
 _orig_step = fr._step
