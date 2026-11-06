@@ -46,3 +46,16 @@ def run(variant='base', **kw):
     from test_vs2_fast import run_fast
     t = time.time(); r = run_fast(**kw); r['variant'] = variant; r['wall_s'] = time.time() - t
     return r
+
+
+def multi(variants=()):
+    """several configs sequentially in one container (saves GPU queue time).  variants: list of dicts for run()."""
+    import gc
+    outs = []
+    for v in variants:
+        try: r = run(**v)
+        except Exception as e:
+            import traceback; traceback.print_exc(); r = dict(variant=v.get('variant'), error=repr(e)[:500])
+        print('PERFJSON ' + json.dumps(r), flush=True); outs.append(r)
+        gc.collect(); torch.cuda.empty_cache(); torch.cuda.reset_peak_memory_stats()
+    return dict(results=[{k: v for k, v in o.items() if k != 'steps'} for o in outs])
