@@ -18,6 +18,7 @@ def mktab():
     return dict(shape=t.shape, nbytes=int(t.nbytes), md5_first_rows=__import__('hashlib').md5(t[:64].tobytes()).hexdigest())
 
 def _run(ch, extra, tag='', extra_env=()):
+    data.reload()   # warm containers can hold a stale mount of the input volume
     os.makedirs('/out/wf', exist_ok=True); chs = str(ch); first = int(chs.split(',')[0]); o = f'/out/wf/chunk{first:04d}' + (f'_b{len(chs.split(","))}' if ',' in chs else '') + tag   # ch: one chunk or a comma list (batched rows on one GPU)
     env = dict(os.environ, PYTHONPATH='.:/data/circuit_wf/engine', WF='1', WF_ROW_CELLS='3840'); env.update(dict(x.split('=') for x in extra_env))
     cmd = ['python', '-u', '/data/circuit_wf/fullrun/circuit_run.py', '/data/w785wf/ref.elf', '/data/ref785wf', o, '--chunks', chs, '--block', '100000', '--rowtab', '/data/rowtab.npy'] + extra

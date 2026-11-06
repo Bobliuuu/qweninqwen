@@ -3,24 +3,24 @@
  "inj_file": "inj",
  "ramimg": false,
  "injections": [
-  20298
+  131698
  ],
  "ram_injections": [
-  20298
+  131698
  ],
  "chunks": [
   1
  ],
  "rows": 1,
  "steps_per_row": [
-  300000
+  2097152
  ],
- "steps_run": 300000,
- "seconds": 106.38725686073303,
- "agg_tok_per_s": 2819.88658073755,
+ "steps_run": 2097152,
+ "seconds": 367.22719740867615,
+ "agg_tok_per_s": 5710.775258452243,
  "forced_kinds": [],
  "free_tokens": [
-  300000
+  2097152
  ],
  "forced_tokens": [
   0
@@ -34,5 +34,5 @@
  "forced_raw_disagreements": [
   0
  ],
- "gpu": "NVIDIA A10G"
+ "gpu": "NVIDIA L40S"
 }

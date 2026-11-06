@@ -1,10 +1,28 @@
-ROW table slice materialised for this run: rows 1636..1944 of 155205
-injections per row [20298]... (RAM-type [20298]), inj file inj, ramimg False, unaddressable-WROM VDOTs forced [0]...
-rows 1, steps/row 300,000, forced kinds [], forced fraction [0.0]
-step 100,000/300,000 36s 2,810 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
-step 200,000/300,000 71s 2,817 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
-step 300,000/300,000 106s 2,820 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
-{"wf_mode": true, "inj_file": "inj", "ramimg": false, "injections": [20298], "ram_injections": [20298], "chunks": [1], "rows": 1, "steps_per_row": [300000], "steps_run": 300000, "seconds": 106.38725686073303, "agg_tok_per_s": 2819.88658073755, "forced_kinds": [], "free_tokens": [300000], "forced_tokens": [0], "free_mismatches": [0], "first_free_mismatch": [null], "forced_raw_disagreements": [0], "gpu": "NVIDIA A10G"}
+ROW table slice materialised for this run: rows 1636..3391 of 155205
+injections per row [131698]... (RAM-type [131698]), inj file inj, ramimg False, unaddressable-WROM VDOTs forced [0]...
+rows 1, steps/row 2,097,152, forced kinds [], forced fraction [0.0]
+step 100,000/2,097,152 18s 5,681 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 200,000/2,097,152 35s 5,683 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 300,000/2,097,152 53s 5,694 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 400,000/2,097,152 70s 5,698 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 500,000/2,097,152 88s 5,701 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 600,000/2,097,152 105s 5,702 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 700,000/2,097,152 123s 5,704 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 800,000/2,097,152 140s 5,704 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 900,000/2,097,152 158s 5,704 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,000,000/2,097,152 175s 5,705 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,100,000/2,097,152 193s 5,705 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,200,000/2,097,152 210s 5,706 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,300,000/2,097,152 228s 5,706 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,400,000/2,097,152 245s 5,707 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,500,000/2,097,152 263s 5,707 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,600,000/2,097,152 280s 5,708 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,700,000/2,097,152 298s 5,708 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,800,000/2,097,152 315s 5,709 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,900,000/2,097,152 333s 5,710 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 2,000,000/2,097,152 350s 5,710 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 2,097,152/2,097,152 367s 5,711 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+{"wf_mode": true, "inj_file": "inj", "ramimg": false, "injections": [131698], "ram_injections": [131698], "chunks": [1], "rows": 1, "steps_per_row": [2097152], "steps_run": 2097152, "seconds": 367.22719740867615, "agg_tok_per_s": 5710.775258452243, "forced_kinds": [], "free_tokens": [2097152], "forced_tokens": [0], "free_mismatches": [0], "first_free_mismatch": [null], "forced_raw_disagreements": [0], "gpu": "NVIDIA L40S"}
 
 --STDERR--
 /usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
