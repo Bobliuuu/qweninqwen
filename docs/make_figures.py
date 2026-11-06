@@ -1,5 +1,5 @@
-"""Generates the hand-laid-out SVG figures in docs/assets/ (no dependencies). Run: python docs/make_figures.py
-Colours switch with the viewer's light/dark preference (prefers-color-scheme), which GitHub honours for SVG images."""
+"""Generates the hand-laid-out static figures in docs/assets/ as PNG (needs rsvg-convert on PATH; no SVG files are kept).
+Run: python docs/make_figures.py. Animated/launch media: docs/launch/make_media.py."""
 import os, math
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
 
@@ -29,7 +29,17 @@ def tx(x, y, s, cls='', anchor=None):
     s = s.replace('&', '&amp;').replace('<', '&lt;')
     return f'<text x="{x}" y="{y}" class="{c}">{s}</text>'
 def arrow(d, flow=False, extra=''): return f'<path d="{d}" class="ln{" flow" if flow else ""}" marker-end="url(#ar)" {extra}/>'
-def save(name, s): open(os.path.join(OUT, name), 'w').write(s)
+def save(name, s):
+    """Rasterise to PNG with rsvg-convert (no SVG files are kept). CSS variables are resolved to the light theme first
+    because rsvg does not implement var() or prefers-color-scheme."""
+    import subprocess, re
+    root = re.search(r':root\{([^}]*)\}', CSS).group(1)
+    vals = dict(re.findall(r'--(\w+):(#[0-9a-fA-F]+)', root))
+    s = re.sub(r'@media[^{]*\{:root\{[^}]*\}\}', '', s)
+    s = re.sub(r'var\(--(\w+)\)', lambda m: vals[m.group(1)], s)
+    s = re.sub(r'animation:[^;}]*;?', '', s)
+    png = os.path.join(OUT, name.replace('.svg', '.png'))
+    subprocess.run(['rsvg-convert', '-z', '2', '-b', 'white', '-o', png], input=s.encode(), check=True)
 
 # ------------------------------------------------------------------ (a) architecture
 def architecture():

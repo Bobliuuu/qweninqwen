@@ -1,0 +1,13 @@
+flowchart LR
+  H["Host streamer<br/>weights, ids, addresses,<br/>position ids"]
+  G["DeltaNet layers<br/>paged weight memory<br/>(matvec banks, registers)"]
+  O["Compiled norm / MLP layers<br/>RMSNorm, SwiGLU,<br/>residual, gadgets"]
+  A["Full-attention layers<br/>RoPE, softmax, KV<br/>(outer KV = inner KV)"]
+  L["In-model argmax<br/>+ outer lm_head<br/>36 rails -> token id"]
+  X["Host: outer argmax<br/>+ append"]
+  H --> G
+  G --> O
+  O --> A
+  A --> L
+  L --> X
+  X -->|next token| H

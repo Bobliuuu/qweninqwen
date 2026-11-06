@@ -1,0 +1,16 @@
+flowchart LR
+  E["Embed (host row)"]
+  L["Inner layers x28<br/>norm, QKV bank, RoPE+attn,<br/>SwiGLU, residuals"]
+  N["Final RMSNorm"]
+  B["LM head<br/>594 blocks of 256"]
+  M["Block max/argmax<br/>(in model)"]
+  C["Hard-max attention<br/>over 594 winners"]
+  R["36 rails<br/>outer lm_head"]
+  T["Host argmax<br/>+ append token"]
+  E --> L
+  L --> N
+  N --> B
+  B --> M
+  M --> C
+  C --> R
+  R --> T

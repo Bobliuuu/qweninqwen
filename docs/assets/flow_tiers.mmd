@@ -1,0 +1,18 @@
+flowchart LR
+  T0["T0 gadget<br/>verified"]
+  T1["T1 projection<br/>verified"]
+  T2["T2 op chain<br/>partial"]
+  T3t["T3-toy<br/>achieved"]
+  T3r["T3 real<br/>partial"]
+  T4["T4 cost model<br/>partial"]
+  FR["free-running vs HF<br/>in progress"]
+  HG["HostGuard audit<br/>in progress"]
+  SP["speedup<br/>in progress"]
+  T0 --> T1
+  T1 --> T2
+  T2 --> T3t
+  T3t --> T3r
+  T3r --> T4
+  FR -->|completes| T3r
+  HG -->|completes| T3r
+  SP -->|improves| T4
