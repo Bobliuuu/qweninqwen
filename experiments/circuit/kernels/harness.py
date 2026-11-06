@@ -6,7 +6,7 @@ against a numpy reference.  Needs a checkout of github.com/divagr18/qwenputer br
 import os, sys, collections
 import numpy as np
 sys.dont_write_bytecode = True
-_p = os.environ.get('QWENPUTER_NPU', os.path.expanduser('~/qwenos-work/qwenputer-npu/experimental/riscv'))
+_p = os.environ.get('QWENPUTER_NPU', 'qwenputer/experimental/riscv')   # checkout of github.com/divagr18/qwenputer branch npu
 sys.path.insert(0, _p)
 from chipformer.rv import asm, ref, spec as S      # noqa: E402
 
