@@ -1,0 +1,81 @@
+{
+ "pure": true,
+ "host_writes": 0,
+ "token_overrides": 0,
+ "injections_applied": 0,
+ "would_be_injections": [
+  {
+   "type1": 158279,
+   "type2": 0,
+   "type3": 0,
+   "first_step": {
+    "type1": 35,
+    "type2": null,
+    "type3": null
+   }
+  },
+  {
+   "type1": 131698,
+   "type2": 0,
+   "type3": 0,
+   "first_step": {
+    "type1": 11,
+    "type2": null,
+    "type3": null
+   }
+  },
+  {
+   "type1": 155727,
+   "type2": 0,
+   "type3": 0,
+   "first_step": {
+    "type1": 31,
+    "type2": null,
+    "type3": null
+   }
+  }
+ ],
+ "wf_mode": true,
+ "inj_file": "inj",
+ "ramimg": false,
+ "chunks": [
+  0,
+  1,
+  2
+ ],
+ "rows": 3,
+ "steps_per_row": [
+  2097151,
+  2097152,
+  2097152
+ ],
+ "steps_run": 100000,
+ "seconds": 30.55733609199524,
+ "agg_tok_per_s": 9817.608959427056,
+ "free_tokens": [
+  100000,
+  100000,
+  100000
+ ],
+ "forced_tokens": [
+  0,
+  0,
+  0
+ ],
+ "free_mismatches": [
+  84646,
+  92252,
+  98281
+ ],
+ "first_free_mismatch": [
+  35,
+  11,
+  31
+ ],
+ "forced_raw_disagreements": [
+  0,
+  0,
+  0
+ ],
+ "gpu": "NVIDIA A100-SXM4-40GB"
+}
