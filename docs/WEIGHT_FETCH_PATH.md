@@ -89,7 +89,12 @@ In the blocked VDOT kernel (22 VDOT words + 2 loads, 0.163 tok/MAC = 1.30 tokens
 
 Inputs [M]: 74.5 M VDOT words per inner token (596 M MACs / 8); baseline v2 int4 VDOT build 1.34e8 instr, 1.55e8 tokens (1.154 tok/instr, `TIERS.md`); 4,963 tok/s tuned A10G / 4,225 tok/s untuned A100 on the 11-layer executor.
 
-[BENCH] (executor ms/step for the 12-layer chip, filled below)
+| W (4-bit, 3840 entries/row) | extra tok/VDOT [M] | tokens/inner token (baseline 1.55e8) | chip layers | step-time factor [E: linear in layers, NOT measured] | s/token at 4,963 tok/s (baseline 3.12e4 s = 8.7 h) |
+|---|---|---|---|---|---|
+| 1 | ~1.05 | 2.33e8 (+50 %) | 12 | 1.09 | 5.1e4 s = 14.2 h |
+| 8 | 0.13 | 1.65e8 (+6 %) | 12 | 1.09 | 3.6e4 s = 10.0 h (+15 %) |
+| 16 | ~0.085 | 1.61e8 (+4 %) | 13 | 1.18 | 3.8e4 s = 10.6 h (+22 %) |
+At 4,225 tok/s multiply by 1.17. Tokens per instruction: ROW is a final token and WROW is one extra instruction per window, so tok/instr stays ~1.15; instructions rise by one per W VDOTs (+0.7 % to +3 % of the 1.34e8). **The executor ms/step on the 12-layer chip was NOT measured**: `bench_wf_exec.py` (fused FreeRun3 free-run exactness of the chunks plus ms/step vs the 11-layer baseline) is written and queued on the shared A100 lock (`run_bench.sh`), but the lock was held by other jobs for the whole session and its first launches failed on the baseline (fixed: executor needs `NPAY`=16 for the baseline). Free-running (the circuit consuming its own tokens, ROW embedding gathered from a table) is therefore unverified; only teacher-forced IR checks exist. Step factor is the integration lead's linear-in-layers assumption; select/unpack units add 4-17 K to 45.7 K units, so the real factor may be 1.1-1.3.
 
 ## 6. Open items, in order
 1. Merge the fetch layers and ROW rows into the real checkpoint and run `hfcheck`/`npucheck` (HF modules) on a ROW-bearing trace; place the 3840 cells in the 4096-wide residual.
