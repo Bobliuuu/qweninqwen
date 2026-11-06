@@ -49,7 +49,7 @@ int main(int argc,char**argv){
     else if(!strcmp(argv[i],"-w")){FILE*f=fopen(argv[i+1],"rb");fseek(f,0,SEEK_END);wrom_n=ftell(f);fseek(f,0,SEEK_SET);wrom=malloc(wrom_n);size_t r=fread(wrom,1,wrom_n,f);(void)r;fclose(f);i++;}
     else if(!strcmp(argv[i],"-o")){outp=argv[++i];} else if(!strcmp(argv[i],"-p")) prof=1; else if(!strcmp(argv[i],"-m")) maxi=strtoull(argv[++i],0,0);}
   uint32_t x[32]={0}; uint32_t pc=entry; x[2]=0xFFF00000u; uint64_t n=0; FILE*out=outp?fopen(outp,"wb"):NULL;
-  uint64_t cls[8]={0}; // 0 alu,1 mul,2 div,3 load,4 store,5 branch,6 jump,7 custom
+  uint64_t cls[8]={0}; uint64_t tokens=0; int nsince=0; // tokens: Qwenputer P2 record-size model (rv32.md): rd value 1/2/3 by 15-bit chunks, J/NT/ST/WB 1, SB/SH 4, +1 R refresh per 63 instr, DIV +9 (QS+8 QD) // 0 alu,1 mul,2 div,3 load,4 store,5 branch,6 jump,7 custom
   uint64_t marks[1<<16]; int nm=0; uint32_t wbase=0; int exitc=-1; Sym*cur=NULL;
   uint64_t *symn=prof?calloc(nsym+1,8):NULL;
   while(n<maxi){
@@ -91,10 +91,15 @@ int main(int argc,char**argv){
       else if(x[17]==64){if(out)fwrite(mem+x[11],1,x[12],out);} else {fprintf(stderr,"bad ecall %u at %x\n",x[17],pc);goto done;}
       break;
     default: fprintf(stderr,"illegal %08x at %08x after %llu\n",w,pc,(unsigned long long)n); goto done;}
+    { int ctl = (op==0x6f||op==0x67||(op==0x63&&nxt!=pc+4)); int64_t sv=(int32_t)res; uint64_t t;
+      if(ctl) t=1; else if(wr&&rd) t=(sv>=-(1<<14)&&sv<(1<<14))?1:(sv>=-(1<<29)&&sv<(1<<29))?2:3;
+      else if(op==0x23&&f3<2) t=4; else t=1;
+      if(op==0x33&&f7==1&&f3>=4&&rd) t+=9;
+      tokens+=t; if(ctl) nsince=0; else if(++nsince==63){tokens++;nsince=0;} }
     if(wr&&rd)x[rd]=res; pc=nxt;
   }
 done:
-  printf("exit=%d instr=%llu alu=%llu mul=%llu div=%llu load=%llu store=%llu branch=%llu jump=%llu custom=%llu\n",exitc,(unsigned long long)n,
+  printf("tokens=%llu ",(unsigned long long)tokens); printf("exit=%d instr=%llu alu=%llu mul=%llu div=%llu load=%llu store=%llu branch=%llu jump=%llu custom=%llu\n",exitc,(unsigned long long)n,
     (unsigned long long)cls[0],(unsigned long long)cls[1],(unsigned long long)cls[2],(unsigned long long)cls[3],(unsigned long long)cls[4],(unsigned long long)cls[5],(unsigned long long)cls[6],(unsigned long long)cls[7]);
   for(int i=0;i<nm;i++)printf("mark %d %llu\n",i,(unsigned long long)marks[i]);
   if(prof){for(int i=0;i<nsym;i++)if(syms[i].n)printf("sym %s %llu\n",syms[i].name,(unsigned long long)syms[i].n);}
