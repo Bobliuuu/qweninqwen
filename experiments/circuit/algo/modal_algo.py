@@ -13,6 +13,7 @@ def _go(job, args):
     os.environ['HF_HOME'] = '/hf'; sys.path.insert(0, '/repo/algo')
     if job == 'iss': sys.path.insert(0, '/repo/algo/iss'); import run_iss as m; r = m.main(**args)
     elif job == 'lmhead': import lmhead_prune as m; r = m.run(**args)
+    elif job == 'lmshort': import lmhead_prune as m; r = m.shortlist(**args)
     elif job == 'quant': import quant_study as m; r = m.run(**args)
     r['job'] = job; print('ALGOJSON ' + json.dumps(r), flush=True)
     os.makedirs('/out', exist_ok=True); json.dump(r, open(f'/out/{job}_{time.strftime("%H%M%S")}.json', 'w'), indent=1); vol.commit(); return r

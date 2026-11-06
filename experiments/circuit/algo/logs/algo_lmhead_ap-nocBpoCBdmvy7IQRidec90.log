@@ -1,0 +1,13 @@
+
+[1ALoading weights:   0%|          | 0/311 [00:00<?, ?it/s]
+[1ALoading weights:   0%|          | 1/311 [00:00<01:16,  4.08it/s]
+[1ALoading weights:  55%|█████▍    | 171/311 [00:00<00:00, 628.06it/s]
+[1ALoading weights:  89%|████████▊ | 276/311 [00:00<00:00, 748.83it/s]
+[1ALoading weights: 100%|██████████| 311/311 [00:00<00:00, 656.68it/s]
+LMH {"stages": [64], "mean_macs": 155582464.0, "full_macs": 155582464, "fraction": 1.0, "argmax_ok": 140, "positions": 140}
+LMH {"stages": [128], "mean_macs": 155582464.0, "full_macs": 155582464, "fraction": 1.0, "argmax_ok": 140, "positions": 140}
+LMH {"stages": [64, 256], "mean_macs": 155582464.0, "full_macs": 155582464, "fraction": 1.0, "argmax_ok": 140, "positions": 140}
+LMH {"stages": [128, 512], "mean_macs": 155581527.77142859, "full_macs": 155582464, "fraction": 0.9999939824286919, "argmax_ok": 140, "positions": 140}
+LMH {"stages": [32, 128, 512], "mean_macs": 155581527.77142859, "full_macs": 155582464, "fraction": 0.9999939824286919, "argmax_ok": 140, "positions": 140}
+LMH {"stages": [64, 192, 512], "mean_macs": 155581527.77142859, "full_macs": 155582464, "fraction": 0.9999939824286919, "argmax_ok": 140, "positions": 140}
+ALGOJSON {"lmhead": [{"stages": [64], "mean_macs": 155582464.0, "full_macs": 155582464, "fraction": 1.0, "argmax_ok": 140, "positions": 140}, {"stages": [128], "mean_macs": 155582464.0, "full_macs": 155582464, "fraction": 1.0, "argmax_ok": 140, "positions": 140}, {"stages": [64, 256], "mean_macs": 155582464.0, "full_macs": 155582464, "fraction": 1.0, "argmax_ok": 140, "positions": 140}, {"stages": [128, 512], "mean_macs": 155581527.77142859, "full_macs": 155582464, "fraction": 0.9999939824286919, "argmax_ok": 140, "positions": 140}, {"stages": [32, 128, 512], "mean_macs": 155581527.77142859, "full_macs": 155582464, "fraction": 0.9999939824286919, "argmax_ok": 140, "positions": 140}, {"stages": [64, 192, 512], "mean_macs": 155581527.77142859, "full_macs": 155582464, "fraction": 0.9999939824286919, "argmax_ok": 140, "positions": 140}], "job": "lmhead"}
