@@ -84,15 +84,17 @@ def run(R, K, N, seed=0):
     W = rng.integers(-128, 128, (R, K)).astype(np.int8); x = rng.integers(-128, 128, K).astype(np.int8)
     ref_y = (W.astype(np.int64) @ x.astype(np.int64)).astype(np.int32)
     per = R // N; lanes = [build_lane(W, x, i * per, per)[0] for i in range(N)]
-    steps = 0; tok_serial = 0; tok_unb = 0; tok_pack = 0; bits_tot = 0.0; bits_val = 0
+    steps = 0; tok_serial = 0; tok_unb = 0; uni_steps = 0; tok_pack = 0; bits_tot = 0.0; bits_val = 0
     single_tokens = 0
     while not lanes[0].halted:
         recs = [m.record() for m in lanes]; steps += 1
         assert len({(m.anchor + m.n) for m in lanes}) == 1 or all(m.halted for m in lanes), 'lanes diverged'
         info = [bits_of(r) for r in recs]
         ctl = max((b for k, b, _ in info if k == 'ctl'), default=0)   # shared control symbol, emitted once
-        val = sum(b for k, b, _ in info if k == 'val')
+        uniform = all(r == recs[0] for r in recs)                       # SPMD-uniform value (pointer, counter): emitted once
+        val = (max((b for k, b, _ in info if k == 'val'), default=0) if uniform else sum(b for k, b, _ in info if k == 'val'))
         bits = ctl + val + (2 if val else 0)                            # 2 bits: size class of the value chunk set
+        uni_steps += uniform
         tok_serial += sum(len(r) for r in recs)
         tok_unb += max(len(r) for r in recs)
         tok_pack += max(1, math.ceil(bits / BUS_BITS))
@@ -106,7 +108,7 @@ def run(R, K, N, seed=0):
     exact = bool(np.array_equal(y, ref_y))
     return dict(R=R, K=K, lanes=N, exact=exact, steps=steps, instr_per_lane=steps, macs=R * K,
                 instr_per_mac_total=steps * N / (R * K), tok_serial=tok_serial, tok_unbounded=tok_unb, tok_packed=tok_pack,
-                tok_ideal_bits=math.ceil(bits_tot / BUS_BITS), bits_per_step=bits_tot / steps)
+                tok_ideal_bits=math.ceil(bits_tot / BUS_BITS), uniform_frac=uni_steps / steps, bits_per_step=bits_tot / steps)
 
 
 _YADDR = {}

@@ -12,10 +12,12 @@
   "tok_unbounded": 8781,
   "tok_packed": 8781,
   "tok_ideal_bits": 5664,
+  "uniform_frac": 1.0,
   "bits_per_step": 13.885894103160487,
   "speedup_unbounded": 1.0,
   "speedup_packed": 1.0,
-  "speedup_ideal_bits": 1.5503177966101696
+  "speedup_ideal_bits": 1.5503177966101696,
+  "speedup_lane_only_vs_best_single": 1.0
  },
  {
   "R": 16,
@@ -28,12 +30,14 @@
   "instr_per_mac_total": 7.150390625,
   "tok_serial": 8797,
   "tok_unbounded": 4492,
-  "tok_packed": 6652,
-  "tok_ideal_bits": 4863,
-  "bits_per_step": 23.803878721660748,
+  "tok_packed": 5863,
+  "tok_ideal_bits": 4364,
+  "uniform_frac": 0.43949740508057905,
+  "bits_per_step": 21.358645178912866,
   "speedup_unbounded": 1.9548085485307214,
-  "speedup_packed": 1.3200541190619364,
-  "speedup_ideal_bits": 1.8056755089450955
+  "speedup_packed": 1.4976974245266927,
+  "speedup_ideal_bits": 2.0121448212648945,
+  "speedup_lane_only_vs_best_single": 1.2978918423464711
  },
  {
   "R": 16,
@@ -46,12 +50,14 @@
   "instr_per_mac_total": 7.17578125,
   "tok_serial": 8829,
   "tok_unbounded": 2312,
-  "tok_packed": 5304,
-  "tok_ideal_bits": 4472,
-  "bits_per_step": 43.62438758845944,
+  "tok_packed": 4521,
+  "tok_ideal_bits": 3718,
+  "uniform_frac": 0.4403919433859554,
+  "bits_per_step": 36.26401741970604,
   "speedup_unbounded": 3.7980103806228374,
-  "speedup_packed": 1.6555429864253393,
-  "speedup_ideal_bits": 1.963550983899821
+  "speedup_packed": 1.942269409422694,
+  "speedup_ideal_bits": 2.3617536309844,
+  "speedup_lane_only_vs_best_single": 1.5233996772458311
  },
  {
   "R": 16,
@@ -64,12 +70,14 @@
   "instr_per_mac_total": 7.2265625,
   "tok_serial": 8893,
   "tok_unbounded": 1176,
-  "tok_packed": 4698,
-  "tok_ideal_bits": 4295,
-  "bits_per_step": 83.20864864864865,
+  "tok_packed": 3810,
+  "tok_ideal_bits": 3402,
+  "uniform_frac": 0.44216216216216214,
+  "bits_per_step": 65.90918918918919,
   "speedup_unbounded": 7.466836734693878,
-  "speedup_packed": 1.8690932311621966,
-  "speedup_ideal_bits": 2.0444703143189757
+  "speedup_packed": 2.304724409448819,
+  "speedup_ideal_bits": 2.5811287477954146,
+  "speedup_lane_only_vs_best_single": 1.6649029982363315
  },
  {
   "R": 16,
@@ -82,11 +90,13 @@
   "instr_per_mac_total": 7.328125,
   "tok_serial": 9021,
   "tok_unbounded": 599,
-  "tok_packed": 4529,
-  "tok_ideal_bits": 4244,
-  "bits_per_step": 162.15778251599147,
+  "tok_packed": 3492,
+  "tok_ideal_bits": 3260,
+  "uniform_frac": 0.44562899786780386,
+  "bits_per_step": 124.54584221748401,
   "speedup_unbounded": 14.659432387312187,
-  "speedup_packed": 1.9388385957164938,
-  "speedup_ideal_bits": 2.069038642789821
+  "speedup_packed": 2.5146048109965635,
+  "speedup_ideal_bits": 2.693558282208589,
+  "speedup_lane_only_vs_best_single": 1.7374233128834355
  }
 ]
