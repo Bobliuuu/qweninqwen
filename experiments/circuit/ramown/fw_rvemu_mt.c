@@ -20,9 +20,9 @@ static uint32_t rot16(uint32_t a,uint32_t b){int32_t x1=(int16_t)a,x2=(int16_t)(
 
 // ---- memory tracing (ramown): per-word access stats for the data region [0x100000,0x400000) and the stack window [0xFFE00000,0xFFF00000); blob loads only counted ----
 typedef struct { uint64_t first, lastw, lastr; uint32_t nr, nw; uint8_t haswr, rdsince; } WS;
-#define LO_BASE 0x100000u
+#define LO_BASE 0x0u
 #define LO_WORDS ((0x1000000u-0x100000u)>>2)
-#define ST_BASE 0xFFE00000u
+#define ST_BASE 0xFFE00000u /* flat-map stack window; with -s 0x8000 the stack is inside the LO window */
 #define ST_WORDS (0x100000u>>2)
 static WS *wlo, *wst; static uint64_t *ev; static size_t nev, capev; static uint64_t blob_ld, other_ld, other_st; static int trace_on;
 static uint64_t *tl_buf; static size_t tl_n; // coarse live timeline not needed here
@@ -64,14 +64,14 @@ static Sym* findsym(uint32_t pc){int lo=0,hi=nsym-1;while(lo<=hi){int m=(lo+hi)/
 static inline int32_t sx(uint32_t v,int b){return (int32_t)(v<<(32-b))>>(32-b);}
 int main(int argc,char**argv){
   mem=mmap(0,MEMSZ,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE,-1,0); if(mem==MAP_FAILED){perror("mmap");return 1;}
-  ext_init(); uint32_t entry; loadelf(argv[1],&entry); const char*outp=NULL; const char*tracepre=NULL; int prof=0; uint64_t maxi=~0ull;
+  ext_init(); uint32_t entry; loadelf(argv[1],&entry); const char*outp=NULL; const char*tracepre=NULL; uint32_t spinit=0xFFF00000u; int prof=0; uint64_t maxi=~0ull;
   for(int i=2;i<argc;i++){
     if(!strcmp(argv[i],"-b")){uint32_t a=strtoul(argv[i+1],0,0);FILE*f=fopen(argv[i+2],"rb");if(!f){perror(argv[i+2]);return 1;}
       fseek(f,0,SEEK_END);long n=ftell(f);fseek(f,0,SEEK_SET);size_t r=fread(mem+a,1,n,f);(void)r;fclose(f);i+=2;}
     else if(!strcmp(argv[i],"-w")){FILE*f=fopen(argv[i+1],"rb");fseek(f,0,SEEK_END);wrom_n=ftell(f);fseek(f,0,SEEK_SET);wrom=malloc(wrom_n);size_t r=fread(wrom,1,wrom_n,f);(void)r;fclose(f);i++;}
-    else if(!strcmp(argv[i],"-T")){tracepre=argv[++i];}else if(!strcmp(argv[i],"-o")){outp=argv[++i];} else if(!strcmp(argv[i],"-p")) prof=1; else if(!strcmp(argv[i],"-m")) maxi=strtoull(argv[++i],0,0);}
+    else if(!strcmp(argv[i],"-s")){spinit=strtoul(argv[++i],0,0);}else if(!strcmp(argv[i],"-T")){tracepre=argv[++i];}else if(!strcmp(argv[i],"-o")){outp=argv[++i];} else if(!strcmp(argv[i],"-p")) prof=1; else if(!strcmp(argv[i],"-m")) maxi=strtoull(argv[++i],0,0);}
   if(tracepre){trace_on=1;wlo=calloc(LO_WORDS,sizeof(WS));wst=calloc(ST_WORDS,sizeof(WS));}
-  uint32_t x[32]={0}; uint32_t pc=entry; x[2]=0xFFF00000u; uint64_t n=0; FILE*out=outp?fopen(outp,"wb"):NULL;
+  uint32_t x[32]={0}; uint32_t pc=entry; x[2]=spinit; uint64_t n=0; FILE*out=outp?fopen(outp,"wb"):NULL;
   uint64_t cls[8]={0}; uint64_t tokens=0; int nsince=0; // tokens: Qwenputer P2 record-size model (rv32.md): rd value 1/2/3 by 15-bit chunks, J/NT/ST/WB 1, SB/SH 4, +1 R refresh per 63 instr, DIV +9 (QS+8 QD) // 0 alu,1 mul,2 div,3 load,4 store,5 branch,6 jump,7 custom
   uint64_t marks[1<<16]; int nm=0; uint32_t wbase=0; int exitc=-1; Sym*cur=NULL;
   uint64_t *symn=prof?calloc(nsym+1,8):NULL;

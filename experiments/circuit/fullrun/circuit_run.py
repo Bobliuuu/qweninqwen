@@ -26,6 +26,8 @@ from tune_warps import W
 
 ap = argparse.ArgumentParser(); ap.add_argument('elf'); ap.add_argument('refdir'); ap.add_argument('out'); ap.add_argument('--chunks', required=True)
 ap.add_argument('--steps', type=int, default=0); ap.add_argument('--block', type=int, default=50000); ap.add_argument('--kinds', default=''); ap.add_argument('--tuned', default='autotune.json'); ap.add_argument('--forcewin', default=''); ap.add_argument('--wrom', default='')
+ap.add_argument('--ramimg', action='store_true', help='restore the snapshot RAM image (refdir/ramimg_NNNN.npy, 8192 aliased words) into the circuit RAM head state at chunk start')
+ap.add_argument('--inj', default='inj', help='injection file prefix in refdir: inj (all, legacy), injF (filtered), injB (blob-only), injN (no RAM injection)')
 ap.add_argument('--chain', action='store_true', help='ONE continuous circuit run over consecutive chunks (no snapshot restore between chunks); compare circuit state to the reference snapshot at every chunk boundary')
 ap.add_argument('--handoff', action='store_true', help='like --chain, but at each boundary READ the circuit state back (regs, pc, n, wb, bn, 32KB RAM) and re-snapshot the circuit from that read-back state (hidden lag history reset, as a chunk restart)')
 a = ap.parse_args(); os.makedirs(a.out, exist_ok=True); CHAIN = a.chain or a.handoff
@@ -100,11 +102,13 @@ entry, segs = elf.segments(a.elf)
 text = [s for s in segs if s[0] == S.ROM_BASE][0][1]
 from chipformer.rv.asm import Program
 prog = Program([int.from_bytes(text[i:i + 4], 'little') for i in range(0, len(text), 4)], b'', {'_start': entry}, data_base=S.RAM_BASE, rodata=b'', wrom=b'')
-def machine(stt):
-    m = ref.Machine.from_program(prog); m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF
+def machine(stt, ch=None):
+    m = ref.Machine.from_program(prog);
+    if a.ramimg: m.ram = [int(v) for v in np.load(f'{a.refdir}/ramimg_{ch:04d}.npy')]
+    m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF
     if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
     return m
-core.snapshot(c, machine(states[0]))
+core.snapshot(c, machine(states[0], chunks[0]))
 fr = fusedexec.FreeRun3(c, B, 'cuda'); fr.load(0, S.tok('GO'))
 AL.setup(fr)
 # force tables
@@ -136,11 +140,11 @@ rl = lambda name, h, x: loc[f'{name}{h}'][1] + x
 lut_ram = np.zeros((8192, 3), np.int64)                   # slot -> (sublayer id, j, row)
 for wi in range(8192):
     h = (wi & 15) | ((wi >> 12) << 4); x = wi >> 4 & 1; si, j = loc[f'ram{h}']; lut_ram[wi] = (sidx[si], j + x, wi >> 5 & 127)
-n_inj = np.zeros(B, np.int64); n_zone = np.zeros(B, np.int64)
+n_ramin = np.zeros(B, np.int64); n_inj = np.zeros(B, np.int64); n_zone = np.zeros(B, np.int64)
 for r in range(B):
     if CHAIN: inj = INJ; to = inj[:, 0]
     else:
-        inj = np.load(f'{a.refdir}/inj_{chunks[r]:04d}.npy'); sh = 1 if chunks[r] == 0 else 0
+        inj = np.load(f'{a.refdir}/{a.inj}_{chunks[r]:04d}.npy'); sh = 1 if chunks[r] == 0 else 0
         inj = inj[inj[:, 0] - sh < len(toks[r])]; to = inj[:, 0] - sh
     m1 = inj[:, 1] == 1; q = inj[m1]; i1 = to[m1]; sl = lut_ram[q[:, 2]]
     I_kind[r, i1] = (1 << 3) | sl[:, 0]; I_base[r, i1] = sl[:, 1] * 16384 + sl[:, 2] * 128; I_dat[r, i1] = q[:, 3].astype(np.uint32).view(np.int32)
@@ -152,7 +156,7 @@ for r in range(B):
     for n_ in np.nonzero(ok)[0]:
         si, j = loc[f'wrom{hh[n_]}']
         I_kind[r, i2[n_]] = (2 << 3) | sidx[si]; I_base[r, i2[n_]] = (j + xx[n_]) * 16384 + pp[n_] * 128; I_cc[r, i2[n_]] = 8 * slot[n_]; I_dat[r, i2[n_]] = packed[n_]
-    n_inj[r] = len(inj); n_zone[r] = int((~ok).sum())
+    n_inj[r] = len(inj); n_ramin[r] = int((inj[:, 1] == 1).sum()); n_zone[r] = int((~ok).sum())
     for n_ in np.nonzero(~ok)[0]:      # unaddressable WROM words (WP mod 2^15 >= 32640): force the whole record
         st0 = int(i2[n_]); en0 = int(np.searchsorted(np.nonzero(isfinal[toks[r]])[0], st0)); MASK[r, st0:int(np.nonzero(isfinal[toks[r]])[0][en0]) + 1] = 1
 if os.environ.get('NOVD'): I_kind[I_kind >> 3 == 2] = 0
@@ -162,7 +166,7 @@ def _step_inj():
     _inject[(B,)](Ss[0], Ss[1], Ss[2], Ss[3], SV0=SVs[0], SV1=SVs[1], SV2=SVs[2], SV3=SVs[3], kind=I_kind, base0=I_base, cc0=I_cc, data=I_dat, ictr=ICTR, N=N)
     _orig_step()
 fr._step = _step_inj
-print(f'injections per row {n_inj.tolist()[:4]}..., unaddressable-WROM VDOTs forced {n_zone.tolist()[:4]}...', flush=True)
+print(f'injections per row {n_inj.tolist()[:4]}... (RAM-type {n_ramin.tolist()[:4]}), inj file {a.inj}, ramimg {a.ramimg}, unaddressable-WROM VDOTs forced {n_zone.tolist()[:4]}...', flush=True)
 if a.forcewin:
     lo, hi = (int(x) for x in a.forcewin.split(',')); MASK[:, lo:hi] = 1
 F_fid, F_p, MASK, TREF = (x.to(dev) for x in (F_fid, F_p, MASK, TREF))
@@ -179,7 +183,7 @@ fusedexec._decode_embed = OV()
 fr.capture()
 def load_rows():
     for r in range(B):
-        core.snapshot(c, machine(states[r])); fr.load(r, S.tok('GO'))
+        core.snapshot(c, machine(states[r], chunks[r])); fr.load(r, S.tok('GO'))
     CTR.zero_(); ICTR.zero_()
 load_rows(); torch.cuda.synchronize()
 print(f'rows {B}, steps/row {N:,}, forced kinds {forced_kinds}, forced fraction {[float(MASK[r,:len(toks[r])].float().mean()) for r in range(B)][:4]}', flush=True)
@@ -288,7 +292,7 @@ while done < N:
 for r in range(B):
     if first_bad[r] is not None:
         fb = first_bad[r]; print(f'row {r} (chunk {chunks[r]}) first free mismatch at step {fb}: ' + ' | '.join(f'{j}:{S.name(int(TREF[r,j]))}/{S.name(int(RAW[r,j]))}/f{int(MASK[r,j])}' for j in range(max(0, fb - 16), fb + 2)), flush=True)
-res = dict(chunks=chunks, rows=B, steps_per_row=[len(t) for t in toks], steps_run=done, seconds=time.time() - t0, agg_tok_per_s=done * B / (time.time() - t0), forced_kinds=forced_kinds,
+res = dict(inj_file=a.inj, ramimg=a.ramimg, injections=n_inj.tolist(), ram_injections=n_ramin.tolist(), chunks=chunks, rows=B, steps_per_row=[len(t) for t in toks], steps_run=done, seconds=time.time() - t0, agg_tok_per_s=done * B / (time.time() - t0), forced_kinds=forced_kinds,
            free_tokens=n_free.tolist(), forced_tokens=n_forced.tolist(), free_mismatches=nbad_free.tolist(), first_free_mismatch=first_bad, forced_raw_disagreements=nbad_forced.tolist(),
            gpu=torch.cuda.get_device_name())
 json.dump(res, open(a.out + '/result_' + '_'.join(map(str, chunks[:3])) + f'_n{len(chunks)}.json', 'w'), indent=1); print(json.dumps(res), flush=True)
