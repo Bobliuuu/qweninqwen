@@ -1,0 +1,18 @@
+{
+ "mode": "chain",
+ "chunks": [
+  0
+ ],
+ "steps": 700000,
+ "steps_run": 300000,
+ "seconds": 54.72485136985779,
+ "tok_per_s": 5481.970023900781,
+ "free_tokens": 300000,
+ "free_mismatches": 397,
+ "first_free_mismatch": 293279,
+ "forced_tokens": 0,
+ "forced_raw_disagreements": 0,
+ "diverged": true,
+ "boundaries": [],
+ "gpu": "NVIDIA A100-SXM4-40GB"
+}

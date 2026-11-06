@@ -1,0 +1,370 @@
+{
+ "mode": "chain",
+ "chunks": [
+  40,
+  41,
+  42,
+  43,
+  44,
+  45,
+  46,
+  47
+ ],
+ "steps": 16777216,
+ "steps_run": 16777217,
+ "seconds": 3056.282039642334,
+ "tok_per_s": 5489.420406810957,
+ "free_tokens": 16747776,
+ "free_mismatches": 0,
+ "first_free_mismatch": null,
+ "forced_tokens": 29440,
+ "forced_raw_disagreements": 14765,
+ "diverged": false,
+ "boundaries": [
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1376,
+    1376
+   ],
+   "n": [
+    24,
+    24
+   ],
+   "wb15": [
+    28571,
+    28571
+   ],
+   "wb_ref_full27": 48394139,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 6983,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 5919,
+    "sb_sh": 0,
+    "sw": 1064
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 31,
+   "ok": true,
+   "boundary_after_chunk": 40,
+   "step": 2097152
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1376,
+    1376
+   ],
+   "n": [
+    30,
+    30
+   ],
+   "wb15": [
+    30139,
+    30139
+   ],
+   "wb_ref_full27": 48919995,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 6983,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 5907,
+    "sb_sh": 0,
+    "sw": 1076
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 31,
+   "ok": true,
+   "boundary_after_chunk": 41,
+   "step": 4194304
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1376,
+    1376
+   ],
+   "n": [
+    20,
+    20
+   ],
+   "wb15": [
+    12219,
+    12219
+   ],
+   "wb_ref_full27": 50638779,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 6983,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 4895,
+    "sb_sh": 0,
+    "sw": 2088
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 31,
+   "ok": true,
+   "boundary_after_chunk": 42,
+   "step": 6291456
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1376,
+    1376
+   ],
+   "n": [
+    25,
+    25
+   ],
+   "wb15": [
+    17595,
+    17595
+   ],
+   "wb_ref_full27": 51692731,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 6983,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 6418,
+    "sb_sh": 0,
+    "sw": 565
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 31,
+   "ok": true,
+   "boundary_after_chunk": 43,
+   "step": 8388608
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    183,
+    183
+   ],
+   "n": [
+    19,
+    19
+   ],
+   "wb15": [
+    29307,
+    29307
+   ],
+   "wb_ref_full27": 52687483,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 6983,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 3913,
+    "sb_sh": 0,
+    "sw": 3070
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 31,
+   "ok": true,
+   "boundary_after_chunk": 44,
+   "step": 10485760
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1376,
+    1376
+   ],
+   "n": [
+    32,
+    32
+   ],
+   "wb15": [
+    891,
+    891
+   ],
+   "wb_ref_full27": 54559611,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 6983,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 6175,
+    "sb_sh": 0,
+    "sw": 808
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 31,
+   "ok": true,
+   "boundary_after_chunk": 45,
+   "step": 12582912
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1376,
+    1376
+   ],
+   "n": [
+    5,
+    5
+   ],
+   "wb15": [
+    27675,
+    27675
+   ],
+   "wb_ref_full27": 54979611,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 6983,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 6163,
+    "sb_sh": 0,
+    "sw": 820
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 31,
+   "ok": true,
+   "boundary_after_chunk": 46,
+   "step": 14680064
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    484,
+    484
+   ],
+   "n": [
+    4,
+    4
+   ],
+   "wb15": [
+    1659,
+    1659
+   ],
+   "wb_ref_full27": 73336443,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 6983,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 6700,
+    "sb_sh": 0,
+    "sw": 283
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 31,
+   "ok": true,
+   "boundary_after_chunk": 47,
+   "step": 16777216
+  }
+ ],
+ "gpu": "NVIDIA A100-SXM4-40GB"
+}

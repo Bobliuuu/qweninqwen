@@ -1,0 +1,8 @@
+CMD python -u /data/circuit2/fullrun/circuit_run.py /data/ramrc/ramfw.elf /data/ramrc/refRC /out/chain/abl_allhost_off --chunks 0 --chain --block 100000 --wrom /data/w785/wrom.bin --reset0 --ramimg --nodrom --novdot --steps 700000
+injections per row [303466]... (RAM-type [0]), inj file inj, ramimg True, unaddressable-WROM VDOTs forced [0]...
+/usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
+  warn_once(FP_FUSION_DEFAULT_WARNING)
+rows 1, steps/row 700,001, forced kinds [], forced fraction [0.0]
+[chain] step 100,000/700,001 (boundary 1/1, chunk 0) 18s 5,447 tok/s; free 100,000 mismatches 84860, forced 0 raw-disagree 0
+FIRST FREE-TOKEN MISMATCH at step 32 (chunk 0): 16:ST1/ST1/f0 | 17:ST1/ST1/f0 | 18:ST1/ST1/f0 | 19:ST1/ST1/f0 | 20:ST1/ST1/f0 | 21:ST1/ST1/f0 | 22:ST1/ST1/f0 | 23:ST1/ST1/f0 | 24:ST1/ST1/f0 | 25:ST1/ST1/f0 | 26:V(27968)/V(27968)/f0 | 27:F1(0)/F1(0)/f0 | 28:V(12992)/V(12992)/f0 | 29:F1(8289)/F1(8289)/f0 | 30:V(4096)/V(4096)/f0 | 31:F1(8290)/F1(8290)/f0 | 32:F0(32608)/F0(0)/f0 | 33:V(23876)/V(23876)/f0
+{"mode": "chain", "chunks": [0], "steps": 700000, "steps_run": 100000, "seconds": 18.36145520210266, "tok_per_s": 5446.1912905248455, "free_tokens": 100000, "free_mismatches": 84860, "first_free_mismatch": 32, "forced_tokens": 0, "forced_raw_disagreements": 0, "diverged": true, "boundaries": [], "gpu": "NVIDIA A100-SXM4-40GB"}

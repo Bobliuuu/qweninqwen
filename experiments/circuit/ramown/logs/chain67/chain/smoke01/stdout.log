@@ -1,0 +1,50 @@
+CMD python -u /data/circuit2/fullrun/circuit_run.py /data/ramrc/ramfw.elf /data/ramrc/refRC /out/chain/smoke01 --chunks 0,1 --chain --block 100000 --wrom /data/w785/wrom.bin --reset0 --ramimg
+injections per row [1849801]... (RAM-type [0]), inj file inj, ramimg True, unaddressable-WROM VDOTs forced [6656]...
+/usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
+  warn_once(FP_FUSION_DEFAULT_WARNING)
+rows 1, steps/row 4,194,304, forced kinds [], forced fraction [0.0015869144117459655]
+[chain] step 100,000/2,097,152 (boundary 1/2, chunk 0) 18s 5,419 tok/s; free 100,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 200,000/2,097,152 (boundary 1/2, chunk 0) 37s 5,435 tok/s; free 200,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 300,000/2,097,152 (boundary 1/2, chunk 0) 55s 5,441 tok/s; free 299,872 mismatches 0, forced 128 raw-disagree 127
+[chain] step 400,000/2,097,152 (boundary 1/2, chunk 0) 73s 5,445 tok/s; free 399,488 mismatches 0, forced 512 raw-disagree 511
+[chain] step 500,000/2,097,152 (boundary 1/2, chunk 0) 92s 5,446 tok/s; free 499,488 mismatches 0, forced 512 raw-disagree 511
+[chain] step 600,000/2,097,152 (boundary 1/2, chunk 0) 110s 5,447 tok/s; free 599,488 mismatches 0, forced 512 raw-disagree 511
+[chain] step 700,000/2,097,152 (boundary 1/2, chunk 0) 128s 5,448 tok/s; free 699,488 mismatches 0, forced 512 raw-disagree 511
+[chain] step 800,000/2,097,152 (boundary 1/2, chunk 0) 147s 5,448 tok/s; free 799,104 mismatches 0, forced 896 raw-disagree 894
+[chain] step 900,000/2,097,152 (boundary 1/2, chunk 0) 165s 5,449 tok/s; free 898,464 mismatches 0, forced 1,536 raw-disagree 1,532
+[chain] step 1,000,000/2,097,152 (boundary 1/2, chunk 0) 184s 5,449 tok/s; free 998,464 mismatches 0, forced 1,536 raw-disagree 1,532
+[chain] step 1,100,000/2,097,152 (boundary 1/2, chunk 0) 202s 5,450 tok/s; free 1,098,464 mismatches 0, forced 1,536 raw-disagree 1,532
+[chain] step 1,200,000/2,097,152 (boundary 1/2, chunk 0) 220s 5,450 tok/s; free 1,198,464 mismatches 0, forced 1,536 raw-disagree 1,532
+[chain] step 1,300,000/2,097,152 (boundary 1/2, chunk 0) 239s 5,450 tok/s; free 1,298,464 mismatches 0, forced 1,536 raw-disagree 1,532
+[chain] step 1,400,000/2,097,152 (boundary 1/2, chunk 0) 257s 5,451 tok/s; free 1,398,464 mismatches 0, forced 1,536 raw-disagree 1,532
+[chain] step 1,500,000/2,097,152 (boundary 1/2, chunk 0) 275s 5,451 tok/s; free 1,497,824 mismatches 0, forced 2,176 raw-disagree 2,168
+[chain] step 1,600,000/2,097,152 (boundary 1/2, chunk 0) 294s 5,451 tok/s; free 1,597,440 mismatches 0, forced 2,560 raw-disagree 2,549
+[chain] step 1,700,000/2,097,152 (boundary 1/2, chunk 0) 312s 5,451 tok/s; free 1,697,440 mismatches 0, forced 2,560 raw-disagree 2,549
+[chain] step 1,800,000/2,097,152 (boundary 1/2, chunk 0) 330s 5,451 tok/s; free 1,797,440 mismatches 0, forced 2,560 raw-disagree 2,549
+[chain] step 1,900,000/2,097,152 (boundary 1/2, chunk 0) 349s 5,452 tok/s; free 1,897,440 mismatches 0, forced 2,560 raw-disagree 2,549
+[chain] step 2,000,000/2,097,152 (boundary 1/2, chunk 0) 367s 5,452 tok/s; free 1,997,440 mismatches 0, forced 2,560 raw-disagree 2,549
+[chain] step 2,097,152/2,097,152 (boundary 1/2, chunk 0) 385s 5,452 tok/s; free 2,094,207 mismatches 0, forced 2,944 raw-disagree 2,930
+BOUNDARY after chunk 0 (step 2,097,151): ok=True regs_rd_bad=0 (rs1 0, rs2 0) anchor/n (1376, 1376)/(9, 9) wb15 (5371, 5371) ref_wb27 1119483 high12_lost=True j,vcnt (128.0, 128.0) bn_bad 0 ram touched 5703 bad 0 untouched-nonzero 31 touched-by-op {'load': 3615, 'sb_sh': 0, 'sw': 2088} bad-by-op {'load': 0, 'sb_sh': 0, 'sw': 0}
+[chain] step 2,197,152/4,194,304 (boundary 2/2, chunk 1) 403s 5,450 tok/s; free 2,193,568 mismatches 0, forced 3,584 raw-disagree 3,563
+[chain] step 2,297,152/4,194,304 (boundary 2/2, chunk 1) 422s 5,450 tok/s; free 2,293,568 mismatches 0, forced 3,584 raw-disagree 3,563
+[chain] step 2,397,152/4,194,304 (boundary 2/2, chunk 1) 440s 5,450 tok/s; free 2,393,568 mismatches 0, forced 3,584 raw-disagree 3,563
+[chain] step 2,497,152/4,194,304 (boundary 2/2, chunk 1) 458s 5,450 tok/s; free 2,493,568 mismatches 0, forced 3,584 raw-disagree 3,563
+[chain] step 2,597,152/4,194,304 (boundary 2/2, chunk 1) 477s 5,450 tok/s; free 2,593,568 mismatches 0, forced 3,584 raw-disagree 3,563
+[chain] step 2,697,152/4,194,304 (boundary 2/2, chunk 1) 495s 5,451 tok/s; free 2,693,568 mismatches 0, forced 3,584 raw-disagree 3,563
+[chain] step 2,797,152/4,194,304 (boundary 2/2, chunk 1) 513s 5,451 tok/s; free 2,792,672 mismatches 0, forced 4,480 raw-disagree 4,455
+[chain] step 2,897,152/4,194,304 (boundary 2/2, chunk 1) 532s 5,451 tok/s; free 2,892,544 mismatches 0, forced 4,608 raw-disagree 4,582
+[chain] step 2,997,152/4,194,304 (boundary 2/2, chunk 1) 550s 5,451 tok/s; free 2,992,544 mismatches 0, forced 4,608 raw-disagree 4,582
+[chain] step 3,097,152/4,194,304 (boundary 2/2, chunk 1) 568s 5,451 tok/s; free 3,092,544 mismatches 0, forced 4,608 raw-disagree 4,582
+[chain] step 3,197,152/4,194,304 (boundary 2/2, chunk 1) 587s 5,451 tok/s; free 3,192,544 mismatches 0, forced 4,608 raw-disagree 4,582
+[chain] step 3,297,152/4,194,304 (boundary 2/2, chunk 1) 605s 5,451 tok/s; free 3,292,544 mismatches 0, forced 4,608 raw-disagree 4,582
+[chain] step 3,397,152/4,194,304 (boundary 2/2, chunk 1) 623s 5,451 tok/s; free 3,392,544 mismatches 0, forced 4,608 raw-disagree 4,582
+[chain] step 3,497,152/4,194,304 (boundary 2/2, chunk 1) 642s 5,451 tok/s; free 3,491,520 mismatches 0, forced 5,632 raw-disagree 5,600
+[chain] step 3,597,152/4,194,304 (boundary 2/2, chunk 1) 660s 5,451 tok/s; free 3,591,008 mismatches 0, forced 6,144 raw-disagree 6,108
+[chain] step 3,697,152/4,194,304 (boundary 2/2, chunk 1) 678s 5,451 tok/s; free 3,691,008 mismatches 0, forced 6,144 raw-disagree 6,108
+[chain] step 3,797,152/4,194,304 (boundary 2/2, chunk 1) 697s 5,451 tok/s; free 3,791,008 mismatches 0, forced 6,144 raw-disagree 6,108
+[chain] step 3,897,152/4,194,304 (boundary 2/2, chunk 1) 715s 5,451 tok/s; free 3,890,496 mismatches 0, forced 6,656 raw-disagree 6,619
+[chain] step 3,997,152/4,194,304 (boundary 2/2, chunk 1) 733s 5,451 tok/s; free 3,990,496 mismatches 0, forced 6,656 raw-disagree 6,619
+[chain] step 4,097,152/4,194,304 (boundary 2/2, chunk 1) 752s 5,451 tok/s; free 4,090,496 mismatches 0, forced 6,656 raw-disagree 6,619
+[chain] step 4,194,304/4,194,304 (boundary 2/2, chunk 1) 769s 5,451 tok/s; free 4,187,647 mismatches 0, forced 6,656 raw-disagree 6,619
+BOUNDARY after chunk 1 (step 4,194,303): ok=True regs_rd_bad=0 (rs1 0, rs2 0) anchor/n (446, 446)/(5, 5) wb15 (27259, 27259) ref_wb27 2747003 high12_lost=True j,vcnt (128.0, 128.0) bn_bad 0 ram touched 6983 bad 0 untouched-nonzero 31 touched-by-op {'load': 6432, 'sb_sh': 0, 'sw': 551} bad-by-op {'load': 0, 'sb_sh': 0, 'sw': 0}
+{"mode": "chain", "chunks": [0, 1], "steps": 4194303, "steps_run": 4194304, "seconds": 769.5781977176666, "tok_per_s": 5450.133605448018, "free_tokens": 4187647, "free_mismatches": 0, "first_free_mismatch": null, "forced_tokens": 6656, "forced_raw_disagreements": 6619, "diverged": false, "boundaries": [{"regs_rd_bad": [], "regs_rs1_bad": 0, "regs_rs2_bad": 0, "anchor": [1376, 1376], "n": [9, 9], "wb15": [5371, 5371], "wb_ref_full27": 1119483, "wb_high12_lost": true, "pc_ok": true, "wb15_ok": true, "j_vcnt": [128.0, 128.0], "bn_bad": 0, "ram_slots_touched": 5703, "ram_bad": 0, "ram_bad_first": [], "ram_touched_by_op": {"load": 3615, "sb_sh": 0, "sw": 2088}, "ram_bad_by_op": {"load": 0, "sb_sh": 0, "sw": 0}, "ram_untouched_nonzero": 31, "ok": true, "boundary_after_chunk": 0, "step": 2097151}, {"regs_rd_bad": [], "regs_rs1_bad": 0, "regs_rs2_bad": 0, "anchor": [446, 446], "n": [5, 5], "wb15": [27259, 27259], "wb_ref_full27": 2747003, "wb_high12_lost": true, "pc_ok": true, "wb15_ok": true, "j_vcnt": [128.0, 128.0], "bn_bad": 0, "ram_slots_touched": 6983, "ram_bad": 0, "ram_bad_first": [], "ram_touched_by_op": {"load": 6432, "sb_sh": 0, "sw": 551}, "ram_bad_by_op": {"load": 0, "sb_sh": 0, "sw": 0}, "ram_untouched_nonzero": 31, "ok": true, "boundary_after_chunk": 1, "step": 4194303}], "gpu": "NVIDIA A100-SXM4-40GB"}

@@ -1,0 +1,3 @@
+[chain] step 100,000/700,001 (boundary 1/1, chunk 0) 18s 5,465 tok/s; free 100,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 200,000/700,001 (boundary 1/1, chunk 0) 37s 5,478 tok/s; free 200,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 300,000/700,001 (boundary 1/1, chunk 0) 55s 5,482 tok/s; free 300,000 mismatches 397, forced 0 raw-disagree 0
