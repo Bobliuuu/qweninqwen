@@ -8,6 +8,15 @@
 #include <stdint.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <math.h>
+
+// ---- custom-1 (0x2b) nonlinear extensions: semantics = nonlinear/ext.py ----
+static int64_t EXP_T[257], SIG_T[769], RSQ_T[513]; static int32_t amx_v=INT32_MIN; static uint32_t amx_i;
+static void ext_init(void){ for(int i=0;i<=256;i++)EXP_T[i]=llround(pow(2.0,i/256.0)*(1<<30)); for(int i=0;i<=768;i++)SIG_T[i]=llround(1.0/(1.0+exp(-(-12.0+i/32.0)))*65536); for(int i=0;i<=512;i++)RSQ_T[i]=llround(pow(1+3.0*i/512,-0.5)*(1<<30)); }
+static uint32_t exp2q(int32_t xv){int32_t xi=xv>>16;uint32_t f=xv&0xFFFF;int i=f>>8,fr=f&255;int64_t m=(EXP_T[i]*(256-fr)+EXP_T[i+1]*fr)>>8;int sh=24-30+xi;int64_t v=sh>=0?(sh>=40?(int64_t)1<<40:(m<<sh)):(-sh<40?(m>>-sh):0);return v>0xFFFFFFFFll?0xFFFFFFFFu:(uint32_t)v;}
+static uint32_t sigmq(int32_t xv){if(xv<-(12<<16))xv=-(12<<16);if(xv>(12<<16)-1)xv=(12<<16)-1;int32_t u=xv+(12<<16);int i=u>>11;int fr=u&2047;return (uint32_t)(SIG_T[i]+(((SIG_T[i+1]-SIG_T[i])*fr)>>11));}
+static uint32_t rsqq(uint32_t m){if(!m)return 0xFFFFFFFFu;int e=31-__builtin_clz(m);int E=e-16,par=E&1,Ee=E-par;int64_t Mp=(((int64_t)m<<30)>>e)<<par;int64_t u=Mp-((int64_t)1<<30);int64_t idx=(u*512)/(3ll<<30);if(idx>511)idx=511;int64_t fr=u-((3ll<<30)*idx)/512;int64_t t0=RSQ_T[idx],t1=RSQ_T[idx+1];int64_t y=t0+(int64_t)(((__int128)(t1-t0)*fr*512)/((__int128)3<<30));int sh=24-30-(Ee/2);int64_t v=sh>=0?(y<<sh):(y>>-sh);return v>0xFFFFFFFFll?0xFFFFFFFFu:(uint32_t)v;}
+static uint32_t rot16(uint32_t a,uint32_t b){int32_t x1=(int16_t)a,x2=(int16_t)(a>>16),c=(int16_t)b,s=(int16_t)(b>>16);int32_t y1=(x1*c-x2*s+(1<<14))>>15,y2=(x1*s+x2*c+(1<<14))>>15;if(y1>32767)y1=32767;if(y1<-32768)y1=-32768;if(y2>32767)y2=32767;if(y2<-32768)y2=-32768;return ((uint32_t)y2<<16)|((uint32_t)y1&0xFFFF);}
 #define MEMSZ (1ull<<32)
 static uint8_t *mem;
 typedef struct { uint32_t addr, size; char name[48]; uint64_t n; } Sym;
@@ -33,7 +42,7 @@ static Sym* findsym(uint32_t pc){int lo=0,hi=nsym-1;while(lo<=hi){int m=(lo+hi)/
 static inline int32_t sx(uint32_t v,int b){return (int32_t)(v<<(32-b))>>(32-b);}
 int main(int argc,char**argv){
   mem=mmap(0,MEMSZ,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE,-1,0); if(mem==MAP_FAILED){perror("mmap");return 1;}
-  uint32_t entry; loadelf(argv[1],&entry); const char*outp=NULL; int prof=0; uint64_t maxi=~0ull;
+  ext_init(); uint32_t entry; loadelf(argv[1],&entry); const char*outp=NULL; int prof=0; uint64_t maxi=~0ull;
   for(int i=2;i<argc;i++){
     if(!strcmp(argv[i],"-b")){uint32_t a=strtoul(argv[i+1],0,0);FILE*f=fopen(argv[i+2],"rb");if(!f){perror(argv[i+2]);return 1;}
       fseek(f,0,SEEK_END);long n=ftell(f);fseek(f,0,SEEK_SET);size_t r=fread(mem+a,1,n,f);(void)r;fclose(f);i+=2;}
@@ -73,6 +82,9 @@ int main(int argc,char**argv){
       if(f3==5){int32_t s=0;for(int k=0;k<4;k++){s+=(int8_t)(a>>(8*k))*((int)(wrom[wbase*8+k]&15)-8);s+=(int8_t)(b>>(8*k))*((int)(wrom[wbase*8+4+k]&15)-8);} wbase++; res=x[rd]+s; wr=1;}
       else if(f3==6){wbase=a;}
       else if(f3==7){int32_t s=0;for(int k=0;k<4;k++)s+=(int8_t)(a>>(8*k))*(int8_t)(b>>(8*k));res=x[rd]+s;wr=1;}
+      break;}
+    case 0x2b:{cls[7]++; if(f3==0){res=exp2q(a);wr=1;}else if(f3==1){res=rsqq(a);wr=1;}else if(f3==2){res=sigmq(a);wr=1;}
+      else if(f3==3){if((int32_t)a>amx_v){amx_v=a;amx_i=b;}}else if(f3==4){res=amx_i;wr=1;if(a){amx_v=INT32_MIN;amx_i=0;}}else if(f3==5){res=rot16(a,b);wr=1;}
       break;}
     case 0x73: cls[0]++;
       if(x[17]==93){exitc=x[10];goto done;} else if(x[17]==1){if(out)fputc(x[10]&0xff,out);} else if(x[17]==2){if(nm<65536)marks[nm++]=n;}

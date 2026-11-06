@@ -8,7 +8,7 @@ out = ["  .text"]
 for init in (True, False):
     for scaled in (True, False):
         f = f"vk_{'init' if init else 'acc'}_{'scaled' if scaled else 'raw'}"
-        fn = [f"  .globl {f}", f"{f}:", "  addi sp, sp, -48"] + [f"  sw s{i}, {4*i}(sp)" for i in range(12)]
+        fn = [f"  .globl {f}", f"  .type {f},@function", f"{f}:", "  addi sp, sp, -48"] + [f"  sw s{i}, {4*i}(sp)" for i in range(12)]
         fn += ["  lui t2, %hi(vk_x)", "  lw t2, %lo(vk_x)(t2)"] + [f"  lw {REGS[i]}, {4*i}(t2)" for i in range(16)] + ["1:"]
         fn += [f"  li {a}, 0" if init else f"  lw {a}, {4*r}(a0)" for r, a in enumerate(ACC)]
         fn += ["  .insn r 0x0B, 6, 0, zero, a1, zero"]   # WB a1
@@ -17,6 +17,6 @@ for init in (True, False):
             if scaled: fn += [f"  lw t1, {4*r}(a3)", f"  mul {a}, {a}, t1", f"  mulh {a}, {a}, a4"]
             fn += [f"  sw {a}, {4*r}(a0)"]
         fn += ["  addi a0, a0, 16", "  addi a1, a1, 32"] + (["  addi a3, a3, 16"] if scaled else []) + ["  addi a2, a2, -4", "  bnez a2, 1b"]
-        fn += [f"  lw s{i}, {4*i}(sp)" for i in range(12)] + ["  addi sp, sp, 48", "  ret"]
+        fn += [f"  lw s{i}, {4*i}(sp)" for i in range(12)] + ["  addi sp, sp, 48", "  ret", f"  .size {f}, .-{f}"]
         out += fn
 open(sys.argv[1] if len(sys.argv) > 1 else "vdk.S", "w").write("\n".join(out) + "\n")

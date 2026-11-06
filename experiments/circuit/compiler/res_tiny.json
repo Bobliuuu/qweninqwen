@@ -1,0 +1,86 @@
+[
+ {
+  "mode": "f32",
+  "max_rel_logit_err": 6.279306603573787e-07,
+  "argmax_fw": [
+   105,
+   25,
+   25,
+   48,
+   25,
+   42,
+   68,
+   105
+  ],
+  "argmax_hf": [
+   105,
+   25,
+   25,
+   48,
+   25,
+   42,
+   68,
+   105
+  ],
+  "argmax_ok_given_gap": true,
+  "instr_total": 131493495,
+  "instr_per_pos": [
+   16186782,
+   16273203,
+   16340151,
+   16404853,
+   16473955,
+   16538905,
+   16597310,
+   16678252
+  ],
+  "blob": {
+   "blob_bytes": 329728,
+   "wrom_words": 0,
+   "wrom_weights": 0
+  },
+  "emu_line": "exit=0 instr=131493495 alu=90460978 mul=2820940 div=18624 load=9271203 store=7818377 branch=16493681 jump=4609692 custom=0"
+ },
+ {
+  "mode": "q4v",
+  "max_rel_logit_err": 0.5448837876319885,
+  "argmax_fw": [
+   105,
+   25,
+   75,
+   48,
+   25,
+   105,
+   68,
+   30
+  ],
+  "argmax_hf": [
+   105,
+   25,
+   25,
+   48,
+   25,
+   42,
+   68,
+   105
+  ],
+  "argmax_ok_given_gap": true,
+  "instr_total": 14538847,
+  "instr_per_pos": [
+   1569524,
+   1647690,
+   1723094,
+   1782447,
+   1860437,
+   1922064,
+   1987002,
+   2046502
+  ],
+  "blob": {
+   "blob_bytes": 39424,
+   "wrom_words": 10240,
+   "wrom_weights": 81920
+  },
+  "emu_line": "exit=0 instr=14538847 alu=9798878 mul=308400 div=19584 load=965769 store=884286 branch=1931115 jump=546335 custom=84480"
+ }
+]

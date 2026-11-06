@@ -1,5 +1,6 @@
   .text
   .globl vk_init_scaled
+  .type vk_init_scaled,@function
 vk_init_scaled:
   addi sp, sp, -48
   sw s0, 0(sp)
@@ -105,7 +106,9 @@ vk_init_scaled:
   lw s11, 44(sp)
   addi sp, sp, 48
   ret
+  .size vk_init_scaled, .-vk_init_scaled
   .globl vk_init_raw
+  .type vk_init_raw,@function
 vk_init_raw:
   addi sp, sp, -48
   sw s0, 0(sp)
@@ -198,7 +201,9 @@ vk_init_raw:
   lw s11, 44(sp)
   addi sp, sp, 48
   ret
+  .size vk_init_raw, .-vk_init_raw
   .globl vk_acc_scaled
+  .type vk_acc_scaled,@function
 vk_acc_scaled:
   addi sp, sp, -48
   sw s0, 0(sp)
@@ -304,7 +309,9 @@ vk_acc_scaled:
   lw s11, 44(sp)
   addi sp, sp, 48
   ret
+  .size vk_acc_scaled, .-vk_acc_scaled
   .globl vk_acc_raw
+  .type vk_acc_raw,@function
 vk_acc_raw:
   addi sp, sp, -48
   sw s0, 0(sp)
@@ -397,3 +404,4 @@ vk_acc_raw:
   lw s11, 44(sp)
   addi sp, sp, 48
   ret
+  .size vk_acc_raw, .-vk_acc_raw
