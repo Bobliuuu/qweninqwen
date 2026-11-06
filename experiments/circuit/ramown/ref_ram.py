@@ -27,6 +27,7 @@ SRC = ['zero', 'image', 'ownstore', 'injected']
 CAUSES = ['cold', 'alias', 'merge']
 
 DROMW = [0] * 32768
+DBG_SLOT = int(os.environ['DBG_SLOT']) if os.environ.get('DBG_SLOT') else None; DBG_CHUNK = int(os.environ.get('DBG_CHUNK', 0)); DBG_MAX = int(os.environ.get('DBG_MAX', 10**9)); CUR_CHUNK = [0]
 class Sim:
     """software model of the circuit's 32 KB RAM under one injection policy"""
     def __init__(self, name, policy): self.name, self.policy = name, policy; self.inj = []; self.reset(None)
@@ -42,6 +43,7 @@ class Sim:
         return 'alias' if self.own[s] != wi else 'merge'
     def load(self, nb, ea, w):
         st = self.st; wi = ea >> 2; s = wi & 0x1FFF; st['loads'] += 1
+        if DBG_SLOT is not None and s == DBG_SLOT and self.name == 'F' and CUR_CHUNK[0] == DBG_CHUNK and nb < DBG_MAX: print('DBG load', nb, hex(ea), 'true', hex(w), 'slot', hex(self.cs[s]), 'owner', hex(self.own[s] * 4) if self.own[s] >= 0 else None, 'src', self.src[s], flush=True)
         if REALMAP and (ea >= 0x10000000 or 0x20000 <= ea < 0x40000):
             # DROM-class load (real 128 KB DROM at 0x20000, or the weight/table blob at 0x10000000): the circuit's DROM table, slot = word index mod 32768 (patched core: in_drom := not in_ram).
             # Not a RAM role: constants. A blob word is injected into the DROM head state (host-served); a real-DROM word is the circuit's own unless a blob injection overwrote it.
@@ -60,6 +62,7 @@ class Sim:
             self.inj.append((nb, 1, s, w)); st['injected'] += 1; self.cs[s] = w; self.own[s] = wi; self.src[s] = 3
     def store(self, nb, ea, op, b, trueold):
         st = self.st; wi = ea >> 2; s = wi & 0x1FFF
+        if DBG_SLOT is not None and s == DBG_SLOT and self.name == 'F' and CUR_CHUNK[0] == DBG_CHUNK and nb < DBG_MAX: print('DBG store', op, nb, hex(ea), 'b', hex(b & M32), 'trueold', hex(trueold), 'slot', hex(self.cs[s]), flush=True)
         if op == 'SW': self.cs[s] = b & M32; self.own[s] = wi; self.src[s] = 2; return
         st['sbsh'] += 1
         if self.cs[s] != trueold:
@@ -134,7 +137,7 @@ def flush():
     json.dump(dict(chunk=chunk, steps_tokens=len(buf), ram_loads_sbsh_legacy_injections=len(m.inj), vdot_injections=len(m.inj2), policies={sm.name: dict(policy=sm.policy, **sm.st) for sm in m.sims}),
               open(f'{out}/stats_{chunk:04d}.json', 'w'), indent=1)
     print(f'chunk {chunk}: legacy RAM injections {len(m.inj)}, ' + ', '.join(f"{sm.name}: inj {sm.st['injected']} need {sm.st['need']}" for sm in m.sims), flush=True)
-    m.inj = []; m.inj2 = []; chunk += 1; buf = []; kbuf = []; nb = 0
+    m.inj = []; m.inj2 = []; chunk += 1; CUR_CHUNK[0] = chunk; buf = []; kbuf = []; nb = 0
     dump_state()
 buf.append(S.tok('GO')); kbuf.append(0); nb = 1; dump_state()
 m.nbuf = lambda: nb

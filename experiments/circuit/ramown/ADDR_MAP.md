@@ -96,5 +96,22 @@ Tiles: the three tile buffers cost 3 x TILE x 4 B; `-DTILE=128` verified; kernel
 
 **Context > 1 does not fit any RAM of this family.** Per extra token the K/V cache is `kq` 28,672 B + `vt` 28,672 B (compact; the allocated `vt` is padded to 4 tokens = 114,688 B) + `kmx`/`vmx` 1,792 B = **59,136 B/token (57.75 KB)**, i.e. 1.8 x the whole 32 KB RAM per token. The generic path at ctx 1 (no q/k skipping) is 196 KB [E: default + q32 8K + k32 4K + ao 8K + qh 4K + kh 2K + kq 28K + vt 112K + 1.8K]. Next sizes: 256 KB RAM (8 x the current 32 tables) for generic ctx 1-4; the right answer for ctx > 1 is the KV in outer full-attention KV (docs/QWENFS_FOR_RAM.md section 4, MEMORY_DESIGN section 6), RAM kept at 32 KB.
 
-## 7. Full reference-machine run (real 8192-word RAM)
-See `logs/ref32_785/summary.json` (added when the run finishes).
+## 7. Full reference-machine run with the REAL 8192-word RAM  [M]  (`fw_ref32.py`, `logs/ref32_785/summary.json`)
+
+`ref.Machine` with RAM = 0x0..0x8000 (8192 words, real spec), real DROM at 0x20000, only the 624.6 MB blob (0x10000000) and WROM enlarged. Any RAM access outside the window would fault.
+
+| | ref785b (old firmware, 4 MB RAM) | ref32_785 (new firmware, 32 KB RAM) |
+|---|---|---|
+| argmax | 13 | **13** (`out_hex 0d000000`) |
+| fault / exit code | none / 0 | **none / 0** |
+| machine instructions | 136,877,011 | 121,926,899 |
+| instructions by final tokens | 139,205,075 | 123,910,899 (equals the emulator's 123,910,899 exactly) |
+| trace tokens | 162,682,048 | 139,464,461 (-14.3 %) |
+| chunks (2^21 tokens) | 78 | 67 |
+| LOAD/SB/SH answered by RAM (no injection) | 0 (all injected) | 10,222,869 LW/LB/LH loads + 201,728 SB/SH = 10,424,597 |
+| SW stores to RAM | 5.1 M ST0 + ST1 | 8,964,294 SW + 201,728 SB/SH = 9,166,022 (max RAM address touched 32,764) |
+| real-DROM rodata loads (not injected) | n/a | 3,559 |
+| blob loads (injected, host-served) | included in ~1.0-1.2 M per segment | 469,376 (4.4 % of loads) |
+| wall | 1,822 s | 2,164 s on lambda-final (56.7 K instr/s) |
+
+Raw outputs (tokens, kinds, `inj_*.npy` with only blob/VDOT rows, `ramimg_NNNN.npy`, `state_NNNN.pkl`, `ckpt.pkl`, 2.6 GB) are on lambda-final `~/ramown/ref32_785`; only `summary.json` is in the repo. Rebuild with `fw_rebuild.sh`, then the command it prints.
