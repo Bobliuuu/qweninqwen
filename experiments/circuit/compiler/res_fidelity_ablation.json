@@ -1,0 +1,82 @@
+[
+ {
+  "label": "int8 per-row all",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879327714443207,
+  "mean_kl": 0.013490504585206509,
+  "kl_pos0": 0.509111762046814
+ },
+ {
+  "label": "int8 per-row, embed/lm_head kept fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48817774653434753,
+  "mean_kl": 0.013206466101109982,
+  "kl_pos0": 0.5081501603126526
+ },
+ {
+  "label": "int8 per-row, down_proj kept fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4166035056114197,
+  "mean_kl": 0.010594803839921951,
+  "kl_pos0": 0.4165041744709015
+ },
+ {
+  "label": "int8 per-row, attn kept fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4871158003807068,
+  "mean_kl": 0.012278026901185513,
+  "kl_pos0": 0.507103681564331
+ },
+ {
+  "label": "int8 per-row, gate/up kept fp",
+  "top1_agree": 1.0,
+  "pos0_ok": true,
+  "pos0_rel_err": 0.1322416365146637,
+  "mean_kl": 0.0030885532032698393,
+  "kl_pos0": 0.04439367353916168
+ },
+ {
+  "label": "int8 g=64",
+  "top1_agree": 1.0,
+  "pos0_ok": true,
+  "pos0_rel_err": 0.3066413402557373,
+  "mean_kl": 0.005108479410409927,
+  "kl_pos0": 0.19721770286560059
+ },
+ {
+  "label": "int4 per-row all",
+  "top1_agree": 0.6875,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.9312121868133545,
+  "mean_kl": 1.1254512071609497,
+  "kl_pos0": 2.7728402614593506
+ },
+ {
+  "label": "int4 g=128 all",
+  "top1_agree": 0.7083333134651184,
+  "pos0_ok": false,
+  "pos0_rel_err": 1.0019631385803223,
+  "mean_kl": 0.4141954183578491,
+  "kl_pos0": 2.357455253601074
+ },
+ {
+  "label": "int4 g=64 all",
+  "top1_agree": 0.8541666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.9604388475418091,
+  "mean_kl": 0.31996652483940125,
+  "kl_pos0": 2.3610949516296387
+ },
+ {
+  "label": "int4 g=64 embed fp",
+  "top1_agree": 0.8541666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.9588025212287903,
+  "mean_kl": 0.2787717282772064,
+  "kl_pos0": 2.3512911796569824
+ }
+]

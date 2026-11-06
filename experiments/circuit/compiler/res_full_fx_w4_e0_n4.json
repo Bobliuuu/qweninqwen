@@ -1,0 +1,64 @@
+{
+ "model": "Qwen/Qwen3-0.6B",
+ "wbits": 4,
+ "ext": false,
+ "ntok": 4,
+ "instr_per_pos": [
+  137828241,
+  137932903,
+  138019146,
+  138101826
+ ],
+ "classes": "exit=0 instr=551882186 alu=106725821 mul=24684197 div=365508 load=47262197 store=42523049 branch=21978600 jump=665630 custom=307677184",
+ "by_symbol": {
+  "quantize": 12111157,
+  "rope": 6044968,
+  "kv_store": 3589343,
+  "attn": 9331688,
+  "rms": 24121801,
+  "argmax.constprop.0": 3038760,
+  "resid.constprop.0": 1607200,
+  "mv.constprop.0": 51906556,
+  "swiglu": 19845125,
+  "exit": 2,
+  "main": 68956,
+  "vk_init_raw": 22355460,
+  "vk_acc_raw": 397505340,
+  "memset": 14784,
+  "__clzdi2": 58230,
+  "__divdi3": 148160,
+  "__udivdi3": 134652
+ },
+ "blob": {
+  "blob_bytes": 624577024,
+  "wrom_words": 74498048,
+  "wrom_weights": 595984384
+ },
+ "argmax_fw": [
+  13,
+  315,
+  279,
+  374
+ ],
+ "argmax_hf": [
+  15846,
+  315,
+  279,
+  374
+ ],
+ "argmax_hf_weightquant_only": [
+  454,
+  315,
+  279,
+  374
+ ],
+ "top1_agree_fw_vs_hf": 0.75,
+ "top1_agree_weightquant_vs_hf": 0.75,
+ "top1_agree_fw_vs_weightquant": 0.75,
+ "hf_top1_top2_gap_pos0": 0.13597488403320312,
+ "rel_err_fw_vs_hf": 0.6961559115531862,
+ "rel_err_weightquant_vs_hf": 0.6350844502449036,
+ "rel_err_fw_vs_weightquant": 0.17784445441205624,
+ "rms_err_fw_vs_hf": 2.0029617643718067,
+ "rms_err_weightquant_vs_hf": 1.8601292371749878
+}

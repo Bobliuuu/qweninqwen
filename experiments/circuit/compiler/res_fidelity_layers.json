@@ -1,0 +1,226 @@
+[
+ {
+  "label": "int8 per-row, layer 0 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4876575171947479,
+  "mean_kl": 0.013341489247977734,
+  "kl_pos0": 0.5106320381164551
+ },
+ {
+  "label": "int8 per-row, layer 1 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4899582862854004,
+  "mean_kl": 0.013486619107425213,
+  "kl_pos0": 0.5106327533721924
+ },
+ {
+  "label": "int8 per-row, layer 2 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4114174544811249,
+  "mean_kl": 0.01073440071195364,
+  "kl_pos0": 0.41718366742134094
+ },
+ {
+  "label": "int8 per-row, layer 3 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48792871832847595,
+  "mean_kl": 0.013659662567079067,
+  "kl_pos0": 0.5091114044189453
+ },
+ {
+  "label": "int8 per-row, layer 4 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879319667816162,
+  "mean_kl": 0.013609033077955246,
+  "kl_pos0": 0.5091084241867065
+ },
+ {
+  "label": "int8 per-row, layer 5 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879337251186371,
+  "mean_kl": 0.013528748415410519,
+  "kl_pos0": 0.509115993976593
+ },
+ {
+  "label": "int8 per-row, layer 6 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879344701766968,
+  "mean_kl": 0.013386513106524944,
+  "kl_pos0": 0.5091139078140259
+ },
+ {
+  "label": "int8 per-row, layer 7 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879266619682312,
+  "mean_kl": 0.013390916399657726,
+  "kl_pos0": 0.5091112852096558
+ },
+ {
+  "label": "int8 per-row, layer 8 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879301190376282,
+  "mean_kl": 0.013424120843410492,
+  "kl_pos0": 0.5091069340705872
+ },
+ {
+  "label": "int8 per-row, layer 9 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48792997002601624,
+  "mean_kl": 0.01352641824632883,
+  "kl_pos0": 0.509101390838623
+ },
+ {
+  "label": "int8 per-row, layer 10 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879307746887207,
+  "mean_kl": 0.013454890809953213,
+  "kl_pos0": 0.5091167092323303
+ },
+ {
+  "label": "int8 per-row, layer 11 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879332184791565,
+  "mean_kl": 0.013477792032063007,
+  "kl_pos0": 0.5091170072555542
+ },
+ {
+  "label": "int8 per-row, layer 12 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48792871832847595,
+  "mean_kl": 0.013547845184803009,
+  "kl_pos0": 0.5091070532798767
+ },
+ {
+  "label": "int8 per-row, layer 13 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879298210144043,
+  "mean_kl": 0.013370826840400696,
+  "kl_pos0": 0.5091072916984558
+ },
+ {
+  "label": "int8 per-row, layer 14 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879317581653595,
+  "mean_kl": 0.013385378755629063,
+  "kl_pos0": 0.5091112852096558
+ },
+ {
+  "label": "int8 per-row, layer 15 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879445731639862,
+  "mean_kl": 0.013520125299692154,
+  "kl_pos0": 0.5091316103935242
+ },
+ {
+  "label": "int8 per-row, layer 16 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48794376850128174,
+  "mean_kl": 0.013341006822884083,
+  "kl_pos0": 0.5091198682785034
+ },
+ {
+  "label": "int8 per-row, layer 17 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879540205001831,
+  "mean_kl": 0.0134689686819911,
+  "kl_pos0": 0.5091274380683899
+ },
+ {
+  "label": "int8 per-row, layer 18 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4879670739173889,
+  "mean_kl": 0.013538685627281666,
+  "kl_pos0": 0.5092193484306335
+ },
+ {
+  "label": "int8 per-row, layer 19 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48775750398635864,
+  "mean_kl": 0.013513525016605854,
+  "kl_pos0": 0.5090874433517456
+ },
+ {
+  "label": "int8 per-row, layer 20 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48792245984077454,
+  "mean_kl": 0.013469395227730274,
+  "kl_pos0": 0.5090926885604858
+ },
+ {
+  "label": "int8 per-row, layer 21 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48794257640838623,
+  "mean_kl": 0.013399857096374035,
+  "kl_pos0": 0.5090968608856201
+ },
+ {
+  "label": "int8 per-row, layer 22 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48793020844459534,
+  "mean_kl": 0.013380981981754303,
+  "kl_pos0": 0.509122371673584
+ },
+ {
+  "label": "int8 per-row, layer 23 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.4878740906715393,
+  "mean_kl": 0.01350588258355856,
+  "kl_pos0": 0.5090060234069824
+ },
+ {
+  "label": "int8 per-row, layer 24 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48789745569229126,
+  "mean_kl": 0.01345702726393938,
+  "kl_pos0": 0.50902259349823
+ },
+ {
+  "label": "int8 per-row, layer 25 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.48787519335746765,
+  "mean_kl": 0.013473819941282272,
+  "kl_pos0": 0.5089118480682373
+ },
+ {
+  "label": "int8 per-row, layer 26 gate/up/down fp",
+  "top1_agree": 0.9791666865348816,
+  "pos0_ok": false,
+  "pos0_rel_err": 0.49232327938079834,
+  "mean_kl": 0.013099655508995056,
+  "kl_pos0": 0.493080198764801
+ },
+ {
+  "label": "int8 per-row, layer 27 gate/up/down fp",
+  "top1_agree": 1.0,
+  "pos0_ok": true,
+  "pos0_rel_err": 0.14227573573589325,
+  "mean_kl": 0.003682496026158333,
+  "kl_pos0": 0.04594031721353531
+ }
+]

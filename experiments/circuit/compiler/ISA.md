@@ -32,3 +32,11 @@ Other agents plug in by replacing a function body (e.g. integer-only glue, SMAQA
 `fw/qwen3.c` firmware; `gen_fw.py` weight/cfg emitter; `fw/vdk.S` (from `fw/gen_vdk.py`); `fw/rvemu.c`; `fw/bench_proj.c` micro-benchmark;
 `test_tiny.py` (HF vs emulator, tiny config); `run_full.py` (real Qwen3-0.6B); `footprint.py`; results `fw/res_proj_instr_per_mac.json`,
 `res_tiny.json`, `res_full_*.json`, `res_footprint.json`.
+
+## v2 (integer-only) firmware: `fw/qwen3_fx.c`, `gen_fx.py`
+Integer fixed point: residual Q16, norm outputs Q12, dynamic per-vector int8 activation quantisation, per-row weight scales (26-bit mantissa | 5-bit exponent in one int32),
+weights as signed base-16 digit planes of int4 (1/2/3 planes = int4/int8/int12, per-matrix via `gen_fx.gen(boost={(layer,'mlp'):12})`), VDOT kernels `fw/vdk.S`,
+attention with int8 K cache and transposed int8 V cache via SMAQA, softmax/SwiGLU/RMSNorm/RoPE/argmax via plain fixed point or the custom-1 extensions
+(`-DEXT`: EXP2 f3=0, RSQ f3=1, SIGM f3=2, AMX f3=3, AMXR f3=4, ROT16 f3=5, opcode 0x2b; semantics = `nonlinear/ext.py`, emulated in `fw/rvemu.c`).
+Tests: `test_tiny_fx.py` (random d=64, 2 layers: int8 weights max rel logit err 4.4e-2, argmax 8/8; int4 random-Gaussian weights 0.55, pessimistic), `run_full_fx.py` (real model).
+Weights are data; on the real machine WROM (15-bit word index, 32,640 words) must grow: 0.6B int4 = 74.5M words (27 bits), see `footprint.py` / `res_footprint.json`.
