@@ -1,0 +1,5 @@
+RESULT {"elf": "guests/stories260k/stories260k.elf", "steps_checked": 3000, "steps_requested": 3000, "mismatch": null, "seconds": 9.4}
+RESULT {"elf": "tests/data/rv/c-crc32p.elf", "steps_checked": 4188, "steps_requested": 4400, "mismatch": {"at": 4188, "want": "F0(99)", "got": "<non-rv -248254>", "got_raw": 66, "context_in": ["F0(1)", "J(32)", "F0(99)", "F0(0)", "F0(0)", "F0(1)", "BYTE(99)"], "context_next": ["F0(99)", "J(342)", "NT"]}, "seconds": 17.0}
+RESULT {"elf": "guests/q3/q3.elf", "steps_checked": 42400, "steps_requested": 45000, "mismatch": {"at": 42400, "want": "F0(596)", "got": "<non-rv -248266>", "got_raw": 54, "context_in": ["F0(128)", "NT", "F0(87)", "F0(0)", "F0(0)", "F0(1)", "BYTE(87)"], "context_next": ["F0(596)", "F0(476)", "F0(628)"]}, "seconds": 135.3}
+---
+RESULT {"elf": "guests/q3/q3.elf", "steps_checked": 46500, "steps_requested": 46500, "mismatch": null, "echoes": ["W"], "seconds": 184.3}
