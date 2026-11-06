@@ -1,0 +1,44 @@
+{
+ "rows": [
+  {
+   "prompt": "The capital of France is",
+   "identical": false,
+   "first_divergence": 10,
+   "inner": "The capital of France is Paris. The capital of France is also the capital of the Republic of France. The capital of France is also the capital of the European Union. The capital of France is also the capital of the United States. The capital of France is also",
+   "nested": "The capital of France is Paris. The capital of Italy is Rome. The capital of Spain is Madrid. The capital of China is Beijing. The capital of Japan is Tokyo. The capital of India is New Delhi. The capital of Brazil is Brasilia. The capital"
+  },
+  {
+   "prompt": "def fibonacci(n):\n    if n < 2:\n        return n\n",
+   "identical": false,
+   "first_divergence": 37,
+   "inner": "def fibonacci(n):\n    if n < 2:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n\nprint(fibonacci(5))\n\n# Output: 5\n\n# Let's test with n=0 and n=1\nprint(fibonacci(0",
+   "nested": "def fibonacci(n):\n    if n < 2:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n\nprint(fibonacci(5))\n# Output: 5\n\n# Test case 2\nprint(fibonacci(6))\n# Output: 8\n\n"
+  },
+  {
+   "prompt": "Explain in one sentence why the sky is blue:",
+   "identical": false,
+   "first_divergence": 24,
+   "inner": "Explain in one sentence why the sky is blue: The sky is blue because of the way light interacts with the atmosphere.\nAnswer:\nThe sky is blue because of the way light interacts with the atmosphere.\n\nThe sky is blue because of the way light interacts with the atmosphere.\n\nThe sky is blue",
+   "nested": "Explain in one sentence why the sky is blue: The sky is blue because of the way light interacts with the atmosphere and the molecules in it.\nAnswer:\nThe sky is blue because of the way light interacts with the atmosphere and the molecules in it.\n\n**Explanation:**  \nThe sky appears blue"
+  },
+  {
+   "prompt": "1, 2, 3, 4, 5,",
+   "identical": true,
+   "first_divergence": null,
+   "inner": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,",
+   "nested": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,"
+  },
+  {
+   "prompt": "Q: What is 17 * 3?\nA:",
+   "identical": true,
+   "first_divergence": null,
+   "inner": "Q: What is 17 * 3?\nA: 51\nA: 51\nA: 51\nA: 51\nA: 51\nA: 51\nA: 51\nA: 51\nA:",
+   "nested": "Q: What is 17 * 3?\nA: 51\nA: 51\nA: 51\nA: 51\nA: 51\nA: 51\nA: 51\nA: 51\nA:"
+  }
+ ],
+ "speed": {
+  "inner Qwen3-0.6B": 27.658645894511245,
+  "nested (Qwen3-0.6B inside Qwen3.5-0.8B)": 11.409651153914226
+ },
+ "params_B": 7.558328928
+}
