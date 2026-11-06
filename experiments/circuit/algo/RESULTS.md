@@ -6,6 +6,8 @@ The compiler agent's full-model counts (experiments/circuit/compiler) were not i
 (595,984,384 = 28 layers x 17,... + lm_head 155,582,464) and a flagged estimate for the non-matvec work (5.4 M instr: norms, RoPE, SiLU, attention at ctx 128, argmax).
 Trace tokens per instruction: 1.4 (Qwenputer measured 1.19-1.55); executor 5,500 trace tokens/s (L4, fused executor, Qwenputer README).
 
+**Quantisation protocol of the fidelity numbers below:** weights are symmetric RTN, group 128 along the input dim (per-row when group=0); activations are per-token symmetric absmax at EVERY linear including down_proj and lm_head; 12 diverse prompts, 140 teacher-forced positions. These are not comparable to the compiler's 92.3% (repeated-text prompt); a same-positions run on the compiler prompt (first 130 tokens, per-row int4 weights, per-token int8 acts) is launched, see RUNS.md.
+
 ## 1. Matvec: instructions per MAC (measured, bit-exact vs numpy int64, 192x1024 matvec)
 | kernel | instr/MAC | exact |
 |---|---|---|

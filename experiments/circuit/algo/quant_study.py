@@ -55,11 +55,15 @@ def evaluate(model, ref_logits, ids_list):
     e = torch.cat(errs); return dict(argmax_agree=agree / tot, top5_contains_ref=top5 / tot, rel_err_mean=e.mean().item(), rel_err_max=e.max().item(), positions=tot)
 
 
-def run(grid=None, gs_list=(128,)):
+REPEAT = ("The capital of France is Paris. The capital of Germany is Berlin. The capital of Italy is Rome. " * 40)
+
+
+def run(grid=None, gs_list=(128,), repeat=0):
     grid = [tuple(g) for g in grid] if grid else None
     from transformers import AutoTokenizer, Qwen3ForCausalLM
     tok = AutoTokenizer.from_pretrained('Qwen/Qwen3-0.6B')
     ids_list = [torch.tensor(tok(p)['input_ids']) for p in PROMPTS]
+    if repeat: ids_list = [torch.tensor(tok(REPEAT)['input_ids'][:repeat])]   # compiler's run_full_fx.py prompt, first `repeat` tokens
     out = []
     grid = grid or [(16, 0, 0, None), (8, 8, 128, None), (6, 8, 128, None), (4, 8, 128, None), (4, 8, 0, None), (4, 6, 128, None), (4, 4, 128, None), (3, 8, 128, None), (3, 6, 128, None), (3, 4, 128, None),
                     (2, 8, 128, None), (4, 8, 128, 8), (3, 8, 128, 8), (3, 6, 128, 8), (2, 8, 128, 8), (4, 5, 128, None), (5, 6, 128, None), (3, 5, 128, 6)]
