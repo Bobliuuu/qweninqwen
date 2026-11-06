@@ -1,0 +1,8 @@
+{
+  "evidence": "stock_Qwen3_5_layers_CPU_BF16_circuit_only",
+  "pretrained_language_weights": false,
+  "readouts": 10,
+  "layers": 16,
+  "parameters": 134655200,
+  "seconds": 8.259815647999972
+}

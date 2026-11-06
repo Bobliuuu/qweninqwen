@@ -1,0 +1,5 @@
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+{"k": 4, "macs": 4, "seconds": 0.6563061490001019, "macs_per_second": 6.094716628960579, "tile_tokens": 10, "accumulator_tokens": 28, "result": 0, "partials": [1778, -1778]}
+{"k": 16, "macs": 16, "seconds": 2.525672601999986, "macs_per_second": 6.334946179219823, "tile_tokens": 40, "accumulator_tokens": 100, "result": -1769, "partials": [-460, 581, -60, -766, -675, 441, -198, -632]}
+{"k": 32, "macs": 32, "seconds": 5.159556231999886, "macs_per_second": 6.2020837764174415, "tile_tokens": 80, "accumulator_tokens": 196, "result": -1040, "partials": [-93, -106, -8, -720, -228, 387, -14, -404, 545, 129, -444, -129, -831, 1074, -397, 199]}

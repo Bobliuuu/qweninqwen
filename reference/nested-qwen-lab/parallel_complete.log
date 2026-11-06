@@ -1,0 +1,9 @@
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+{"case": 0, "load_encode_seconds": 0.0023504269997829397, "compute_decode_seconds": 2.0279910180001934, "total_seconds": 2.0303414449999764, "macs_per_second": 488.5877705166047}
+{"case": 1, "load_encode_seconds": 0.006224413999916578, "compute_decode_seconds": 2.1585483349999777, "total_seconds": 2.1647727489998942, "macs_per_second": 458.2467145608218}
+{"case": 2, "load_encode_seconds": 0.003568642000118416, "compute_decode_seconds": 2.7697281060000023, "total_seconds": 2.7732967480001207, "macs_per_second": 357.69702636955486}
+{"case": 3, "load_encode_seconds": 0.0018609839999044198, "compute_decode_seconds": 4.723490310000216, "total_seconds": 4.72535129400012, "macs_per_second": 209.93148197459175}
+{"case": 4, "load_encode_seconds": 0.006710157999805233, "compute_decode_seconds": 3.987476372999936, "total_seconds": 3.994186530999741, "macs_per_second": 248.36095968500084}
+{"case": 5, "load_encode_seconds": 0.0018424940003569645, "compute_decode_seconds": 2.1265797649998603, "total_seconds": 2.1284222590002173, "macs_per_second": 466.07293069091077}

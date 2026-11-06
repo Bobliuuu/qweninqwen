@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-05",
+  "repos": {
+    "Bobliuuu/qwentpu": "2f3f0606f793ad8c196e24c9bfccead3c20a8892",
+    "divagr18/qwenputer": "cb1c969cf4e9b6d703c16678be42c9cf3a2d42fe",
+    "vixhal-baraiya/qwenGPU": "e2695f6a0a818ebc68e2e14b6b990eddf04c51b3"
+  },
+  "validation": "CPU only; see results.json for evidence scopes"
+}

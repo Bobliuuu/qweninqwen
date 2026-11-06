@@ -1,0 +1,21 @@
+{
+  "evidence": "native_Qwen_GDN_primitive_plus_BF16_norm_boundary",
+  "signed_outputs_checked": 672,
+  "shape": [
+    32,
+    31
+  ],
+  "parallel_heads": 8,
+  "logical_macs_per_read": 992,
+  "primitive_calls_per_second": 2852.250269997407,
+  "state_bytes": 524288,
+  "exclusions": [
+    "state_loading",
+    "query_encoding",
+    "signed_reconstruction",
+    "group_scales",
+    "persistent_sum",
+    "full_Qwen_layers"
+  ],
+  "warning": "primitive throughput is NOT end_to_end MAC throughput"
+}

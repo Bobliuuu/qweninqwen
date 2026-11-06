@@ -1,0 +1,5 @@
+torch
+transformers>=5.2
+safetensors
+huggingface_hub
+pytest

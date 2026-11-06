@@ -1,0 +1,14 @@
+{
+  "evidence": "stock_Qwen3_5_architecture_CPU_BF16_circuit_only",
+  "pretrained_language_weights": false,
+  "results": [
+    1778,
+    0,
+    3145728,
+    0
+  ],
+  "parameters": 108515744,
+  "layers": 10,
+  "seconds": 8.509926125999982,
+  "torch": "2.15.0+cpu"
+}
