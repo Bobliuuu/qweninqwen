@@ -1,0 +1,69 @@
+[chain] step 100,000/2,097,152 (boundary 1/3, chunk 0) 19s 5,201 tok/s; free 100,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 200,000/2,097,152 (boundary 1/3, chunk 0) 38s 5,211 tok/s; free 199,744 mismatches 0, forced 256 raw-disagree 256
+[chain] step 300,000/2,097,152 (boundary 1/3, chunk 0) 58s 5,214 tok/s; free 299,488 mismatches 0, forced 512 raw-disagree 511
+[chain] step 400,000/2,097,152 (boundary 1/3, chunk 0) 77s 5,216 tok/s; free 399,232 mismatches 0, forced 768 raw-disagree 767
+[chain] step 500,000/2,097,152 (boundary 1/3, chunk 0) 96s 5,217 tok/s; free 498,976 mismatches 0, forced 1,024 raw-disagree 1,023
+[chain] step 600,000/2,097,152 (boundary 1/3, chunk 0) 115s 5,219 tok/s; free 598,976 mismatches 0, forced 1,024 raw-disagree 1,023
+[chain] step 700,000/2,097,152 (boundary 1/3, chunk 0) 134s 5,219 tok/s; free 698,720 mismatches 0, forced 1,280 raw-disagree 1,279
+[chain] step 800,000/2,097,152 (boundary 1/3, chunk 0) 153s 5,220 tok/s; free 798,464 mismatches 0, forced 1,536 raw-disagree 1,535
+[chain] step 900,000/2,097,152 (boundary 1/3, chunk 0) 172s 5,220 tok/s; free 898,208 mismatches 0, forced 1,792 raw-disagree 1,790
+[chain] step 1,000,000/2,097,152 (boundary 1/3, chunk 0) 192s 5,221 tok/s; free 997,952 mismatches 0, forced 2,048 raw-disagree 2,046
+[chain] step 1,100,000/2,097,152 (boundary 1/3, chunk 0) 211s 5,221 tok/s; free 1,097,952 mismatches 0, forced 2,048 raw-disagree 2,046
+[chain] step 1,200,000/2,097,152 (boundary 1/3, chunk 0) 230s 5,222 tok/s; free 1,197,952 mismatches 0, forced 2,048 raw-disagree 2,046
+[chain] step 1,300,000/2,097,152 (boundary 1/3, chunk 0) 249s 5,222 tok/s; free 1,297,952 mismatches 0, forced 2,048 raw-disagree 2,046
+[chain] step 1,400,000/2,097,152 (boundary 1/3, chunk 0) 268s 5,223 tok/s; free 1,397,952 mismatches 0, forced 2,048 raw-disagree 2,046
+[chain] step 1,500,000/2,097,152 (boundary 1/3, chunk 0) 287s 5,223 tok/s; free 1,497,952 mismatches 0, forced 2,048 raw-disagree 2,046
+[chain] step 1,600,000/2,097,152 (boundary 1/3, chunk 0) 306s 5,223 tok/s; free 1,597,824 mismatches 0, forced 2,176 raw-disagree 2,173
+[chain] step 1,700,000/2,097,152 (boundary 1/3, chunk 0) 325s 5,224 tok/s; free 1,697,568 mismatches 0, forced 2,432 raw-disagree 2,429
+[chain] step 1,800,000/2,097,152 (boundary 1/3, chunk 0) 345s 5,224 tok/s; free 1,797,218 mismatches 0, forced 2,782 raw-disagree 2,777
+[chain] step 1,900,000/2,097,152 (boundary 1/3, chunk 0) 364s 5,224 tok/s; free 1,896,928 mismatches 0, forced 3,072 raw-disagree 3,067
+[chain] step 2,000,000/2,097,152 (boundary 1/3, chunk 0) 383s 5,224 tok/s; free 1,996,928 mismatches 0, forced 3,072 raw-disagree 3,067
+[chain] step 2,097,152/2,097,152 (boundary 1/3, chunk 0) 401s 5,224 tok/s; free 2,093,951 mismatches 0, forced 3,200 raw-disagree 3,195
+BOUNDARY after chunk 0 (step 2,097,151): ok=True regs_rd_bad=0 (rs1 0, rs2 0) anchor/n (1626, 1626)/(11, 11) wb15 (10049, 10049) ref_wb27 829249 high12_lost=True j,vcnt (128.0, 128.0) bn_bad 0 ram touched 8192 bad 0 untouched-nonzero 0 touched-by-op {'load': 4898, 'sb_sh': 224, 'sw': 3070} bad-by-op {'load': 0, 'sb_sh': 0, 'sw': 0}
+  WB27 boundary after chunk 0: circuit wb27 829249 (wbase 10049, wbase_hi 25) ref wb 829249 wb27_ok=True
+[chain] step 2,197,152/4,194,304 (boundary 2/3, chunk 1) 421s 5,223 tok/s; free 2,193,696 mismatches 0, forced 3,456 raw-disagree 3,450
+[chain] step 2,297,152/4,194,304 (boundary 2/3, chunk 1) 440s 5,223 tok/s; free 2,293,440 mismatches 0, forced 3,712 raw-disagree 3,705
+[chain] step 2,397,152/4,194,304 (boundary 2/3, chunk 1) 459s 5,223 tok/s; free 2,393,184 mismatches 0, forced 3,968 raw-disagree 3,960
+[chain] step 2,497,152/4,194,304 (boundary 2/3, chunk 1) 478s 5,223 tok/s; free 2,492,928 mismatches 0, forced 4,224 raw-disagree 4,213
+[chain] step 2,597,152/4,194,304 (boundary 2/3, chunk 1) 497s 5,223 tok/s; free 2,592,672 mismatches 0, forced 4,480 raw-disagree 4,469
+[chain] step 2,697,152/4,194,304 (boundary 2/3, chunk 1) 516s 5,223 tok/s; free 2,692,544 mismatches 0, forced 4,608 raw-disagree 4,596
+[chain] step 2,797,152/4,194,304 (boundary 2/3, chunk 1) 535s 5,224 tok/s; free 2,792,416 mismatches 0, forced 4,736 raw-disagree 4,724
+[chain] step 2,897,152/4,194,304 (boundary 2/3, chunk 1) 555s 5,224 tok/s; free 2,892,160 mismatches 0, forced 4,992 raw-disagree 4,978
+[chain] step 2,997,152/4,194,304 (boundary 2/3, chunk 1) 574s 5,224 tok/s; free 2,991,904 mismatches 0, forced 5,248 raw-disagree 5,232
+[chain] step 3,097,152/4,194,304 (boundary 2/3, chunk 1) 593s 5,224 tok/s; free 3,091,648 mismatches 0, forced 5,504 raw-disagree 5,488
+[chain] step 3,197,152/4,194,304 (boundary 2/3, chunk 1) 612s 5,224 tok/s; free 3,191,392 mismatches 0, forced 5,760 raw-disagree 5,740
+[chain] step 3,297,152/4,194,304 (boundary 2/3, chunk 1) 631s 5,224 tok/s; free 3,291,136 mismatches 0, forced 6,016 raw-disagree 5,994
+[chain] step 3,397,152/4,194,304 (boundary 2/3, chunk 1) 650s 5,224 tok/s; free 3,391,008 mismatches 0, forced 6,144 raw-disagree 6,119
+[chain] step 3,497,152/4,194,304 (boundary 2/3, chunk 1) 669s 5,225 tok/s; free 3,491,008 mismatches 0, forced 6,144 raw-disagree 6,119
+[chain] step 3,597,152/4,194,304 (boundary 2/3, chunk 1) 688s 5,225 tok/s; free 3,591,008 mismatches 0, forced 6,144 raw-disagree 6,119
+[chain] step 3,697,152/4,194,304 (boundary 2/3, chunk 1) 708s 5,225 tok/s; free 3,691,008 mismatches 0, forced 6,144 raw-disagree 6,119
+[chain] step 3,797,152/4,194,304 (boundary 2/3, chunk 1) 727s 5,225 tok/s; free 3,791,008 mismatches 0, forced 6,144 raw-disagree 6,119
+[chain] step 3,897,152/4,194,304 (boundary 2/3, chunk 1) 746s 5,225 tok/s; free 3,891,008 mismatches 0, forced 6,144 raw-disagree 6,119
+[chain] step 3,997,152/4,194,304 (boundary 2/3, chunk 1) 765s 5,225 tok/s; free 3,990,752 mismatches 0, forced 6,400 raw-disagree 6,374
+[chain] step 4,097,152/4,194,304 (boundary 2/3, chunk 1) 784s 5,225 tok/s; free 4,090,368 mismatches 0, forced 6,784 raw-disagree 6,757
+[chain] step 4,194,304/4,194,304 (boundary 2/3, chunk 1) 803s 5,225 tok/s; free 4,187,263 mismatches 0, forced 7,040 raw-disagree 7,011
+BOUNDARY after chunk 1 (step 4,194,303): ok=True regs_rd_bad=0 (rs1 0, rs2 0) anchor/n (1626, 1626)/(11, 11) wb15 (385, 385) ref_wb27 1802625 high12_lost=True j,vcnt (128.0, 128.0) bn_bad 0 ram touched 8192 bad 0 untouched-nonzero 0 touched-by-op {'load': 6832, 'sb_sh': 304, 'sw': 1056} bad-by-op {'load': 0, 'sb_sh': 0, 'sw': 0}
+  WB27 boundary after chunk 1: circuit wb27 1802625 (wbase 385, wbase_hi 55) ref wb 1802625 wb27_ok=True
+[chain] step 4,294,304/6,291,456 (boundary 3/3, chunk 2) 822s 5,224 tok/s; free 4,287,008 mismatches 0, forced 7,296 raw-disagree 7,266
+[chain] step 4,394,304/6,291,456 (boundary 3/3, chunk 2) 841s 5,224 tok/s; free 4,386,752 mismatches 0, forced 7,552 raw-disagree 7,522
+[chain] step 4,494,304/6,291,456 (boundary 3/3, chunk 2) 860s 5,224 tok/s; free 4,486,624 mismatches 0, forced 7,680 raw-disagree 7,647
+[chain] step 4,594,304/6,291,456 (boundary 3/3, chunk 2) 879s 5,224 tok/s; free 4,586,624 mismatches 0, forced 7,680 raw-disagree 7,647
+[chain] step 4,694,304/6,291,456 (boundary 3/3, chunk 2) 899s 5,224 tok/s; free 4,686,368 mismatches 0, forced 7,936 raw-disagree 7,901
+[chain] step 4,794,304/6,291,456 (boundary 3/3, chunk 2) 918s 5,224 tok/s; free 4,786,112 mismatches 0, forced 8,192 raw-disagree 8,157
+[chain] step 4,894,304/6,291,456 (boundary 3/3, chunk 2) 937s 5,224 tok/s; free 4,885,856 mismatches 0, forced 8,448 raw-disagree 8,413
+[chain] step 4,994,304/6,291,456 (boundary 3/3, chunk 2) 956s 5,224 tok/s; free 4,985,600 mismatches 0, forced 8,704 raw-disagree 8,667
+[chain] step 5,094,304/6,291,456 (boundary 3/3, chunk 2) 975s 5,224 tok/s; free 5,085,472 mismatches 0, forced 8,832 raw-disagree 8,795
+[chain] step 5,194,304/6,291,456 (boundary 3/3, chunk 2) 994s 5,224 tok/s; free 5,185,216 mismatches 0, forced 9,088 raw-disagree 9,051
+[chain] step 5,294,304/6,291,456 (boundary 3/3, chunk 2) 1014s 5,224 tok/s; free 5,285,088 mismatches 0, forced 9,216 raw-disagree 9,178
+[chain] step 5,394,304/6,291,456 (boundary 3/3, chunk 2) 1033s 5,224 tok/s; free 5,384,832 mismatches 0, forced 9,472 raw-disagree 9,433
+[chain] step 5,494,304/6,291,456 (boundary 3/3, chunk 2) 1052s 5,224 tok/s; free 5,484,576 mismatches 0, forced 9,728 raw-disagree 9,687
+[chain] step 5,594,304/6,291,456 (boundary 3/3, chunk 2) 1071s 5,224 tok/s; free 5,584,576 mismatches 0, forced 9,728 raw-disagree 9,687
+[chain] step 5,694,304/6,291,456 (boundary 3/3, chunk 2) 1090s 5,224 tok/s; free 5,684,576 mismatches 0, forced 9,728 raw-disagree 9,687
+[chain] step 5,794,304/6,291,456 (boundary 3/3, chunk 2) 1109s 5,224 tok/s; free 5,784,576 mismatches 0, forced 9,728 raw-disagree 9,687
+[chain] step 5,894,304/6,291,456 (boundary 3/3, chunk 2) 1128s 5,224 tok/s; free 5,884,576 mismatches 0, forced 9,728 raw-disagree 9,687
+[chain] step 5,994,304/6,291,456 (boundary 3/3, chunk 2) 1147s 5,224 tok/s; free 5,984,576 mismatches 0, forced 9,728 raw-disagree 9,687
+[chain] step 6,094,304/6,291,456 (boundary 3/3, chunk 2) 1167s 5,224 tok/s; free 6,084,320 mismatches 0, forced 9,984 raw-disagree 9,943
+[chain] step 6,194,304/6,291,456 (boundary 3/3, chunk 2) 1186s 5,224 tok/s; free 6,184,064 mismatches 0, forced 10,240 raw-disagree 10,199
+[chain] step 6,291,456/6,291,456 (boundary 3/3, chunk 2) 1204s 5,224 tok/s; free 6,280,959 mismatches 0, forced 10,496 raw-disagree 10,455
+BOUNDARY after chunk 2 (step 6,291,455): ok=True regs_rd_bad=0 (rs1 0, rs2 0) anchor/n (1595, 1595)/(60, 60) wb15 (6561, 6561) ref_wb27 2693537 high12_lost=True j,vcnt (128.0, 128.0) bn_bad 0 ram touched 8192 bad 0 untouched-nonzero 0 touched-by-op {'load': 7038, 'sb_sh': 96, 'sw': 1058} bad-by-op {'load': 0, 'sb_sh': 0, 'sw': 0}
+  WB27 boundary after chunk 2: circuit wb27 2693537 (wbase 6561, wbase_hi 82) ref wb 2693537 wb27_ok=True
