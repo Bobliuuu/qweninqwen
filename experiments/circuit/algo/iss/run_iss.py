@@ -34,9 +34,9 @@ def run(variant, R, K, rb=4, unr=2, seed=0):
     n = int(re.search(r'INSTR (\d+)', out).group(1)); assert np.array_equal(got, ref), (variant, 'MISMATCH')
     return dict(variant=variant, rb=rb, unr=unr, R=R, K=K, macs=R * K, instr=n, instr_per_mac=n / (R * K), exact=True, stats=out.strip())
 
-def main(R=64, K=1024):
+def main(R=192, K=1024):
     rows = []
-    for v, rb, unr in [(0, 1, 1), (1, 1, 1), (2, 4, 1), (3, 1, 1), (4, 1, 1), (5, 2, 2), (5, 4, 2), (5, 4, 4), (5, 8, 2), (5, 8, 4)]:
+    for v, rb, unr in [(0, 1, 1), (1, 1, 1), (2, 4, 1), (3, 1, 1), (4, 1, 1), (5, 2, 2), (5, 4, 2), (5, 4, 4), (5, 8, 2), (5, 8, 4), (5, 12, 2)]:
         r = run(v, R, K, rb, unr); rows.append(r); print('KERNEL ' + json.dumps(r), flush=True)
     return dict(kernels=rows)
 

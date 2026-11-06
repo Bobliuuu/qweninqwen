@@ -29,12 +29,34 @@ int main(void) {
 #elif VARIANT == 4
   WBSET(W); const u32 *xx = (const u32 *)x;
   for (u32 r = 0; r < R; r++) { i32 a = 0; for (u32 k = 0; k < K / 8; k++) VDOT(a, xx[2 * k], xx[2 * k + 1]); y[r] = a; }
-#elif VARIANT == 5
+#elif VARIANT == 5 && RB == 2
   WBSET(W); const u32 *xx = (const u32 *)x;
-  for (u32 r = 0; r < R; r += RB) { i32 a[RB]; for (int j = 0; j < RB; j++) a[j] = 0;
-    for (u32 k = 0; k < K / 8; k += UNR) {
-      for (int u = 0; u < UNR; u++) { u32 x0 = xx[2 * (k + u)], x1 = xx[2 * (k + u) + 1]; for (int j = 0; j < RB; j++) VDOT(a[j], x0, x1); } }
-    for (int j = 0; j < RB; j++) y[r + j] = a[j]; }
+  for (u32 r = 0; r < R; r += 2) { i32 a0 = 0, a1 = 0;
+    for (const u32 *p = xx, *e = xx + K / 4; p < e; p += 2 * UNR) {
+#pragma GCC unroll 8
+      for (int u = 0; u < UNR; u++) { u32 x0 = p[2 * u], x1 = p[2 * u + 1]; VDOT(a0, x0, x1); VDOT(a1, x0, x1); } }
+    y[r + 0] = a0; y[r + 1] = a1; }
+#elif VARIANT == 5 && RB == 4
+  WBSET(W); const u32 *xx = (const u32 *)x;
+  for (u32 r = 0; r < R; r += 4) { i32 a0 = 0, a1 = 0, a2 = 0, a3 = 0;
+    for (const u32 *p = xx, *e = xx + K / 4; p < e; p += 2 * UNR) {
+#pragma GCC unroll 8
+      for (int u = 0; u < UNR; u++) { u32 x0 = p[2 * u], x1 = p[2 * u + 1]; VDOT(a0, x0, x1); VDOT(a1, x0, x1); VDOT(a2, x0, x1); VDOT(a3, x0, x1); } }
+    y[r + 0] = a0; y[r + 1] = a1; y[r + 2] = a2; y[r + 3] = a3; }
+#elif VARIANT == 5 && RB == 8
+  WBSET(W); const u32 *xx = (const u32 *)x;
+  for (u32 r = 0; r < R; r += 8) { i32 a0 = 0, a1 = 0, a2 = 0, a3 = 0, a4 = 0, a5 = 0, a6 = 0, a7 = 0;
+    for (const u32 *p = xx, *e = xx + K / 4; p < e; p += 2 * UNR) {
+#pragma GCC unroll 8
+      for (int u = 0; u < UNR; u++) { u32 x0 = p[2 * u], x1 = p[2 * u + 1]; VDOT(a0, x0, x1); VDOT(a1, x0, x1); VDOT(a2, x0, x1); VDOT(a3, x0, x1); VDOT(a4, x0, x1); VDOT(a5, x0, x1); VDOT(a6, x0, x1); VDOT(a7, x0, x1); } }
+    y[r + 0] = a0; y[r + 1] = a1; y[r + 2] = a2; y[r + 3] = a3; y[r + 4] = a4; y[r + 5] = a5; y[r + 6] = a6; y[r + 7] = a7; }
+#elif VARIANT == 5 && RB == 12
+  WBSET(W); const u32 *xx = (const u32 *)x;
+  for (u32 r = 0; r < R; r += 12) { i32 a0 = 0, a1 = 0, a2 = 0, a3 = 0, a4 = 0, a5 = 0, a6 = 0, a7 = 0, a8 = 0, a9 = 0, a10 = 0, a11 = 0;
+    for (const u32 *p = xx, *e = xx + K / 4; p < e; p += 2 * UNR) {
+#pragma GCC unroll 8
+      for (int u = 0; u < UNR; u++) { u32 x0 = p[2 * u], x1 = p[2 * u + 1]; VDOT(a0, x0, x1); VDOT(a1, x0, x1); VDOT(a2, x0, x1); VDOT(a3, x0, x1); VDOT(a4, x0, x1); VDOT(a5, x0, x1); VDOT(a6, x0, x1); VDOT(a7, x0, x1); VDOT(a8, x0, x1); VDOT(a9, x0, x1); VDOT(a10, x0, x1); VDOT(a11, x0, x1); } }
+    y[r + 0] = a0; y[r + 1] = a1; y[r + 2] = a2; y[r + 3] = a3; y[r + 4] = a4; y[r + 5] = a5; y[r + 6] = a6; y[r + 7] = a7; y[r + 8] = a8; y[r + 9] = a9; y[r + 10] = a10; y[r + 11] = a11; }
 #endif
   return R * 4;
 }
