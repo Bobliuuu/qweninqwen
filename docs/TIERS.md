@@ -35,11 +35,14 @@ Instr/token = trace tok/token / 1.4 tok per instruction (Qwenputer range 1.0-1.5
 | Qwenputer upstream numbers (stories260K token: 2.43M / 225k / 53k trace tokens; executor 5,562 tok/s batch 1) | upstream, not reproduced here | plan sec. 2 |
 | Compiled route (different thing): 1 token, 268.6 s untuned, A100 | measured | `experiments/vslice/logs/real_L28.log` |
 
-## Open conflicts and questions (integration lead)
+## Open items and rulings
 
-1. Several ISAs exist: `compiler/isa.py` is a tensor-op program (MATVEC, RMSNORM, SOFTMAX...), `algo/iss/rvsim.c` is an RV32 simulator, `engine/qwentpu` is Qwenputer's RV32 circuit. The tier table assumes the RV32IM + VDOT/SMAQA CPU. The compiler agent must say whether its ISA lowers to RV32IM instructions on that CPU or replaces it (a replaced ISA is a different outer-model compile and not Qwenputer-style).
-2. Weight memory (298 MB int4 vs 261,120 nibbles in state) is unresolved; every full-token projection assumes M1 paging, which needs a user ruling.
-3. T5/T6 need a ruling on cross-session activation transport.
+1. RESOLVED (coordinator): target ISA is RV32IM Qwenputer (plus VDOT/SMAQA) in the real Qwen3.5-0.8B/4B. Compiler lowers to RV32IM firmware; tensor-op `compiler/isa.py` is an intermediate form only.
+2. OPEN, pending user ruling: weight paging (M1) vs embedding-ROM (M2). Every full-token row depends on it (298 MB int4 vs 261,120 nibbles in state). Marked [needs R2] below.
+3. OPEN, pending user ruling: cross-session activation transport. T5, T6 depend on it [needs R3].
+4. OPEN, pending user ruling: numeric contract (W4A8 vs W8A8, fixed-point nonlinear ops, meaning of "equals"). All rows depend on it [needs R4]; argmax-vs-HF agreement is reported separately.
+
+Dependency marks: T0-T4 need R2 and R4; T5-T6 need R2, R3, R4.
 
 ## How rows get promoted
 
