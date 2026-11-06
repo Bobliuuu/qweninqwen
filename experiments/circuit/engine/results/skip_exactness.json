@@ -1,0 +1,138 @@
+[
+ {
+  "U": 9216,
+  "zmax": 432.0,
+  "P": 1024.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ROM_full"
+ },
+ {
+  "U": 9216,
+  "zmax": 112.0,
+  "P": 512.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "SELECT"
+ },
+ {
+  "U": 9216,
+  "zmax": 432.0,
+  "P": 1024.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ROM_230"
+ },
+ {
+  "U": 9216,
+  "zmax": 23.0,
+  "P": 256.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "PRODUCT"
+ },
+ {
+  "U": 9216,
+  "zmax": 1792.0,
+  "P": 4096.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "DIGITIZE"
+ },
+ {
+  "U": 9216,
+  "zmax": 16.0,
+  "P": 256.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "LOSUM"
+ },
+ {
+  "U": 9216,
+  "zmax": 1792.0,
+  "P": 4096.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC0"
+ },
+ {
+  "U": 9216,
+  "zmax": 1792.0,
+  "P": 4096.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC1"
+ },
+ {
+  "U": 9216,
+  "zmax": 1792.0,
+  "P": 4096.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC2"
+ },
+ {
+  "U": 9216,
+  "zmax": 3840.0,
+  "P": 8192.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC3"
+ },
+ {
+  "U": 9216,
+  "zmax": 3456.0,
+  "P": 8192.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC4"
+ },
+ {
+  "U": 9216,
+  "zmax": 3328.0,
+  "P": 8192.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC5"
+ },
+ {
+  "U": 9216,
+  "zmax": 2784.0,
+  "P": 8192.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC6"
+ },
+ {
+  "U": 9216,
+  "zmax": 576.0,
+  "P": 2048.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC7"
+ },
+ {
+  "U": 9216,
+  "zmax": 256.0,
+  "P": 1024.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC8"
+ },
+ {
+  "U": 9216,
+  "zmax": 112.0,
+  "P": 512.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC9"
+ },
+ {
+  "U": 9216,
+  "zmax": 496.0,
+  "P": 2048.0,
+  "skip_exact": true,
+  "flag_off_unchanged": true,
+  "name": "ACC10"
+ }
+]

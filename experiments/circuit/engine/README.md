@@ -35,3 +35,19 @@ Not done: megakernel (timeline shows every kernel at its ~4.5 us floor with zero
 ## q3.elf (e2e agent's tiny Qwen3 firmware, 16 tokens) on gpuB with the tuned executor, results/q3_tuned.{json,log}
 `run_tuned.py q3.elf`: 708,920 trace steps (529,035 instructions) in 141.9 s = **4,995 tok/s (0.2002 ms/step), exact token-for-token vs ref.Machine** (first_mismatch null).
 The e2e agent's untuned A100 run was 4,225 tok/s. => 14.2 s per tiny-model token (45,056 int4 weights) at 44.3k trace tokens/token.
+
+## Corrected ROM circuit (MEMORY_DESIGN s.10): step time, flag-gated skip, skip exactness (results/corrected.{json,log}, skip_exactness.json)
+`capture_layers.py` runs memory/rom_select.py, mac_layer.py (K=230) and acc_stage.py (Pg=14) with `mac_layer.fwd` wrapped, captures the exact CSR sparsity of all 17 sublayers and tests the skip gate;
+`bench_corrected.py` times them (timing-only sparse kernel `_k`, predicated on a device flag, active-unit scatter loop only when a unit fires). Per-layer ms on the A10G: ROM_full (138k gate nnz, 19.9M down nnz) 14.1 us, SELECT 4.4, PRODUCT 4.4, DIGITIZE 4.8, LOSUM 4.4, ACC0-10 4.4-11 us.
+**Skip exactness (all 17 layers, real test inputs): with a `notflag` rail and gate coefficient -P, P = 2^ceil(log2(2*zmax+128)) (zmax = max |gate pre-activation|: 16..3840 -> P = 256..8192), the sublayer leaves the residual bit-identical (bf16 silu(z-P) == 0), and with the rail at 0 the layer output is unchanged.** P = 1024 (ROM), 512 (SELECT), 256 (PRODUCT, LOSUM), 4096 (DIGITIZE, ACC0-2), 8192 (ACC3-6). A plain -16 gate leaks ~1e-6 (not exact); silu(x) is exactly 0 in bf16 for x <= -100 (CPU).
+Needs one free residual dim for the rail (one was free in every layer incl. the accumulation layers).
+| pipelines k | appended layers | step ms, ROM_DOT token | step ms, other token: predicate-skip (kernels still launched) | other token, no skip | other token, graph-level skip (chip graph only) |
+|---|---|---|---|---|---|
+| 1 | 45 | 0.701 | 0.617 | 0.701 | 0.200 |
+| 4 | 60 | 0.788 | 0.681 | 0.788 | 0.200 |
+| **14** (110 layers) | 110 | **1.078** (928 tok/s) | **0.897** (1,115 tok/s) | 1.078 | 0.200 (4,995 tok/s) |
+| 29 (~185 layers) | 185 | 1.512 (661 tok/s) | 1.221 | 1.512 | 0.200 |
+The predicate-skip saves only ~17-19% because every skipped kernel still costs its ~4.5 us launch floor (110 appended layers x 4.5 us). A real skip must not launch the kernels: two CUDA graphs (chip-only / chip+ROM) chosen by the host from the previous decoded token family (a one-token device->host read per step, not measured; cost would be added to the 0.200 ms), or CUDA conditional graph nodes.
+Implied time per Qwen3-0.6B token (k=14, 185K ROM_DOT calls, memory agent's 2.4-4.6M tokens/inner token; the other tokens = total - 185K): ROM_DOT calls 185K x 1.078 ms = 199 s; other tokens 2.2-4.4M x {0.200 graph-skip, 0.897 predicate-skip, 1.078 none} ms
+= **~640-1,080 s with graph-level skip** (+ host-select overhead), 2,170-4,150 s with the predicate skip, 2,590-4,960 s with no skip. The ~1e8 nonlinear-glue tokens (MEMORY_DESIGN) cost 1e8 x 0.200 = 2.0e4 s (5.6 h) with graph-level skip but 1e8 x 1.078 = 1.08e5 s (30 h) without: the skip is mandatory and the nonlinear glue still dominates.
+Memory: ROM_full CSR (fp32+int32) per bank in results/corrected.json (rom_bank_csr_mb_each, rom_banks_csr_gb_29): see json.

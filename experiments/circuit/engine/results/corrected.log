@@ -1,0 +1,21 @@
+ROM_full {'ms': 0.014111995697021484, 'ms_flag_off': 0.011525154113769531, 'num_warps': 8, 'KA': 2, 'KB': 16, 'ndmax': 2200}
+SELECT {'ms': 0.004429817199707031, 'ms_flag_off': 0.004689693450927734, 'num_warps': 4, 'KA': 2, 'KB': 8, 'ndmax': 1}
+ROM_230 {'ms': 0.005919933319091797, 'ms_flag_off': 0.004737377166748047, 'num_warps': 4, 'KA': 2, 'KB': 16, 'ndmax': 227}
+PRODUCT {'ms': 0.004379749298095703, 'ms_flag_off': 0.004475116729736328, 'num_warps': 4, 'KA': 2, 'KB': 2, 'ndmax': 1}
+DIGITIZE {'ms': 0.004780292510986328, 'ms_flag_off': 0.004990100860595703, 'num_warps': 4, 'KA': 2, 'KB': 2, 'ndmax': 2}
+LOSUM {'ms': 0.004394054412841797, 'ms_flag_off': 0.0044155120849609375, 'num_warps': 8, 'KA': 2, 'KB': 2, 'ndmax': 1}
+ACC0 {'ms': 0.004379749298095703, 'ms_flag_off': 0.004963874816894531, 'num_warps': 4, 'KA': 2, 'KB': 2, 'ndmax': 2}
+ACC1 {'ms': 0.004398822784423828, 'ms_flag_off': 0.004425048828125, 'num_warps': 8, 'KA': 2, 'KB': 2, 'ndmax': 2}
+ACC2 {'ms': 0.004544258117675781, 'ms_flag_off': 0.004451274871826172, 'num_warps': 2, 'KA': 2, 'KB': 2, 'ndmax': 2}
+ACC3 {'ms': 0.011005401611328125, 'ms_flag_off': 0.009195804595947266, 'num_warps': 8, 'KA': 64, 'KB': 64, 'ndmax': 2}
+ACC4 {'ms': 0.009696483612060547, 'ms_flag_off': 0.009338855743408203, 'num_warps': 4, 'KA': 64, 'KB': 64, 'ndmax': 2}
+ACC5 {'ms': 0.0053119659423828125, 'ms_flag_off': 0.005009174346923828, 'num_warps': 8, 'KA': 32, 'KB': 32, 'ndmax': 2}
+ACC6 {'ms': 0.005278587341308594, 'ms_flag_off': 0.005030632019042969, 'num_warps': 8, 'KA': 32, 'KB': 32, 'ndmax': 2}
+ACC7 {'ms': 0.004479885101318359, 'ms_flag_off': 0.004630088806152344, 'num_warps': 4, 'KA': 4, 'KB': 8, 'ndmax': 2}
+ACC8 {'ms': 0.004401206970214844, 'ms_flag_off': 0.0046539306640625, 'num_warps': 4, 'KA': 2, 'KB': 4, 'ndmax': 1}
+ACC9 {'ms': 0.00446319580078125, 'ms_flag_off': 0.004608631134033203, 'num_warps': 4, 'KA': 2, 'KB': 16, 'ndmax': 1}
+ACC10 {'ms': 0.004413127899169922, 'ms_flag_off': 0.0044536590576171875, 'num_warps': 8, 'KA': 2, 'KB': 4, 'ndmax': 4}
+{"pipelines": 14, "banks": 29, "appended_layers": 110, "appended_ms_flag_on": 0.8773953475952148, "appended_ms_flag_off": 0.6969763679504395, "step_ms_ROM_DOT": 1.0775953475952147, "step_ms_other": 0.8971763679504394, "tok_per_s_ROM_DOT": 927.9921282433354, "tok_per_s_other": 1114.6080477849152, "step_ms_other_with_no_skip": 1.0775953475952147}
+{"pipelines": 29, "banks": 29, "appended_layers": 185, "appended_ms_flag_on": 1.3121540489196777, "appended_ms_flag_off": 1.02053271484375, "step_ms_ROM_DOT": 1.5123540489196776, "step_ms_other": 1.22073271484375, "tok_per_s_ROM_DOT": 661.2208303434845, "tok_per_s_other": 819.1801430733319, "step_ms_other_with_no_skip": 1.5123540489196776}
+{"pipelines": 4, "banks": 29, "appended_layers": 60, "appended_ms_flag_on": 0.5875562133789063, "appended_ms_flag_off": 0.48127213668823243, "step_ms_ROM_DOT": 0.7877562133789062, "step_ms_other": 0.6814721366882324, "tok_per_s_ROM_DOT": 1269.428260947281, "tok_per_s_other": 1467.411426180571, "step_ms_other_with_no_skip": 0.7877562133789062}
+{"pipelines": 1, "banks": 29, "appended_layers": 45, "appended_ms_flag_on": 0.5006044731140137, "appended_ms_flag_off": 0.4165608673095703, "step_ms_ROM_DOT": 0.7008044731140137, "step_ms_other": 0.6167608673095704, "tok_per_s_ROM_DOT": 1426.9315313535537, "tok_per_s_other": 1621.3739441060723, "step_ms_other_with_no_skip": 0.7008044731140137}

@@ -39,3 +39,4 @@
 | 2026-11-06 | Lambda A100 / CPU bf16 | experiments/circuit/memory acc_stage.py (digit accumulation), rom_select.py (full-width ROM + slot select) | exact on CPU: acc 7 layers (Pg=5), 11 layers (Pg=14); select exact; A100 rerun of acc_stage queued |
 | 2026-11-06 10:20 UTC | gpuB (A10G) | bench_exec.py --wf 4 --wh 8 --batch 4,16,64 | exact; aggregate 11.9k / 19.0k / 21.95k tok/s |
 | 2026-11-06 11:00 UTC | gpuB (A10G) | `run_tuned.py q3.elf` (e2e firmware, 16 tokens, per-sublayer tuned fused executor) | exact, 708,920 steps, 141.9 s = 4,995 tok/s |
+| 2026-11-06 11:30 UTC | gpuB (A10G) | `capture_layers.py` + `bench_corrected.py` (corrected ROM+SELECT+MAC+acc, MEMORY_DESIGN s.10) | k=14 (110 layers): 1.078 ms/step on ROM_DOT tokens (928 tok/s), predicate skip 0.897 on others, graph-level skip 0.200; skip bit-exact for all 17 layers with P=2^ceil(log2(2 zmax+128)) |
