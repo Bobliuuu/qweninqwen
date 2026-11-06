@@ -34,7 +34,7 @@ class Big(ref.Machine):
                 op = d.op
                 if op in MEMLOAD or op in ('SB', 'SH', 'SW'):   # host-served memory word (aligned), circuit RAM slot = word index mod 8192
                     ea = (self.x[d.rs1] + d.imm) & 0xFFFFFFFF
-                    self.touch[(ea >> 2) & 0x1FFF] = ea & ~3   # last-touched word address per circuit RAM slot (loads, stores): chained-run RAM readback check
+                    self.touch[(ea >> 2) & 0x1FFF] = (ea & ~3, 0 if op in MEMLOAD else 2 if op == 'SW' else 1)   # last-touched word address per circuit RAM slot (loads, stores): chained-run RAM readback check
                     if op != 'SW':
                         ri = self.ram_index(ea)
                         if ri is not None: w = self.ram[ri]
@@ -63,11 +63,12 @@ else:
     first = np.array([S.tok('GO')], dtype=np.uint32); ntok = 1
 def dump_state():
     # machine state at this record boundary (= the start of chunk `chunk`): enough to snapshot the circuit (no RAM: loads are host-served)
-    tea = np.full(8192, -1, np.int64); tval = np.zeros(8192, np.int64)
-    for sl, ea in m.touch.items():
+    tea = np.full(8192, -1, np.int64); tval = np.zeros(8192, np.int64); top = np.full(8192, -1, np.int8)
+    for sl, (ea, tk) in m.touch.items():
+        top[sl] = tk
         ri = m.ram_index(ea); w = m.ram[ri] if ri is not None else m.drom_word(ea)
         tea[sl] = ea; tval[sl] = 0 if w is None else w
-    pickle.dump(dict(x=list(m.x), anchor=m.anchor, n=m.n, wb=m.wb, steps=m.steps, tok_start=ntok, halted=m.halted, bn=[list(r) for r in m.bn], touch_ea=tea, touch_val=tval), open(f'{out}/state_{chunk:04d}.pkl', 'wb'))
+    pickle.dump(dict(x=list(m.x), anchor=m.anchor, n=m.n, wb=m.wb, steps=m.steps, tok_start=ntok, halted=m.halted, bn=[list(r) for r in m.bn], touch_ea=tea, touch_val=tval, touch_op=top), open(f'{out}/state_{chunk:04d}.pkl', 'wb'))
 CH = 1 << 21; buf = []; kbuf = []; nb = 0
 def flush():
     global chunk, buf, kbuf, nb
