@@ -1,0 +1,467 @@
+{
+ "mode": "chain",
+ "chunks": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "steps": 12582912,
+ "steps_run": 12582913,
+ "seconds": 2277.80304646492,
+ "tok_per_s": 5524.144422521542,
+ "free_tokens": 12561408,
+ "free_mismatches": 0,
+ "first_free_mismatch": null,
+ "forced_tokens": 21504,
+ "forced_raw_disagreements": 21380,
+ "diverged": false,
+ "boundaries": [
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1626,
+    1626
+   ],
+   "n": [
+    11,
+    11
+   ],
+   "wb15": [
+    10049,
+    10049
+   ],
+   "wb_ref_full27": 829249,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 224,
+   "ram_bad_first": [
+    [
+     1498,
+     "0x0",
+     "0x1f40708",
+     "0x11e1768"
+    ],
+    [
+     1499,
+     "0x0",
+     "0xfb07fb08",
+     "0x11e176c"
+    ],
+    [
+     1500,
+     "0x0",
+     "0xf90a0504",
+     "0x11e1770"
+    ],
+    [
+     1501,
+     "0x0",
+     "0x12fd0109",
+     "0x11e1774"
+    ],
+    [
+     1502,
+     "0x0",
+     "0x7ff0afe",
+     "0x11e1778"
+    ],
+    [
+     1503,
+     "0x0",
+     "0x1f20501",
+     "0x11e177c"
+    ]
+   ],
+   "ram_touched_by_op": {
+    "load": 4898,
+    "sb_sh": 224,
+    "sw": 3070
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 224,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "boundary_after_chunk": 0,
+   "step": 2097151
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1626,
+    1626
+   ],
+   "n": [
+    11,
+    11
+   ],
+   "wb15": [
+    385,
+    385
+   ],
+   "wb_ref_full27": 1802625,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 299,
+   "ram_bad_first": [
+    [
+     1930,
+     "0x0",
+     "0xfd00",
+     "0x11e1e28"
+    ],
+    [
+     1931,
+     "0x0",
+     "0xfffffe00",
+     "0x11e1e2c"
+    ],
+    [
+     1932,
+     "0x0",
+     "0x7fe0102",
+     "0x11e1e30"
+    ],
+    [
+     1933,
+     "0x0",
+     "0x40103f5",
+     "0x11e1e34"
+    ],
+    [
+     1934,
+     "0x0",
+     "0xfd000000",
+     "0x11e1e38"
+    ],
+    [
+     1935,
+     "0x0",
+     "0x10201fe",
+     "0x11e1e3c"
+    ]
+   ],
+   "ram_touched_by_op": {
+    "load": 6832,
+    "sb_sh": 304,
+    "sw": 1056
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 299,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "boundary_after_chunk": 1,
+   "step": 4194303
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1595,
+    1595
+   ],
+   "n": [
+    60,
+    60
+   ],
+   "wb15": [
+    6561,
+    6561
+   ],
+   "wb_ref_full27": 2693537,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 96,
+   "ram_bad_first": [
+    [
+     1882,
+     "0x0",
+     "0xf005fd0d",
+     "0x11e1d68"
+    ],
+    [
+     1883,
+     "0x0",
+     "0xfc0d12fc",
+     "0x11e1d6c"
+    ],
+    [
+     1884,
+     "0x0",
+     "0x50602f4",
+     "0x11e1d70"
+    ],
+    [
+     1885,
+     "0x0",
+     "0xf504fb06",
+     "0x11e1d74"
+    ],
+    [
+     1886,
+     "0x0",
+     "0xe9e413ee",
+     "0x11e1d78"
+    ],
+    [
+     1887,
+     "0x0",
+     "0x9f50af0",
+     "0x11e1d7c"
+    ]
+   ],
+   "ram_touched_by_op": {
+    "load": 7038,
+    "sb_sh": 96,
+    "sw": 1058
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 96,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "boundary_after_chunk": 2,
+   "step": 6291455
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1626,
+    1626
+   ],
+   "n": [
+    6,
+    6
+   ],
+   "wb15": [
+    31745,
+    31745
+   ],
+   "wb_ref_full27": 3570689,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 670,
+   "ram_bad_first": [
+    [
+     1546,
+     "0x0",
+     "0xff0105fe",
+     "0x11e1828"
+    ],
+    [
+     1547,
+     "0x0",
+     "0xfd020000",
+     "0x11e182c"
+    ],
+    [
+     1548,
+     "0x0",
+     "0x1ff0000",
+     "0x11e1830"
+    ],
+    [
+     1549,
+     "0x0",
+     "0x1010305",
+     "0x11e1834"
+    ],
+    [
+     1550,
+     "0x0",
+     "0x99010000",
+     "0x11e1838"
+    ],
+    [
+     1551,
+     "0x0",
+     "0x4000100",
+     "0x11e183c"
+    ]
+   ],
+   "ram_touched_by_op": {
+    "load": 6448,
+    "sb_sh": 688,
+    "sw": 1056
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 670,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "boundary_after_chunk": 3,
+   "step": 8388607
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1433,
+    1433
+   ],
+   "n": [
+    37,
+    37
+   ],
+   "wb15": [
+    3458,
+    3458
+   ],
+   "wb_ref_full27": 4459906,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 496,
+   "ram_bad_first": [
+    [
+     1482,
+     "0x0",
+     "0x704f901",
+     "0x11e1728"
+    ],
+    [
+     1483,
+     "0x0",
+     "0x1fcfdfa",
+     "0x11e172c"
+    ],
+    [
+     1484,
+     "0x0",
+     "0x3faf8f8",
+     "0x11e1730"
+    ],
+    [
+     1485,
+     "0x0",
+     "0x3fa0305",
+     "0x11e1734"
+    ],
+    [
+     1486,
+     "0x0",
+     "0x10305f9",
+     "0x11e1738"
+    ],
+    [
+     1487,
+     "0x0",
+     "0xfb01fd06",
+     "0x11e173c"
+    ]
+   ],
+   "ram_touched_by_op": {
+    "load": 7046,
+    "sb_sh": 496,
+    "sw": 650
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 496,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "boundary_after_chunk": 4,
+   "step": 10485759
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    966,
+    966
+   ],
+   "n": [
+    3,
+    3
+   ],
+   "wb15": [
+    31105,
+    31105
+   ],
+   "wb_ref_full27": 5503361,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 5888,
+    "sb_sh": 0,
+    "sw": 2304
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": true,
+   "boundary_after_chunk": 5,
+   "step": 12582912
+  }
+ ],
+ "gpu": "NVIDIA A100-SXM4-40GB"
+}
