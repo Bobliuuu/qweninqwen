@@ -111,7 +111,7 @@ def layer_timeline():
     b += tx(24, 54, 'State and KV only carry data deeper (to layers at or below the layer that holds them), so each inner op gets its own outer layers, in dependency order.', 's')
     chips = [('op', 'RMSNorm', 'GDN gated-norm head'), ('st', 'W_qkv bank', 'GDN state read'), ('st', 'register', 'GDN state'), ('op', 'q/k norm', 'norm + gain product'), ('at', 'RoPE + attention', 'outer KV = inner KV'), ('st', 'register', 'GDN state'),
              ('st', 'W_o bank', 'read + residual'), ('op', 'RMSNorm', 'GDN gated-norm head'), ('st', 'W_gate, W_up bank', 'GDN state read'), ('op', 'SwiGLU', 'MLP gadget'), ('st', 'register', 'GDN state'), ('st', 'W_down bank', 'read + residual')]
-    b += tx(24, 90, 'depth (outer layers)  ->', 'b') + tx(976, 90, 'one inner layer = roughly 15 outer layers', 's', 'r')
+    b += tx(24, 90, 'depth (outer layers)  ->', 'b') + tx(976, 90, 'real model: 1006 outer layers, D = 40775', 's', 'r')
     cw, gap, h = 140, 22, 64
     for row in range(2):
         y = 106 + row * 100
@@ -128,7 +128,7 @@ def layer_timeline():
         if i < 3: b += arrow(f'M{x+152} 346 L{x+174} 346')
     b += arrow('M706 346 L760 346') + box(762, 326, 214, 40, 'ho', 6) + tx(869, 351, 'host: argmax + append', 'b', 'c')
     b += tx(24, 400, 'Weights are paged in the same call: WRITE frames precede the READ frame of each bank, one chunked prefill per inner token.', 's')
-    b += tx(24, 418, 'The only deep-to-shallow channel is the emitted token: outer argmax, host append, next embedding row. Toy run: 1530 outer steps per inner token. Schematic order; q/k norm is Qwen3 only.', 's')
+    b += tx(24, 418, 'The only deep-to-shallow channel is the emitted token: outer argmax, host append, next embedding row. Real Qwen3-0.6B: 293,068 outer frames per token. Toy: 1530. Schematic order.', 's')
     return svg(1000, 440, b, 'Unrolled pipeline', 'Each inner op occupies its own outer layers in dependency order; registers are DeltaNet layers placed between producer and consumer; one forward call per inner token.')
 
 # ------------------------------------------------------------------ log bar helper
@@ -152,30 +152,49 @@ def logbars(title, sub, rows, xmin, xmax, unit_ticks, footer, w=1000):
     return svg(w, h + 16 * (len(footer) - 1), b, title, sub), h
 
 def cost_model():
-    rows = [('paging bound (design estimate)', 110, 'ho', '2048 floats/step, A100 stand-in; untested', True),
-            ('bank nL=4, measured', 41.95, 'st', '519,430 frames at 12.4k frames/s', False),
-            ('bank nL=2, extrapolated', 19, 'st', 'plan() estimate from frame cost', True),
-            ('bank nL=1, extrapolated', 7, 'st', 'plan() estimate, multi-pass K', True)]
-    s, _ = logbars('Cost model: weight streaming through DeltaNet state (Qwen3-0.6B)',
-        'All 197 weight matrices incl. LM head = 595,984,384 real weights, fp32, A10G, torch-reference GDN, worst relative error 5.6e-7 (experiments/run/token_results.jsonl).',
-        rows, 1, 300, [(1, '1 s'), (3, '3 s'), (10, '10 s'), (30, '30 s'), (100, '100 s'), (300, '300 s')],
-        ['Matvec streaming only. Not included: op layers and the ~15-layer-per-inner-layer pipeline depth, the in-model argmax.',
-         'Activations in the 41.95 s run were harness-fed (random): a throughput and accuracy measurement of the paging machine, NOT a chained token.'])
+    rows = [('full token, real Qwen3-0.6B (measured)', 268.6, 'st', 'shared A100, 293,068 frames, 1006 layers', False),
+            ('paging bound (design estimate)', 110, 'ho', '2048 floats/step; untested', True),
+            ('weight streaming only, nL=4 bank (measured)', 41.95, 'st', 'A10G, 519,430 frames', False),
+            ('weight streaming only, nL=2 (extrapolated)', 19, 'st', 'plan() estimate', True),
+            ('weight streaming only, nL=1 (extrapolated)', 7, 'st', 'plan() estimate', True)]
+    s, _ = logbars('Cost model: Qwen3-0.6B inside the outer model, seconds per token',
+        'Top row: one full token incl. all norms, attention, LM head and argmax (single position). Other rows: weight streaming alone through a shallow bank (experiments/run/).',
+        rows, 1, 1000, [(1, '1 s'), (3, '3 s'), (10, '10 s'), (30, '30 s'), (100, '100 s'), (300, '300 s'), (1000, '1000 s')],
+        ['Full token: 13.9 s layer building + ~242 s running, torch-reference GDN, fp32, untuned, shared GPU (experiments/vslice/FULL_TOKEN_RESULT.md).',
+         'Streaming-only rows use harness-fed random activations and a shallow stack: they do not add up to, or compare directly with, the full-token row.'])
     save('cost_model.svg', s)
 
 def comparison():
     rows = [('circuit route, real 896-row (measured)', 494e6 / 14.71, 'bd', '14.7 MAC/s, 389 days', False),
             ('circuit route, best synthetic (measured)', 494e6 / 488.6, 'bd', '488 MAC/s, 11.7 days', False),
-            ('state-as-memory, matvecs only (measured)', 41.95, 'st', 'A10G, 596M weights', False),
+            ('state route, full token (measured)', 268.6, 'st', 'real Qwen3-0.6B, 1 position, A100', False),
+            ('state route, matvecs only (measured)', 41.95, 'st', 'A10G, 596M weights', False),
             ('MLP-multiplier, MACs only (estimate)', 0.64, 'ac', '0.77 GMAC/s A100; host copies x (flagged)', True)]
     s, _ = logbars('Circuit route vs state-as-memory route (seconds per inner token)',
         'Same inner model size (~0.5-0.6 B weights). Circuit: bit-level arithmetic in GDN state (reference/). State route: weights written into the state, contraction done by the delta-rule read.',
         rows, 0.3, 1e8, [(1, '1 s'), (60, '1 min'), (3600, '1 h'), (86400, '1 day'), (86400 * 30, '30 d'), (86400 * 365, '1 yr')],
         ['Circuit rows extrapolate measured MAC/s (reference/nested-qwen-lab, experiments/bench/circuit_baseline) to 494M MACs; they exclude all non-matvec ops.',
-         'State row = weight streaming only; MLP-multiplier row = estimate from layer throughput (experiments/alt/FINDINGS.md). No chained token yet.'])
+         'State rows: full token incl. all ops (experiments/vslice) and weight streaming alone. MLP-multiplier row: estimate (experiments/alt/FINDINGS.md).'])
     save('comparison.svg', s)
+
+def lm_head():
+    b = tx(24, 34, 'Full-vocabulary LM head and argmax, in-model', 't')
+    b += tx(24, 54, 'Logits for 151,936 tokens are produced in 594 blocks of 256; the argmax is a two-level hard max done by outer layers.', 's')
+    xs = [24, 262, 500, 738]; w = 214; y = 96; h = 120
+    stages = [('st', 'Blocks of logits', ['594 blocks x 256 logits', 'state-bank matvec on the', '151,936 x 1024 head weights']),
+              ('op', 'Per-block tournament', ['max and local argmax', 'inside each block', 'output: best logit + 8 bits']),
+              ('at', 'Hard-max attention', ['key = block best logit', 'value = 36 dual-rail bits', '(8 local + 10 block index)']),
+              ('ho', 'Outer lm_head', ['36 non-zero columns', 'decode rails -> token id', 'host: argmax + append'])]
+    for i, (c, t, ls) in enumerate(stages):
+        b += box(xs[i], y, w, h, c) + tx(xs[i] + w / 2, y + 28, t, 'b', 'c')
+        for k, l in enumerate(ls): b += tx(xs[i] + w / 2, y + 56 + k * 20, l, 's', 'c')
+        if i < 3: b += arrow(f'M{xs[i]+w+2} {y+h/2} L{xs[i+1]-2} {y+h/2}', True)
+    b += tx(24, 262, 'softmax over block winners is a hard max: the winning block gets weight 1 - e^-40 when the top-2 gap exceeds 1e-3, so the value read out is its code.', 's')
+    b += tx(24, 282, 'Full-token run (real Qwen3-0.6B): outer argmax 15846 == Hugging Face; block-best logit error 5.8e-5 of max|logit|; winning rails clean (score 18.0007 of ideal 18).', 's')
+    b += tx(24, 302, 'Exact ties blend the code and give an invalid token id; the op test notes this is practically never hit (experiments/ops/README.md).', 's')
+    return svg(1000, 326, b, 'LM head in-model', 'Blocks of 256 logits, per-block max and argmax, hard-max attention over block winners, 36 dual-rail bits decoded by the outer lm_head.')
 
 os.makedirs(OUT, exist_ok=True)
 save('architecture.svg', architecture()); save('state_memory.svg', state_memory()); save('unrolled_pipeline.svg', layer_timeline())
-cost_model(); comparison()
+cost_model(); comparison(); save('lm_head.svg', lm_head())
 print('ok')

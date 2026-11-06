@@ -185,17 +185,17 @@ class RMSNormUnit:
             for s, off in ((1.0, 0), (-1.0, d)):
                 n = r.start + off + i
                 b.g[n, xi0 + i] = s; b.u[n, xi0 + i] = s; b.d[MS, n] = kappa / d
-            # L1: PWL of m^-1/2 on geometric knots t_0=eps .. m_max
+            # L1: PWL of m^-1/2 on geometric knots t_0=eps .. t_N=m_max, DOWNWARD hinges relu(t_k-m) (no catastrophic cancellation):
+            #   p(m) = f(t_N) + sum_{k>=1} a_k relu(t_k - m),  a_k = s_k - s_{k-1} (slopes of chords), a_N = -s_{N-1}
             nk = int(math.log(m_max / eps_in) / math.log(rho)) + 2
             t = eps_in * rho ** torch.arange(nk, dtype=torch.float64); f = t ** -0.5
-            sl_ = (f[1:] - f[:-1]) / (t[1:] - t[:-1]); sl_ = torch.cat([sl_, sl_[-1:]])
-            c = sl_.clone(); c[1:] -= sl_[:-1]
-            b = mb[1]; r = b._alloc(nk + 1)
-            idx = r.start + torch.arange(nk)
-            b.g[idx, MS] = lam / kappa; b.g[idx, 0] = ((lam * (eps_in - t)) / B).float()
-            b.u[idx, 0] = 1.0 / B; b.d[R0, idx] = (c / lam).float()
-            # constant neuron: R0 += f(t0): gate=ballast(=1 after weight), up=const
-            n0 = r.start + nk; b.g[n0, 0] = 1.0 / B; b.u[n0, 0] = float(f[0]) / (B * 0.7310585786300049); b.d[R0, n0] = 1.0
+            sg = (f[1:] - f[:-1]) / (t[1:] - t[:-1])                      # s_0..s_{N-1}, N=nk-1
+            a_k = torch.cat([sg[1:] - sg[:-1], -sg[-1:]])                  # for knots k=1..N
+            tk = t[1:]
+            b = mb[1]; r = b._alloc(len(tk) + 1); idx = r.start + torch.arange(len(tk))
+            b.g[idx, MS] = -lam / kappa; b.g[idx, 0] = ((lam * (tk - eps_in)) / B).float()
+            b.u[idx, 0] = 1.0 / B; b.d[R0, idx] = (a_k / lam).float()
+            n0 = r.start + len(tk); b.g[n0, 0] = 1.0 / B; b.u[n0, 0] = float(f[-1]) / (B * 0.7310585786300049); b.d[R0, n0] = 1.0
             # L2: QQ = kappa*R0^2
             b = mb[2]; r = b._alloc(2)
             for j, s in enumerate((1.0, -1.0)):

@@ -1,0 +1,51 @@
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]Loading weights:  68%|██████▊   | 210/311 [00:00<00:00, 2095.36it/s]Loading weights: 100%|██████████| 311/311 [00:00<00:00, 2093.28it/s]
+prompt [785, 6722, 315, 9625, 374]
+[real151936_L28] d=1024 D=40775 outer_layers=1006 I_MLP=8192
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+  [progress] layer 0/1006 R build_s=0.1 run_s=0.3 rows=1
+  [progress] layer 50/1006 W build_s=2.3 run_s=1.1 rows=60
+  [progress] layer 100/1006 R build_s=6.1 run_s=1.4 rows=119
+  [progress] layer 150/1006 R build_s=9.8 run_s=1.7 rows=180
+  [progress] layer 200/1006 W build_s=13.5 run_s=2.0 rows=240
+  [progress] layer 250/1006 NG build_s=17.3 run_s=2.3 rows=300
+  [progress] layer 300/1006 NG build_s=20.8 run_s=2.7 rows=360
+  [progress] layer 350/1006 R build_s=24.5 run_s=3.0 rows=421
+  [progress] layer 400/1006 W build_s=28.1 run_s=3.3 rows=480
+  [progress] layer 450/1006 R build_s=31.8 run_s=3.6 rows=539
+  [progress] layer 500/1006 R build_s=35.5 run_s=3.9 rows=600
+  [progress] layer 550/1006 W build_s=39.1 run_s=4.2 rows=660
+  [progress] layer 600/1006 NG build_s=42.9 run_s=4.5 rows=720
+  [progress] layer 650/1006 NG build_s=46.4 run_s=4.9 rows=780
+  [progress] layer 700/1006 R build_s=50.0 run_s=5.2 rows=841
+  [progress] layer 750/1006 W build_s=53.7 run_s=5.5 rows=900
+  [progress] layer 800/1006 R build_s=57.3 run_s=5.8 rows=959
+  [progress] layer 850/1006 R build_s=61.0 run_s=6.1 rows=1020
+  [progress] layer 900/1006 W build_s=64.7 run_s=6.4 rows=1080
+  [progress] layer 950/1006 NG build_s=68.4 run_s=6.7 rows=1140
+  [progress] layer 1000/1006 TM build_s=72.4 run_s=7.1 rows=1198
+  [progress] layer 0/1006 R build_s=0.0 run_s=0.2 rows=1996
+  [progress] layer 50/1006 W build_s=0.7 run_s=11.7 rows=112036
+  [progress] layer 100/1006 R build_s=1.4 run_s=23.4 rows=223100
+  [progress] layer 150/1006 R build_s=2.1 run_s=35.0 rows=334164
+  [progress] layer 200/1006 W build_s=2.7 run_s=46.7 rows=445740
+  [progress] layer 250/1006 NG build_s=3.4 run_s=58.0 rows=554756
+  [progress] layer 300/1006 NG build_s=4.1 run_s=69.4 rows=665308
+  [progress] layer 350/1006 R build_s=4.8 run_s=81.0 rows=777396
+  [progress] layer 400/1006 W build_s=5.5 run_s=92.5 rows=887436
+  [progress] layer 450/1006 R build_s=6.2 run_s=104.1 rows=998500
+  [progress] layer 500/1006 R build_s=6.9 run_s=115.8 rows=1109564
+  [progress] layer 550/1006 W build_s=7.5 run_s=127.3 rows=1221140
+  [progress] layer 600/1006 NG build_s=8.2 run_s=138.7 rows=1330156
+  [progress] layer 650/1006 NG build_s=8.9 run_s=150.0 rows=1440708
+  [progress] layer 700/1006 R build_s=9.6 run_s=161.7 rows=1552796
+  [progress] layer 750/1006 W build_s=10.3 run_s=173.1 rows=1662836
+  [progress] layer 800/1006 R build_s=11.0 run_s=184.9 rows=1773900
+  [progress] layer 850/1006 R build_s=11.7 run_s=196.5 rows=1884964
+  [progress] layer 900/1006 W build_s=12.4 run_s=208.2 rows=1996540
+  [progress] layer 950/1006 NG build_s=13.1 run_s=219.5 rows=2105556
+  [progress] layer 1000/1006 TM build_s=13.8 run_s=240.9 rows=2289068
+  worst blocks [(593, 1.0439, 1.0447), (14, 7.4198, 7.4195), (1, 7.6111, 7.6108), (3, 6.3186, 6.3183)] nblk 594
+  rails [-0.0, 1.0, 1.0, -0.0, 1.0, -0.0, -0.0, 1.0] top code score 18.000669479370117
+{'step': 0, 'frames': 293068, 'sec': 268.62298583984375, 'build_s': 13.881617307662964, 'run_s': 241.9442367553711, 'maxrel': 5.8052050007972866e-05, 'outer_argmax': 15846, 'hf_argmax': 15846}
+{"tag": "real151936_L28", "d": 1024, "D": 40775, "layers": 1006, "tokens": [785, 6722, 315, 9625, 374], "maxrel_worst": 5.8052050007972866e-05, "params_per_layer_M": null}

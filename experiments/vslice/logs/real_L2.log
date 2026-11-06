@@ -1,0 +1,38 @@
+Loading weights:   0%|          | 0/25 [00:00<?, ?it/s]Loading weights: 100%|██████████| 25/25 [00:00<00:00, 464.52it/s]
+[transformers] [1mQwen3ForCausalLM LOAD REPORT[0m from: Qwen/Qwen3-0.6B
+Key                                                   | Status     |  | 
+------------------------------------------------------+------------+--+-
+model.layers.{2...27}.input_layernorm.weight          | UNEXPECTED |  | 
+model.layers.{2...27}.self_attn.q_proj.weight         | UNEXPECTED |  | 
+model.layers.{2...27}.post_attention_layernorm.weight | UNEXPECTED |  | 
+model.layers.{2...27}.mlp.up_proj.weight              | UNEXPECTED |  | 
+model.layers.{2...27}.self_attn.k_proj.weight         | UNEXPECTED |  | 
+model.layers.{2...27}.self_attn.q_norm.weight         | UNEXPECTED |  | 
+model.layers.{2...27}.self_attn.o_proj.weight         | UNEXPECTED |  | 
+model.layers.{2...27}.self_attn.v_proj.weight         | UNEXPECTED |  | 
+model.layers.{2...27}.mlp.gate_proj.weight            | UNEXPECTED |  | 
+model.layers.{2...27}.self_attn.k_norm.weight         | UNEXPECTED |  | 
+model.layers.{2...27}.mlp.down_proj.weight            | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+prompt [785, 6722, 315, 9625, 374]
+[real151936_L2] d=1024 D=32117 outer_layers=96 I_MLP=8192
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+  worst blocks [(432, 4.1479, 4.1455), (442, 6.6196, 6.6175), (35, 11.6582, 11.6601), (380, 8.8128, 8.8109)] nblk 594
+  rails [0.0, 1.0, -0.0, 1.0, -0.0, 1.0, 1.0, -0.0] top code score 18.001922607421875
+{'step': 0, 'frames': 92088, 'sec': 38.37890315055847, 'build_s': 5.577864646911621, 'run_s': 30.60989761352539, 'maxrel': 0.00014672448742203414, 'outer_argmax': 25992, 'hf_argmax': 25992}
+  worst blocks [(129, 6.5424, 6.5387), (438, 5.1559, 5.1528), (248, 4.1772, 4.1742), (379, 7.7898, 7.7869)] nblk 594
+  rails [-0.001, 1.001, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0] top code score 18.0006103515625
+{'step': 1, 'frames': 92088, 'sec': 34.37442469596863, 'build_s': 1.3463528156280518, 'run_s': 30.4189555644989, 'maxrel': 0.00015715317567810416, 'outer_argmax': 2022, 'hf_argmax': 2022}
+  worst blocks [(175, 2.5052, 2.4962), (533, 3.9824, 3.9745), (380, 2.4059, 2.3985), (532, 0.5172, 0.5099)] nblk 594
+  rails [0.999, 0.001, 0.0, 1.0, 0.001, 0.999, 0.001, 0.999] top code score 17.99773406982422
+{'step': 2, 'frames': 92088, 'sec': 34.85478138923645, 'build_s': 1.522353172302246, 'run_s': 30.900060176849365, 'maxrel': 0.00040077060111798346, 'outer_argmax': 433, 'hf_argmax': 433}
+  worst blocks [(436, 0.5534, 0.557), (342, 0.957, 0.9604), (229, 3.4442, 3.4472), (450, -0.267, -0.2643)] nblk 594
+  rails [-0.0, 1.0, 1.0, -0.0, 1.0, -0.0, 1.0, -0.0] top code score 18.000438690185547
+{'step': 3, 'frames': 92088, 'sec': 35.95592999458313, 'build_s': 1.5620720386505127, 'run_s': 31.8198561668396, 'maxrel': 0.00016413939010817558, 'outer_argmax': 782, 'hf_argmax': 782}
+  worst blocks [(296, 0.7699, 0.7667), (508, -0.7293, -0.7324), (145, 0.079, 0.0761), (523, -4.2008, -4.2036)] nblk 594
+  rails [0.0, 1.0, 0.0, 1.0, 1.0, 0.0, -0.0, 1.0] top code score 17.999357223510742
+{'step': 4, 'frames': 92088, 'sec': 35.68753099441528, 'build_s': 1.7536883354187012, 'run_s': 31.201723337173462, 'maxrel': 0.00013198527449276298, 'outer_argmax': 1172, 'hf_argmax': 1172}
+{"tag": "real151936_L2", "d": 1024, "D": 32117, "layers": 96, "tokens": [785, 6722, 315, 9625, 374, 1172], "maxrel_worst": 0.00040077060111798346, "params_per_layer_M": null}
