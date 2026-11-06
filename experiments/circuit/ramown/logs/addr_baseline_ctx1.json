@@ -1,0 +1,243 @@
+{
+ "total_loads_data": 11484222,
+ "total_stores": 10630383,
+ "distinct_words_touched": 357643,
+ "distinct_words_stored": 356884,
+ "distinct_words_read_never_stored": 759,
+ "peak_live_stored_words": 152222,
+ "peak_live_incl_read_before_write": 152223,
+ "by_buffer": {
+  "NORM_OFF": {
+   "words": 109,
+   "words_stored": 0,
+   "words_ro": 109,
+   "loads": 109,
+   "stores": 0,
+   "bytes_declared": 448
+  },
+  "PLN": {
+   "words": 196,
+   "words_stored": 0,
+   "words_ro": 196,
+   "loads": 196,
+   "stores": 0,
+   "bytes_declared": 784
+  },
+  "SOFF": {
+   "words": 196,
+   "words_stored": 0,
+   "words_ro": 196,
+   "loads": 196,
+   "stores": 0,
+   "bytes_declared": 784
+  },
+  "STACK": {
+   "words": 48,
+   "words_stored": 48,
+   "words_ro": 0,
+   "loads": 69535,
+   "stores": 67239,
+   "bytes_declared": null
+  },
+  "WBW": {
+   "words": 196,
+   "words_stored": 0,
+   "words_ro": 196,
+   "loads": 196,
+   "stores": 0,
+   "bytes_declared": 784
+  },
+  "__clz_tab": {
+   "words": 60,
+   "words_stored": 0,
+   "words_ro": 60,
+   "loads": 1822,
+   "stores": 0,
+   "bytes_declared": 256
+  },
+  "accs_": {
+   "words": 151936,
+   "words_stored": 151936,
+   "words_ro": 0,
+   "loads": 9312256,
+   "stores": 9312256,
+   "bytes_declared": 3646464
+  },
+  "ao": {
+   "words": 2048,
+   "words_stored": 2048,
+   "words_ro": 0,
+   "loads": 114688,
+   "stores": 57344,
+   "bytes_declared": 8192
+  },
+  "hg": {
+   "words": 3072,
+   "words_stored": 3072,
+   "words_ro": 0,
+   "loads": 258048,
+   "stores": 172032,
+   "bytes_declared": 12288
+  },
+  "hu": {
+   "words": 3072,
+   "words_stored": 3072,
+   "words_ro": 0,
+   "loads": 86016,
+   "stores": 86016,
+   "bytes_declared": 12288
+  },
+  "k32": {
+   "words": 1024,
+   "words_stored": 1024,
+   "words_ro": 0,
+   "loads": 86016,
+   "stores": 57344,
+   "bytes_declared": 4096
+  },
+  "kh": {
+   "words": 512,
+   "words_stored": 512,
+   "words_ro": 0,
+   "loads": 114688,
+   "stores": 28672,
+   "bytes_declared": 2048
+  },
+  "kmx": {
+   "words": 224,
+   "words_stored": 224,
+   "words_ro": 0,
+   "loads": 448,
+   "stores": 224,
+   "bytes_declared": 896
+  },
+  "kq": {
+   "words": 7168,
+   "words_stored": 7168,
+   "words_ro": 0,
+   "loads": 43008,
+   "stores": 28672,
+   "bytes_declared": 28672
+  },
+  "other": {
+   "words": 2,
+   "words_stored": 0,
+   "words_ro": 2,
+   "loads": 56,
+   "stores": 0,
+   "bytes_declared": null
+  },
+  "q32": {
+   "words": 2048,
+   "words_stored": 2048,
+   "words_ro": 0,
+   "loads": 172032,
+   "stores": 114688,
+   "bytes_declared": 8192
+  },
+  "q8": {
+   "words": 32,
+   "words_stored": 32,
+   "words_ro": 0,
+   "loads": 71680,
+   "stores": 57344,
+   "bytes_declared": 128
+  },
+  "qh": {
+   "words": 1024,
+   "words_stored": 1024,
+   "words_ro": 0,
+   "loads": 229376,
+   "stores": 57344,
+   "bytes_declared": 4096
+  },
+  "sc": {
+   "words": 1,
+   "words_stored": 1,
+   "words_ro": 0,
+   "loads": 0,
+   "stores": 28,
+   "bytes_declared": 16
+  },
+  "tmp": {
+   "words": 151936,
+   "words_stored": 151936,
+   "words_ro": 0,
+   "loads": 151936,
+   "stores": 151936,
+   "bytes_declared": 607744
+  },
+  "v32": {
+   "words": 1024,
+   "words_stored": 1024,
+   "words_ro": 0,
+   "loads": 57344,
+   "stores": 28672,
+   "bytes_declared": 4096
+  },
+  "vk_x": {
+   "words": 1,
+   "words_stored": 1,
+   "words_ro": 0,
+   "loads": 4496,
+   "stores": 4496,
+   "bytes_declared": 4
+  },
+  "vmx": {
+   "words": 224,
+   "words_stored": 224,
+   "words_ro": 0,
+   "loads": 448,
+   "stores": 224,
+   "bytes_declared": 896
+  },
+  "vt": {
+   "words": 28672,
+   "words_stored": 28672,
+   "words_ro": 0,
+   "loads": 86016,
+   "stores": 28672,
+   "bytes_declared": 114688
+  },
+  "w8": {
+   "words": 1,
+   "words_stored": 1,
+   "words_ro": 0,
+   "loads": 1792,
+   "stores": 1344,
+   "bytes_declared": 4
+  },
+  "wt": {
+   "words": 1,
+   "words_stored": 1,
+   "words_ro": 0,
+   "loads": 0,
+   "stores": 28,
+   "bytes_declared": 16
+  },
+  "x": {
+   "words": 1024,
+   "words_stored": 1024,
+   "words_ro": 0,
+   "loads": 174080,
+   "stores": 58368,
+   "bytes_declared": 4096
+  },
+  "xb": {
+   "words": 1024,
+   "words_stored": 1024,
+   "words_ro": 0,
+   "loads": 174080,
+   "stores": 115712,
+   "bytes_declared": 4096
+  },
+  "xq": {
+   "words": 768,
+   "words_stored": 768,
+   "words_ro": 0,
+   "loads": 273664,
+   "stores": 201728,
+   "bytes_declared": 3136
+  }
+ }
+}
