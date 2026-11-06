@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" width="900" font-family="monospace">
+<rect width="900" height="420" fill="#0d1117"/>
+<style>.t{fill:#e6edf3;font-size:14px}.d{fill:#7d8590;font-size:12px}
+@keyframes flow{0%{transform:translateY(0);opacity:0}8%{opacity:1}92%{opacity:1}100%{transform:translateY(235px);opacity:0}}
+.po{animation:flow 3s linear infinite}.pi{animation:flow 3s linear infinite;animation-delay:1.5s}
+@keyframes glowO{0%,100%{opacity:.35}25%{opacity:1}}@keyframes glowI{0%,100%{opacity:.35}75%{opacity:1}}
+.go{animation:glowO 6s ease-in-out infinite}.gi{animation:glowI 6s ease-in-out infinite}</style>
+<text x="450" y="28" text-anchor="middle" class="t" style="font-size:18px">one checkpoint, two models, one residual stream</text>
+<text x="60" y="62" class="t">hidden state (2080 dims)</text>
+<rect x="60" y="75" width="200" height="40" rx="4" fill="#1e242c" stroke="#30363d"/>
+<rect x="60" y="75" width="98" height="40" rx="4" fill="#58a6ff" class="go"/><text x="109" y="100" text-anchor="middle" fill="#0d1117" font-size="12">outer 1024</text>
+<rect x="162" y="75" width="98" height="40" rx="4" fill="#ffa657" class="gi"/><text x="211" y="100" text-anchor="middle" fill="#0d1117" font-size="12">inner 1024</text>
+<text x="60" y="135" class="d">+ 1 flag dim (2^-10, inner tokens only)</text>
+<rect x="320" y="70" width="520" height="250" rx="8" fill="#161b22" stroke="#30363d"/>
+<text x="340" y="92" class="t">layers 0-23: real Qwen3.5-0.8B (18 GDN + 6 attn)</text>
+<text x="340" y="112" class="d">inner subspace = exact zeros here</text>
+<rect x="340" y="125" width="480" height="70" rx="4" fill="#58a6ff" opacity=".22"/>
+<text x="340" y="210" class="t">layers 24-51: Qwen3-0.6B, 28 appended full-attention layers</text>
+<text x="340" y="230" class="d">outer subspace = exact zeros here</text>
+<rect x="340" y="243" width="480" height="62" rx="4" fill="#ffa657" opacity=".22"/>
+<circle class="po" cx="360" cy="75" r="7" fill="#58a6ff"/><circle class="pi" cx="800" cy="75" r="7" fill="#ffa657"/>
+<text x="60" y="190" class="t">tricks (weights only):</text>
+<text x="60" y="212" class="d">- block-diagonal q/k/v/o + MLP</text><text x="60" y="230" class="d">- shared RoPE grid 10^(-k/32)</text>
+<text x="60" y="248" class="d">- norm width + eps rescale</text><text x="60" y="266" class="d">- attn gate saturated by flag dim</text>
+<text x="60" y="284" class="d">- lm_head: outer rows read -flag</text>
+<text x="450" y="350" text-anchor="middle" class="t" style="fill:#58a6ff">tokens 0..248319 &#8594; Qwen3.5-0.8B</text>
+<text x="450" y="374" text-anchor="middle" class="t" style="fill:#ffa657">tokens 248320+ &#8594; Qwen3-0.6B</text>
+<text x="450" y="400" text-anchor="middle" class="d">stock Qwen3_5ForCausalLM code, no patches</text></svg>
