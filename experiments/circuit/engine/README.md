@@ -11,3 +11,8 @@ The executor runs the compiled circuit (the chip layers' sparse weights) in fp32
 Implied cost of a Qwen3-0.6B token with the compiler agent's q4v firmware (experiments/circuit/compiler/res_full_q4v.json: 586.6M instr at pos 0, 694M at pos 3; Qwenputer 1.19-1.55 trace tokens/instr => ~0.7-1.1e9 trace tokens):
 one CPU at 4,350 tok/s: ~1.6e5-2.5e5 s (45-70 h) per token; perfectly 64-way split at 21.5k tok/s aggregate: ~3.3e4-5e4 s (9-14 h); splitting needs the token-bus/multicore design (experiments/circuit/multicore).
 `bench_batched.py` (separate, earlier): qwentpu signed INT8xINT4 tile circuit compiled to a stock Qwen3.5-style model, B independent traces per forward, exact: 8x2 tile 41k MAC/s at B=256 on the A10G (vs 14.7 MAC/s baseline); not the Qwenputer route.
+
+## Per-sublayer autotune (B=1), results/autotune.{json,log}
+`autotune_layers.py`: CUPTI kernel durations over a grid of triton num_warps, best warps chosen per sublayer (ffn 4/8, head 8/16/32) and for _decode_embed (16 warps: 14.2 -> 3.9 us).
+Per-step kernel sum 297 -> ~190 us; **0.2015 ms/step = 4,963 tok/s at B=1, exact token-for-token vs the reference (20k steps of stories260k)** (baseline 3,350; +48%).
+Timeline (prof_timeline.py): 21 kernels/step, every kernel 4.5-21 us with zero gaps in the graph; ~4.5 us is the per-kernel floor, so a megakernel could save at most ~2 us x 21.
