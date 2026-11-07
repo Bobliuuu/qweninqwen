@@ -26,7 +26,7 @@ Everything is under NEW paths; `/data/cfram`, `/data/w785`, `/data/rowtab_cf.npy
 | reference trace (`cf/ref_chain_cf.py`, Modal CPU, 30 min) | **argmax 15846 (out_hex e63d0000)**, exit 0, no fault; 96 chunks; 199,287,158 trace tokens; 178,066,316 instructions; blob loads 0; **0 injections in all 96 chunks** (stats aggregate in `logs/refQ/`) |
 | hfcheck, stock Qwen3_5 modules + merged checkpoint, chunk 0, 130,000 steps, program-only start | **0 mismatches** over full vocab 680,128 incl. 2,320 ROW + 23,817 VDOT tokens, 0 injections, min top1-top2 margin 22,528 |
 | table+1 negative control | diverges at step 41 (F0(0) vs F0(17), right after WB, ROW(0)), 20 mismatches |
-| replay smoke (final-path flags, chunks 0-2) | see SMOKE section below |
+| replay smoke, final-path flags (real decode, --fulltable, table from the checkpoint, --no-host-writes), chunks 0,1,2 as 3 parallel single-chunk jobs on A100 (549 s each) | each: rc 0, 2,097,152 free tokens, **0 mismatches, 0 forced, 0 injections**; seams 0->1, 1->2, 2->3 **exact** (regs x1..x31, anchor, n, wb15, 8x8 latch, all 8,192 RAM words). The collector prints FAIL only because chunk 2 is not the last chunk (no HALT/final word in a 3-chunk subset): artifact of the subset, not of the run (`logs/smoke_par/`) |
 
 ## Cost / size deltas
 instructions 138.5M -> 178.1M (+28.6%); trace tokens 157.1M -> 199.3M; chunks 75 -> **96**; table 2.40 GB -> 2.59 GB bf16 (hidden 7680). A full parallel replay is ~96 chunks x ~9.6 min = ~15.4 A100-hours (vs ~12 for 75 chunks).
