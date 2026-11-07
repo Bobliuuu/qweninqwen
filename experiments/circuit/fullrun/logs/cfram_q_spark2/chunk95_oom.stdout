@@ -1,0 +1,24 @@
+ROW table slice materialised for this run: rows 0..168683 of 168684
+Traceback (most recent call last):
+  File "/home/jerry/qiq-spark/data/circuit_wfram/fullrun/circuit_run.py", line 204, in <module>
+    fr = fusedexec.FreeRun3(c, B, 'cuda'); fr.load(0, S.tok('GO'))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jerry/qiq-spark/data/qpriscv_wf/chipformer/rv/fusedexec.py", line 306, in __init__
+    fr2 = fastexec.FreeRun(c, batch, device, compile_=False, v2=True)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "fastexec_wf.py", line 247, in __init__
+  File "/home/jerry/qiq-spark/data/qpriscv_wf/chipformer/rv/tritonexec.py", line 234, in __init__
+    st = {"kind": "head", "V": V, "heads": heads, "q": dev3(q), "k": dev3(k),
+                                                       ^^^^^^^
+  File "/home/jerry/qiq-spark/data/qpriscv_wf/chipformer/rv/tritonexec.py", line 183, in dev3
+    return [t(arr[0]), t(arr[1]), t(arr[2], torch.float32)]
+            ^^^^^^^^^
+  File "/home/jerry/qiq-spark/data/qpriscv_wf/chipformer/rv/tritonexec.py", line 180, in <lambda>
+    t = lambda a, dt=torch.int32: torch.tensor(np.asarray(a), dtype=dt, device=device)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: out of memory
+Search for `cudaErrorMemoryAllocation' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+The CUDA driver logged these messages, which may provide useful details:
+Returning 2 (CUDA_ERROR_OUT_OF_MEMORY) from cuDevicePrimaryCtxRetain
+
+
