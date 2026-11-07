@@ -1,0 +1,12 @@
+16,777,218 tokens 14,955,452 instr 155s (96,614 instr/s)
+33,554,435 tokens 30,011,595 instr 308s (97,418 instr/s)
+50,331,652 tokens 44,876,437 instr 455s (98,544 instr/s)
+67,108,869 tokens 59,720,881 instr 603s (99,093 instr/s)
+83,886,086 tokens 74,549,284 instr 750s (99,337 instr/s)
+100,663,302 tokens 89,364,905 instr 897s (99,611 instr/s)
+117,440,518 tokens 104,163,765 instr 1045s (99,710 instr/s)
+134,217,734 tokens 119,468,558 instr 1204s (99,259 instr/s)
+150,994,950 tokens 134,801,067 instr 1364s (98,843 instr/s)
+167,772,169 tokens 149,873,636 instr 1517s (98,798 instr/s)
+184,549,385 tokens 164,903,553 instr 1670s (98,751 instr/s)
+{"ram_stats": {"ram_ld": 13886385, "ram_sbsh": 223232, "ram_sw": 12295143, "drom_ld": 5360, "blob_ld": 0, "ram_max_ea": 32764, "drom_inj": 0, "drom_need_real": 0}, "trace_tokens": 199287158, "instructions_machine": 178066316, "instructions_by_final_tokens": 170787212, "refreshes": 142770, "families": {"V": 17993910, "F0": 130092153, "F1": 9255990, "F2": 4034112, "J": 9679361, "R": 142770, "BYTE": 4, "FLT": 0, "HEX": 0, "QS": 100938, "QD": 498183, "BD": 0, "WB": 2485040, "ROW": 9764144, "NT": 2722176, "ST0": 5987894, "ST1": 6307249, "SS0": 111616, "SS1": 111616, "HALT": 1, "GO": 1, "SC": 0}, "out_hex": "e63d0000", "argmax": 15846, "fault": null, "exit_code": 0, "chunks": 96, "wall_s": 1806.6057801246643}

@@ -1,0 +1,49 @@
+gen: {'blob_bytes': 624576256, 'wrom_words': 80396288, 'wrom_weights': 643170304}
+cfg.h md5 57d25c2cbe120dd17c937634cedd6d59 size 6099
+blob.bin md5 fc76683a2f5a1b5ea11bafd318924960 size 624576256
+wrom.bin md5 914d935e8d62b59ac2a92895f2aad5bb size 643170304
+cf_gen_q: {"rows": 168684, "weight_rows": 167493, "layer_weight_rows": [4096, 4096, 8192, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 8192, 8192], "KH": 3, "KL": 31, "KF": 3, "KS": 317, "LM_ROW0": 127850, "LS_ROW": 168367, "token": 785, "const_words": 562624, "head": {"emb": 0, "rope": 1024}, "layer": {"n0": 0, "s0": 1024, "s1": 3072, "s2": 4096, "qn": 5120, "kn": 5248, "s3": 5376, "n3": 6400, "s4": 7424, "s5": 10496, "s6": 13568}, "const_rows": 1191, "table_bytes_bf16_hidden4096": 1381859328}
+
+gcc rc 0
+
+/tmp/ramcf_q.elf  :
+section              size     addr
+.text                8440   262144
+.rodata              2244   131072
+.data                   4      256
+.bss                30284      260
+.riscv.attributes      42        0
+.comment               24        0
+.debug_info          4549        0
+.debug_abbrev        1283        0
+.debug_loclists      3201        0
+.debug_aranges        120        0
+.debug_rnglists       308        0
+.debug_line          5389        0
+.debug_str            692        0
+.debug_line_str       184        0
+.debug_frame           32        0
+Total               56796
+
+
+
+00020154 00000310 r WBW
+00040bc4 00000398 t rms.constprop.0
+00000704 00000400 b gt
+00000304 00000400 b sbuf
+00040f68 0000041c T main
+00041ccc 0000042c T __udivdi3
+00000b04 00000440 b xqi
+00041858 00000474 T __divdi3
+0004048c 00000568 t mv_rows.constprop.0
+00000f44 00000800 b accs_
+00001744 00001000 b v32
+00006744 00001000 b x
+00005744 00001000 b xb
+00002744 00003000 b hg
+
+00007000 A __heap_end
+00007750 B __heap_start
+00007750 B _end
+
+elf md5 20928a5000874ae6a07b141a358dcc72
