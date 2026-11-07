@@ -56,3 +56,10 @@
 - 2026-11-07T01:59:52Z quantfix gate: modal run --detach quantfix/modal_q.py (6 CPU variants; app qwen-in-qwen-quantfix); results qfr-out /quantfix/*.json; log ~/qweninqwen-work/box-logs/quantfix/launch1.log
 - result: quantfix gate passed (b8_apl2 -> 15846); commit b4d2b54; apps stopped
 - 2026-11-06 21:0x BUILD fork smoke tests: chained 0-2 (ap-PAOj2F8HUspvC8wdJQBQ4h, 6,291,455 free tokens, 0 mismatches, 3/3 boundaries ok); parallel 0-2 on deployed app qwen-in-qwen-cfram-par (3 jobs, seams exact 3/3); parametrized-signature test chunk 0 300k steps OK (0 mismatches); strict-cache test never got a GPU (queued ~20 min, A100/A100-80/L40S capacity short) and was cancelled when the app was stopped. All my Modal apps stopped.
+
+- 2026-11-06 21:08 EST quantfix step 2 (EXT-off gate, CPU): modal run --detach quantfix/modal_q.py --names ctrl_w4_noext,b8_apl2_noext (app ap-ojMnlBYNxdNlNv6rHM8OoS). result: control 13, layers 2/26/27 8-bit weights + 16-bit acts -> 15846 rank 0 (cos 0.917). commit 14c0933
+- 2026-11-06 21:10 EST quantfix cf_gen_q control (CPU, ap-icTnv1ZL5EMMwAMxeeNPiS): per-layer-stride generator reproduces /data/rowtab_cf.npy md5 be83f3a9... on the old cfg (macros identical)
+- 2026-11-06 21:1x EST quantfix build (CPU, ap-rv5LKrWfuaApNYUfaFNxDj final): gen_fx_q + cf_gen_q + gcc -> qfr-data /cfram_q/{cfg,cf,ramcf_q.elf}; table 168,684 rows; bss 30,284 B fits 32 KB RAM with -DTILE=128 (first try without TILE=128 overflowed by 336 B). commit ff6e126..fe76929
+- 2026-11-06 21:13 EST quantfix reference (CPU, ap-jNSyT7lR2qBm5PGB71IBz2, ~30 min): qfr-data /cfram_q/refQ. result: argmax 15846, 96 chunks, 199,287,158 trace tokens, 178,066,316 instr, exit 0, 0 injections. commit 4015158
+- 2026-11-06 21:19 EST quantfix hfcheck (A100/H100 fallback, apps ap-tH2HHd6HGqqLcKedm0vvci pos, ap-mrmo0EYPrq2Hpn42bJCUqW neg): ckpt qfr-wfhf:/ckpt_cf_q (hidden 7680, 2.59 GB table). result: 130k steps 0 mismatches 2,320 ROW tokens; table+1 control diverges at step 41. commit fe76929
+- 2026-11-06 21:38 EST quantfix row-embedding cache build (1 GPU, call fc-01M6SXXD6PTX7PC66VQEVE9EG3 on deployed qwen-in-qwen-cfram-par): /data/cfram_q/rowemb_q.npy
