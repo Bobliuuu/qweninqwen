@@ -1,0 +1,123 @@
+reference chunks present: 73 (0..74); MISSING in between: [64, 72]
+PLAN 15 windows, 3,287,187 steps of 152,882,147 present trace tokens = 2.150% ; per-worker steps [1887187, 1400000]; est. 211 min on the busiest worker @149 step/s
+   {'chunk': 0, 'why': 'spread', 'steps': 100000}
+   {'chunk': 6, 'why': 'spread', 'steps': 100000}
+   {'chunk': 12, 'why': 'spread', 'steps': 100000}
+   {'chunk': 18, 'why': 'spread', 'steps': 100000}
+   {'chunk': 24, 'why': 'spread', 'steps': 100000}
+   {'chunk': 30, 'why': 'spread', 'steps': 100000}
+   {'chunk': 36, 'why': 'spread', 'steps': 100000}
+   {'chunk': 42, 'why': 'spread', 'steps': 100000}
+   {'chunk': 43, 'why': 'densest-ROW(112965/2097152)+densest-WB(28794/2097152)', 'steps': 100000}
+   {'chunk': 48, 'why': 'spread', 'steps': 100000}
+   {'chunk': 53, 'why': 'densest-J(119218/2097152)', 'steps': 100000}
+   {'chunk': 54, 'why': 'spread', 'steps': 100000}
+   {'chunk': 60, 'why': 'spread', 'steps': 100000}
+   {'chunk': 67, 'why': 'spread', 'steps': 100000}
+   {'chunk': 74, 'why': 'spread+last-present-chunk-to-end(final argmax/HALT)', 'steps': 1887187}
+Loading weights:   0%|          | 0/594 [00:00<?, ?it/s]Loading weights:   3%|▎         | 18/594 [00:02<01:07,  8.56it/s]Loading weights:   3%|▎         | 19/594 [00:03<02:21,  4.06it/s]Loading weights:   3%|▎         | 20/594 [00:04<02:47,  3.42it/s]Loading weights:   4%|▎         | 21/594 [00:04<02:44,  3.49it/s]Loading weights:   4%|▎         | 22/594 [00:05<02:43,  3.50it/s]Loading weights:   7%|▋         | 44/594 [00:05<00:30, 18.13it/s]Loading weights:  12%|█▏        | 72/594 [00:05<00:14, 35.91it/s]Loading weights:  18%|█▊        | 106/594 [00:05<00:07, 65.94it/s]Loading weights:  21%|██        | 123/594 [00:05<00:06, 73.74it/s]Loading weights:  27%|██▋       | 159/594 [00:05<00:03, 109.50it/s]Loading weights:  33%|███▎      | 198/594 [00:06<00:02, 152.68it/s]Loading weights:  38%|███▊      | 224/594 [00:06<00:02, 172.43it/s]Loading weights:  42%|████▏     | 249/594 [00:06<00:01, 179.76it/s]Loading weights:  49%|████▉     | 294/594 [00:06<00:01, 229.90it/s]Loading weights:  54%|█████▍    | 322/594 [00:06<00:01, 241.33it/s]Loading weights:  59%|█████▉    | 350/594 [00:06<00:01, 238.99it/s]Loading weights:  63%|██████▎   | 377/594 [00:06<00:00, 237.67it/s]Loading weights:  68%|██████▊   | 403/594 [00:06<00:00, 229.94it/s]Loading weights:  72%|███████▏  | 428/594 [00:07<00:00, 196.35it/s]Loading weights:  78%|███████▊  | 466/594 [00:07<00:00, 231.34it/s]Loading weights:  83%|████████▎ | 495/594 [00:07<00:00, 241.32it/s]Loading weights:  88%|████████▊ | 521/594 [00:07<00:00, 221.35it/s]Loading weights:  92%|█████████▏| 545/594 [00:07<00:00, 223.42it/s]Loading weights:  96%|█████████▌| 569/594 [00:07<00:00, 204.47it/s]Loading weights: 100%|██████████| 594/594 [00:07<00:00, 77.00it/s] 
+[transformers] The tokenizer you are loading from '/wf/ckpt_cf' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[chunk 0] step 10000/100000 mismatches 0 65s (155 step/s)
+[chunk 0] step 20000/100000 mismatches 0 129s (155 step/s)
+[chunk 0] step 30000/100000 mismatches 0 194s (155 step/s)
+[chunk 0] step 40000/100000 mismatches 0 259s (155 step/s)
+[chunk 0] step 50000/100000 mismatches 0 323s (155 step/s)
+[chunk 0] step 60000/100000 mismatches 0 388s (155 step/s)
+[chunk 0] step 70000/100000 mismatches 0 453s (155 step/s)
+[chunk 0] step 80000/100000 mismatches 0 517s (155 step/s)
+[chunk 0] step 90000/100000 mismatches 0 582s (155 step/s)
+[chunk 0] step 100000/100000 mismatches 0 647s (155 step/s)
+WINDOW {"chunk": 0, "why": "spread", "steps_requested": 100000, "steps_checked": 100000, "n_mismatch": 0, "first_mismatch": null, "n_row_tokens": 401, "n_wb_tokens": 293, "n_j_tokens": 5723, "full_vocab": 667840, "min_top1_top2_logit_margin": 22528.0, "steps_code_decode_ne_fullvocab_argmax": 0, "last_token": "F0(99)", "seconds": 646.5210754871368}
+[chunk 6] step 10000/100000 mismatches 0 65s (155 step/s)
+[chunk 6] step 20000/100000 mismatches 0 129s (155 step/s)
+[chunk 6] step 30000/100000 mismatches 0 194s (155 step/s)
+[chunk 6] step 40000/100000 mismatches 0 258s (155 step/s)
+[chunk 6] step 50000/100000 mismatches 0 323s (155 step/s)
+[chunk 6] step 60000/100000 mismatches 0 388s (155 step/s)
+[chunk 6] step 70000/100000 mismatches 0 452s (155 step/s)
+[chunk 6] step 80000/100000 mismatches 0 517s (155 step/s)
+[chunk 6] step 90000/100000 mismatches 0 582s (155 step/s)
+[chunk 6] step 100000/100000 mismatches 0 646s (155 step/s)
+WINDOW {"chunk": 6, "why": "spread", "steps_requested": 100000, "steps_checked": 100000, "n_mismatch": 0, "first_mismatch": null, "n_row_tokens": 5995, "n_wb_tokens": 1523, "n_j_tokens": 4286, "full_vocab": 667840, "min_top1_top2_logit_margin": 22528.0, "steps_code_decode_ne_fullvocab_argmax": 0, "last_token": "F0(32738)", "seconds": 646.1970994472504}
+[chunk 12] step 10000/100000 mismatches 0 65s (155 step/s)
+[chunk 12] step 20000/100000 mismatches 0 129s (155 step/s)
+[chunk 12] step 30000/100000 mismatches 0 194s (155 step/s)
+[chunk 12] step 40000/100000 mismatches 0 258s (155 step/s)
+[chunk 12] step 50000/100000 mismatches 0 323s (155 step/s)
+[chunk 12] step 60000/100000 mismatches 0 388s (155 step/s)
+[chunk 12] step 70000/100000 mismatches 0 452s (155 step/s)
+[chunk 12] step 80000/100000 mismatches 0 517s (155 step/s)
+[chunk 12] step 90000/100000 mismatches 0 581s (155 step/s)
+[chunk 12] step 100000/100000 mismatches 0 646s (155 step/s)
+WINDOW {"chunk": 12, "why": "spread", "steps_requested": 100000, "steps_checked": 100000, "n_mismatch": 0, "first_mismatch": null, "n_row_tokens": 5443, "n_wb_tokens": 1385, "n_j_tokens": 4687, "full_vocab": 667840, "min_top1_top2_logit_margin": 22528.0, "steps_code_decode_ne_fullvocab_argmax": 0, "last_token": "F0(32623)", "seconds": 646.0826463699341}
+[chunk 18] step 10000/100000 mismatches 0 65s (155 step/s)
+[chunk 18] step 20000/100000 mismatches 0 129s (155 step/s)
+[chunk 18] step 30000/100000 mismatches 0 194s (155 step/s)
+[chunk 18] step 40000/100000 mismatches 0 259s (155 step/s)
+[chunk 18] step 50000/100000 mismatches 0 323s (155 step/s)
+[chunk 18] step 60000/100000 mismatches 0 388s (155 step/s)
+[chunk 18] step 70000/100000 mismatches 0 452s (155 step/s)
+[chunk 18] step 80000/100000 mismatches 0 517s (155 step/s)
+[chunk 18] step 90000/100000 mismatches 0 582s (155 step/s)
+[chunk 18] step 100000/100000 mismatches 0 646s (155 step/s)
+WINDOW {"chunk": 18, "why": "spread", "steps_requested": 100000, "steps_checked": 100000, "n_mismatch": 0, "first_mismatch": null, "n_row_tokens": 6038, "n_wb_tokens": 1538, "n_j_tokens": 4840, "full_vocab": 667840, "min_top1_top2_logit_margin": 22528.0, "steps_code_decode_ne_fullvocab_argmax": 0, "last_token": "V(14080)", "seconds": 646.2247974872589}
+[chunk 24] step 10000/100000 mismatches 0 65s (154 step/s)
+[chunk 24] step 20000/100000 mismatches 0 130s (154 step/s)
+[chunk 24] step 30000/100000 mismatches 0 194s (154 step/s)
+[chunk 24] step 40000/100000 mismatches 0 259s (155 step/s)
+[chunk 24] step 50000/100000 mismatches 0 324s (155 step/s)
+[chunk 24] step 60000/100000 mismatches 0 388s (155 step/s)
+[chunk 24] step 70000/100000 mismatches 0 453s (155 step/s)
+[chunk 24] step 80000/100000 mismatches 0 518s (155 step/s)
+[chunk 24] step 90000/100000 mismatches 0 582s (155 step/s)
+[chunk 24] step 100000/100000 mismatches 0 647s (155 step/s)
+WINDOW {"chunk": 24, "why": "spread", "steps_requested": 100000, "steps_checked": 100000, "n_mismatch": 0, "first_mismatch": null, "n_row_tokens": 4186, "n_wb_tokens": 1070, "n_j_tokens": 4355, "full_vocab": 667840, "min_top1_top2_logit_margin": 22528.0, "steps_code_decode_ne_fullvocab_argmax": 0, "last_token": "F0(32683)", "seconds": 646.7128870487213}
+[chunk 30] step 10000/100000 mismatches 0 65s (155 step/s)
+[chunk 30] step 20000/100000 mismatches 0 129s (155 step/s)
+[chunk 30] step 30000/100000 mismatches 0 194s (155 step/s)
+[chunk 30] step 40000/100000 mismatches 0 259s (155 step/s)
+[chunk 30] step 50000/100000 mismatches 0 323s (155 step/s)
+[chunk 30] step 60000/100000 mismatches 0 388s (155 step/s)
+[chunk 30] step 70000/100000 mismatches 0 453s (155 step/s)
+[chunk 30] step 80000/100000 mismatches 0 517s (155 step/s)
+[chunk 30] step 90000/100000 mismatches 0 582s (155 step/s)
+[chunk 30] step 100000/100000 mismatches 0 647s (155 step/s)
+WINDOW {"chunk": 30, "why": "spread", "steps_requested": 100000, "steps_checked": 100000, "n_mismatch": 0, "first_mismatch": null, "n_row_tokens": 7598, "n_wb_tokens": 1899, "n_j_tokens": 3729, "full_vocab": 667840, "min_top1_top2_logit_margin": 22528.0, "steps_code_decode_ne_fullvocab_argmax": 0, "last_token": "F0(288)", "seconds": 646.6008393764496}
+[chunk 36] step 10000/100000 mismatches 0 65s (155 step/s)
+[chunk 36] step 20000/100000 mismatches 0 129s (155 step/s)
+[chunk 36] step 30000/100000 mismatches 0 194s (155 step/s)
+[chunk 36] step 40000/100000 mismatches 0 258s (155 step/s)
+[chunk 36] step 50000/100000 mismatches 0 323s (155 step/s)
+[chunk 36] step 60000/100000 mismatches 0 388s (155 step/s)
+[chunk 36] step 70000/100000 mismatches 0 452s (155 step/s)
+[chunk 36] step 80000/100000 mismatches 0 517s (155 step/s)
+[chunk 36] step 90000/100000 mismatches 0 582s (155 step/s)
+[chunk 36] step 100000/100000 mismatches 0 646s (155 step/s)
+WINDOW {"chunk": 36, "why": "spread", "steps_requested": 100000, "steps_checked": 100000, "n_mismatch": 0, "first_mismatch": null, "n_row_tokens": 2470, "n_wb_tokens": 618, "n_j_tokens": 8217, "full_vocab": 667840, "min_top1_top2_logit_margin": 22528.0, "steps_code_decode_ne_fullvocab_argmax": 0, "last_token": "F0(31783)", "seconds": 646.3571150302887}
+[chunk 42] step 10000/100000 mismatches 0 65s (155 step/s)
+[chunk 42] step 20000/100000 mismatches 0 129s (155 step/s)
+[chunk 42] step 30000/100000 mismatches 0 194s (155 step/s)
+[chunk 42] step 40000/100000 mismatches 0 258s (155 step/s)
+[chunk 42] step 50000/100000 mismatches 0 323s (155 step/s)
+[chunk 42] step 60000/100000 mismatches 0 388s (155 step/s)
+[chunk 42] step 70000/100000 mismatches 0 452s (155 step/s)
+[chunk 42] step 80000/100000 mismatches 0 517s (155 step/s)
+[chunk 42] step 90000/100000 mismatches 0 582s (155 step/s)
+[chunk 42] step 100000/100000 mismatches 0 647s (155 step/s)
+WINDOW {"chunk": 42, "why": "spread", "steps_requested": 100000, "steps_checked": 100000, "n_mismatch": 0, "first_mismatch": null, "n_row_tokens": 5338, "n_wb_tokens": 1382, "n_j_tokens": 5061, "full_vocab": 667840, "min_top1_top2_logit_margin": 22528.0, "steps_code_decode_ne_fullvocab_argmax": 0, "last_token": "F0(32662)", "seconds": 646.7550570964813}
+[chunk 43] step 10000/100000 mismatches 0 65s (155 step/s)
+[chunk 43] step 20000/100000 mismatches 0 129s (155 step/s)
+[chunk 43] step 30000/100000 mismatches 0 194s (155 step/s)
+[chunk 43] step 40000/100000 mismatches 0 258s (155 step/s)
+[chunk 43] step 50000/100000 mismatches 0 323s (155 step/s)
+[chunk 43] step 60000/100000 mismatches 0 387s (155 step/s)
+[chunk 43] step 70000/100000 mismatches 0 452s (155 step/s)
+[chunk 43] step 80000/100000 mismatches 0 517s (155 step/s)
+[chunk 43] step 90000/100000 mismatches 0 581s (155 step/s)
+[chunk 43] step 100000/100000 mismatches 0 646s (155 step/s)
+WINDOW {"chunk": 43, "why": "densest-ROW(112965/2097152)+densest-WB(28794/2097152)", "steps_requested": 100000, "steps_checked": 100000, "n_mismatch": 0, "first_mismatch": null, "n_row_tokens": 5912, "n_wb_tokens": 1478, "n_j_tokens": 4486, "full_vocab": 667840, "min_top1_top2_logit_margin": 22528.0, "steps_code_decode_ne_fullvocab_argmax": 0, "last_token": "J(1226)", "seconds": 645.8319203853607}
+[chunk 48] step 10000/100000 mismatches 0 65s (155 step/s)

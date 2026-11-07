@@ -1,0 +1,105 @@
+reference chunks present: 75 (0..74); MISSING in between: []
+PLAN 14 windows, 3,187,187 steps of 157,076,451 present trace tokens = 2.029% ; per-worker steps [1887187, 1300000]; est. 211 min on the busiest worker @149 step/s
+   {'chunk': 0, 'why': 'spread', 'steps': 100000}
+   {'chunk': 6, 'why': 'spread', 'steps': 100000}
+   {'chunk': 12, 'why': 'spread', 'steps': 100000}
+   {'chunk': 18, 'why': 'spread', 'steps': 100000}
+   {'chunk': 25, 'why': 'spread', 'steps': 100000}
+   {'chunk': 31, 'why': 'spread', 'steps': 100000}
+   {'chunk': 37, 'why': 'spread', 'steps': 100000}
+   {'chunk': 43, 'why': 'spread+densest-ROW(112965/2097152)+densest-WB(28794/2097152)', 'steps': 100000}
+   {'chunk': 49, 'why': 'spread', 'steps': 100000}
+   {'chunk': 53, 'why': 'densest-J(119218/2097152)', 'steps': 100000}
+   {'chunk': 56, 'why': 'spread', 'steps': 100000}
+   {'chunk': 62, 'why': 'spread', 'steps': 100000}
+   {'chunk': 68, 'why': 'spread', 'steps': 100000}
+   {'chunk': 74, 'why': 'spread+last-present-chunk-to-end(final argmax/HALT)', 'steps': 1887187}
+Loading weights:   0%|          | 0/594 [00:00<?, ?it/s]Loading weights:   4%|▎         | 22/594 [00:00<00:03, 170.67it/s]Loading weights:   8%|▊         | 47/594 [00:00<00:02, 209.02it/s]Loading weights:  12%|█▏        | 69/594 [00:00<00:02, 202.18it/s]Loading weights:  16%|█▌        | 93/594 [00:00<00:02, 201.25it/s]Loading weights:  19%|█▉        | 114/594 [00:00<00:02, 189.65it/s]Loading weights:  25%|██▍       | 148/594 [00:00<00:01, 234.49it/s]Loading weights:  30%|███       | 180/594 [00:00<00:01, 257.45it/s]Loading weights:  35%|███▍      | 207/594 [00:00<00:01, 243.92it/s]Loading weights:  40%|████      | 238/594 [00:01<00:01, 259.09it/s]Loading weights:  45%|████▌     | 270/594 [00:01<00:01, 275.42it/s]Loading weights:  51%|█████     | 301/594 [00:01<00:01, 285.38it/s]Loading weights:  56%|█████▌    | 330/594 [00:01<00:01, 243.88it/s]Loading weights:  60%|█████▉    | 356/594 [00:01<00:01, 215.21it/s]Loading weights:  64%|██████▍   | 379/594 [00:01<00:00, 217.29it/s]Loading weights:  68%|██████▊   | 402/594 [00:01<00:00, 206.26it/s]Loading weights:  71%|███████▏  | 424/594 [00:01<00:00, 188.40it/s]Loading weights:  75%|███████▍  | 444/594 [00:02<00:00, 186.71it/s]Loading weights:  78%|███████▊  | 464/594 [00:02<00:00, 187.80it/s]Loading weights:  84%|████████▎ | 496/594 [00:02<00:00, 213.99it/s]Loading weights:  88%|████████▊ | 524/594 [00:04<00:01, 38.01it/s] Loading weights:  93%|█████████▎| 554/594 [00:04<00:00, 53.15it/s]Loading weights:  98%|█████████▊| 580/594 [00:04<00:00, 68.67it/s]Loading weights: 100%|██████████| 594/594 [00:04<00:00, 132.46it/s]
+[transformers] The tokenizer you are loading from '/wf/ckpt_cf' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[chunk 74] step 10000/1887187 mismatches 0 67s (148 step/s)
+[chunk 74] step 20000/1887187 mismatches 0 135s (148 step/s)
+[chunk 74] step 30000/1887187 mismatches 0 203s (148 step/s)
+[chunk 74] step 40000/1887187 mismatches 0 270s (148 step/s)
+[chunk 74] step 50000/1887187 mismatches 0 338s (148 step/s)
+[chunk 74] step 60000/1887187 mismatches 0 405s (148 step/s)
+[chunk 74] step 70000/1887187 mismatches 0 473s (148 step/s)
+[chunk 74] step 80000/1887187 mismatches 0 540s (148 step/s)
+[chunk 74] step 90000/1887187 mismatches 0 608s (148 step/s)
+[chunk 74] step 100000/1887187 mismatches 0 675s (148 step/s)
+[chunk 74] step 110000/1887187 mismatches 0 742s (148 step/s)
+[chunk 74] step 120000/1887187 mismatches 0 810s (148 step/s)
+[chunk 74] step 130000/1887187 mismatches 0 877s (148 step/s)
+[chunk 74] step 140000/1887187 mismatches 0 944s (148 step/s)
+[chunk 74] step 150000/1887187 mismatches 0 1012s (148 step/s)
+[chunk 74] step 160000/1887187 mismatches 0 1079s (148 step/s)
+[chunk 74] step 170000/1887187 mismatches 0 1146s (148 step/s)
+[chunk 74] step 180000/1887187 mismatches 0 1213s (148 step/s)
+[chunk 74] step 190000/1887187 mismatches 0 1281s (148 step/s)
+[chunk 74] step 200000/1887187 mismatches 0 1348s (148 step/s)
+[chunk 74] step 210000/1887187 mismatches 0 1415s (148 step/s)
+[chunk 74] step 220000/1887187 mismatches 0 1483s (148 step/s)
+[chunk 74] step 230000/1887187 mismatches 0 1550s (148 step/s)
+[chunk 74] step 240000/1887187 mismatches 0 1617s (148 step/s)
+[chunk 74] step 250000/1887187 mismatches 0 1684s (148 step/s)
+[chunk 74] step 260000/1887187 mismatches 0 1751s (148 step/s)
+[chunk 74] step 270000/1887187 mismatches 0 1819s (148 step/s)
+[chunk 74] step 280000/1887187 mismatches 0 1886s (148 step/s)
+[chunk 74] step 290000/1887187 mismatches 0 1953s (148 step/s)
+[chunk 74] step 300000/1887187 mismatches 0 2020s (148 step/s)
+[chunk 74] step 310000/1887187 mismatches 0 2087s (149 step/s)
+[chunk 74] step 320000/1887187 mismatches 0 2155s (149 step/s)
+[chunk 74] step 330000/1887187 mismatches 0 2222s (149 step/s)
+[chunk 74] step 340000/1887187 mismatches 0 2289s (149 step/s)
+[chunk 74] step 350000/1887187 mismatches 0 2356s (149 step/s)
+[chunk 74] step 360000/1887187 mismatches 0 2424s (149 step/s)
+[chunk 74] step 370000/1887187 mismatches 0 2491s (149 step/s)
+[chunk 74] step 380000/1887187 mismatches 0 2558s (149 step/s)
+[chunk 74] step 390000/1887187 mismatches 0 2625s (149 step/s)
+[chunk 74] step 400000/1887187 mismatches 0 2693s (149 step/s)
+[chunk 74] step 410000/1887187 mismatches 0 2760s (149 step/s)
+[chunk 74] step 420000/1887187 mismatches 0 2827s (149 step/s)
+[chunk 74] step 430000/1887187 mismatches 0 2894s (149 step/s)
+[chunk 74] step 440000/1887187 mismatches 0 2962s (149 step/s)
+[chunk 74] step 450000/1887187 mismatches 0 3029s (149 step/s)
+[chunk 74] step 460000/1887187 mismatches 0 3096s (149 step/s)
+[chunk 74] step 470000/1887187 mismatches 0 3163s (149 step/s)
+[chunk 74] step 480000/1887187 mismatches 0 3230s (149 step/s)
+[chunk 74] step 490000/1887187 mismatches 0 3298s (149 step/s)
+[chunk 74] step 500000/1887187 mismatches 0 3365s (149 step/s)
+[chunk 74] step 510000/1887187 mismatches 0 3433s (149 step/s)
+[chunk 74] step 520000/1887187 mismatches 0 3500s (149 step/s)
+[chunk 74] step 530000/1887187 mismatches 0 3567s (149 step/s)
+[chunk 74] step 540000/1887187 mismatches 0 3634s (149 step/s)
+[chunk 74] step 550000/1887187 mismatches 0 3702s (149 step/s)
+[chunk 74] step 560000/1887187 mismatches 0 3769s (149 step/s)
+[chunk 74] step 570000/1887187 mismatches 0 3836s (149 step/s)
+[chunk 74] step 580000/1887187 mismatches 0 3904s (149 step/s)
+[chunk 74] step 590000/1887187 mismatches 0 3971s (149 step/s)
+[chunk 74] step 600000/1887187 mismatches 0 4038s (149 step/s)
+[chunk 74] step 610000/1887187 mismatches 0 4105s (149 step/s)
+[chunk 74] step 620000/1887187 mismatches 0 4172s (149 step/s)
+[chunk 74] step 630000/1887187 mismatches 0 4240s (149 step/s)
+[chunk 74] step 640000/1887187 mismatches 0 4308s (149 step/s)
+[chunk 74] step 650000/1887187 mismatches 0 4375s (149 step/s)
+[chunk 74] step 660000/1887187 mismatches 0 4442s (149 step/s)
+[chunk 74] step 670000/1887187 mismatches 0 4509s (149 step/s)
+[chunk 74] step 680000/1887187 mismatches 0 4577s (149 step/s)
+[chunk 74] step 690000/1887187 mismatches 0 4644s (149 step/s)
+[chunk 74] step 700000/1887187 mismatches 0 4711s (149 step/s)
+[chunk 74] step 710000/1887187 mismatches 0 4779s (149 step/s)
+[chunk 74] step 720000/1887187 mismatches 0 4846s (149 step/s)
+[chunk 74] step 730000/1887187 mismatches 0 4913s (149 step/s)
+[chunk 74] step 740000/1887187 mismatches 0 4980s (149 step/s)
+[chunk 74] step 750000/1887187 mismatches 0 5048s (149 step/s)
+[chunk 74] step 760000/1887187 mismatches 0 5115s (149 step/s)
+[chunk 74] step 770000/1887187 mismatches 0 5182s (149 step/s)
+[chunk 74] step 780000/1887187 mismatches 0 5249s (149 step/s)
+[chunk 74] step 790000/1887187 mismatches 0 5317s (149 step/s)
+[chunk 74] step 800000/1887187 mismatches 0 5384s (149 step/s)
+[chunk 74] step 810000/1887187 mismatches 0 5452s (149 step/s)
+[chunk 74] step 820000/1887187 mismatches 0 5519s (149 step/s)
+[chunk 74] step 830000/1887187 mismatches 0 5586s (149 step/s)
