@@ -85,14 +85,17 @@ def worker(b):
         ok = jd is not None and jd.get('rc') == 0 and res and verify(res)
         with lock:
             if ok:
-                sec = jd['seconds']; cpc = b['dph'] * sec / 3600; done[k] = dict(box=b['id'], gpu=b['gpu'], seconds=sec, cost=round(cpc, 3), steps_s=round(res.get('steps_run', 0) / sec) if sec else None); b['n'] = b.get('n', 0) + 1; b['cpc'] = cpc
-                if best[0] is None or cpc < best[0]: best[0] = cpc
+                sec = jd['seconds']; sr = res.get('steps_run', 0) or 0; full = sr >= 1_500_000; cpc = b['dph'] * sec / 3600 * (2097152 / sr if sr else 1)   # $ per FULL chunk (the last chunk is short: do not let it distort the comparison)
+                done[k] = dict(box=b['id'], gpu=b['gpu'], seconds=sec, cost=round(cpc, 3), steps_s=round(sr / sec) if sec else None); b['n'] = b.get('n', 0) + 1
+                if full:
+                    b['cpc'] = cpc
+                    if best[0] is None or cpc < best[0]: best[0] = cpc
             else:
                 failed.setdefault(k, []).append(dict(box=b['id'], gpu=b['gpu'], jd=jd, res={x: res.get(x) for x in ('free_mismatches', 'forced_tokens', 'diverged')} if res else None))
                 if attempts[k] < 3: queue.appendleft(k)
         log(f'chunk {k} on {b["id"]} {b["gpu"]}: {"OK" if ok else "FAIL"} {jd and jd.get("seconds")}s')
         if not ok: destroy(b, f'chunk {k} failed'); return
-        if best[0] and b['cpc'] > 2 * best[0] and len(done) >= 4: destroy(b, f'$/chunk {b["cpc"]:.3f} > 2x best {best[0]:.3f}'); return
+        if best[0] and b.get('cpc') and b['cpc'] > 2 * best[0] and len(done) >= 6: destroy(b, f'$/chunk {b["cpc"]:.3f} > 2x best {best[0]:.3f}'); return
     destroy(b, 'queue empty'); b['state'] = 'destroyed'
 def status():
     while not stop.is_set():
@@ -109,6 +112,27 @@ def status():
             if stop.is_set(): break
             time.sleep(5)
 for k in range(lo, hi + 1):
+    try:
+        rj = json.load(open(f'{PULL}/chunk_{k:04d}/chain_{k}_to_{k}.json')); jd = json.load(open(f'{PULL}/chunk_{k:04d}/job_done.json'))
+        if jd.get('rc') == 0 and verify(rj):
+            done[k] = dict(box=jd.get('host'), gpu=jd.get('gpu'), seconds=jd['seconds'], cost=0.0, steps_s=None, resumed=True); queue = collections.deque(c for c in queue if c != k)
+    except Exception: pass
+def harvest():
+    """pull every finished chunk dir (job_done.json present) that is not yet in PULL from all running boxes (jobs finish while the manager is restarted)"""
+    try: ins = [i for i in v.callv1('/instances/').get('instances', []) if str(i.get('label', '')).startswith('qiq-') and i.get('actual_status') == 'running' and i.get('ssh_host')]
+    except Exception: return
+    def one(i):
+        b = dict(host=i['ssh_host'], port=i['ssh_port']); rc, o = ssh(b, 'for d in /out/cfram_q_par_full/chunk_*; do [ -f $d/job_done.json ] && basename $d; done', 60)
+        if rc != 0: return
+        for name in o.split():
+            if not name.startswith('chunk_'): continue
+            k = int(name[6:]); loc = f'{PULL}/{name}'
+            if k in done or os.path.exists(f'{loc}/chain_{k}_to_{k}.json'): continue
+            os.makedirs(loc, exist_ok=True); subprocess.run(['rsync', '-a', '-e', 'ssh ' + ' '.join(SSHO) + f' -p {b["port"]}', f'root@{b["host"]}:/out/cfram_q_par_full/{name}/', loc + '/'], capture_output=True, timeout=600); log(f'harvested {name} from {i["id"]}')
+    ts = [threading.Thread(target=one, args=(i,)) for i in ins]; [t.start() for t in ts]; [t.join() for t in ts]
+harvest()
+for k in range(lo, hi + 1):
+    if k in done: continue
     try:
         rj = json.load(open(f'{PULL}/chunk_{k:04d}/chain_{k}_to_{k}.json')); jd = json.load(open(f'{PULL}/chunk_{k:04d}/job_done.json'))
         if jd.get('rc') == 0 and verify(rj):
