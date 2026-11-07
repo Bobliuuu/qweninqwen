@@ -9,7 +9,8 @@ ap = argparse.ArgumentParser(); ap.add_argument('--chunks', default='0-91'); ap.
 lo, hi = (int(x) for x in a.chunks.split('-')); HOME = os.path.expanduser('~'); W = f'{HOME}/qweninqwen-work'; PULL = f'{W}/cfram_q_vast_pull/cfram_q_par_full'; OUT = f'{W}/cfram_q_vast_out'; os.makedirs(PULL, exist_ok=True)
 KEY = f'{HOME}/.ssh/vast_qiq'; SSHO = ['-i', KEY, '-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=20', '-o', 'ServerAliveInterval=30', '-o', 'BatchMode=yes']
 RELAY_PUB = open(f'{OUT}/relay_pub.txt').read().strip(); VD = os.path.dirname(os.path.abspath(__file__))
-lock = threading.Lock(); queue = collections.deque(range(lo, hi + 1)); attempts = collections.Counter(); done = {}; failed = {}; boxes = {}; stop = threading.Event(); relay_sem = threading.Semaphore(a.relay_par); best = [None]; T0 = time.time()
+PRIO = {hi: None}   # last chunk (HALT / final word) is claimed only by the hub (reliable A100 PCIE), first
+lock = threading.Lock(); queue = collections.deque([hi] + list(range(lo, hi))); attempts = collections.Counter(); done = {}; failed = {}; boxes = {}; stop = threading.Event(); relay_sem = threading.Semaphore(a.relay_par); best = [None]; T0 = time.time()
 def log(m):
     with open(f'{OUT}/fleet.log', 'a') as f: f.write(f'{time.strftime("%F %T")} {m}\n')
 def ssh(b, cmd, timeout=120):
@@ -51,9 +52,9 @@ def prep(b):
     return False
 def verify(res):
     return res.get('free_mismatches') == 0 and res.get('forced_tokens') == 0 and not res.get('diverged')
-def run_chunk(b, k):
+def run_chunk(b, k, launch=True):
     d = f'/out/cfram_q_par_full/chunk_{k:04d}'; t0 = time.time()
-    ssh(b, f'rm -rf {d}; nohup /root/run_chunks.sh {k} > /root/run_{k}.log 2>&1 < /dev/null &')
+    if launch: ssh(b, f'rm -rf {d}; nohup /root/run_chunks.sh {k} > /root/run_{k}.log 2>&1 < /dev/null &')
     while time.time() - t0 < 4200 and not stop.is_set():
         time.sleep(20); rc, o = ssh(b, f'cat {d}/job_done.json 2>/dev/null', 60)
         if rc == 0 and '"rc"' in o:
@@ -66,12 +67,21 @@ def run_chunk(b, k):
 def worker(b):
     b['state'] = 'prep'
     if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
-    b['state'] = 'ready'; log(f'READY {b["id"]} {b["label"]} {b.get("env","")}'); n = 0
+    b['state'] = 'ready'; log(f'READY {b["id"]} {b["label"]} {b.get("env","")}'); n = 0; adopt = None
+    rc, o = ssh(b, "pgrep -fa 'run_chunks.sh [0-9]+' | grep -v pgrep | grep -o 'run_chunks.sh [0-9]*' | head -1")
+    if rc == 0 and o.strip().startswith('run_chunks.sh'):
+        try: adopt = int(o.split()[1]); log(f'ADOPT chunk {adopt} running on {b["id"]}')
+        except Exception: adopt = None
     while not stop.is_set():
         with lock:
-            if not queue: break
-            k = queue.popleft(); attempts[k] += 1
-        b['state'] = f'chunk {k}'; jd, res = run_chunk(b, k)
+            cand = [c for c in queue if not (c in PRIO and b['id'] != a.hub)]
+            if not cand:
+                if any(c in PRIO for c in queue): time.sleep(5); continue   # only the hub-reserved chunk is left
+                break
+            k = adopt if adopt is not None else cand[0]
+            if k in queue: queue.remove(k)
+            attempts[k] += 1
+        b['state'] = f'chunk {k}'; jd, res = run_chunk(b, k, launch=(adopt is None)); adopt = None
         ok = jd is not None and jd.get('rc') == 0 and res and verify(res)
         with lock:
             if ok:
@@ -98,6 +108,13 @@ def status():
         for _ in range(24):
             if stop.is_set(): break
             time.sleep(5)
+for k in range(lo, hi + 1):
+    try:
+        rj = json.load(open(f'{PULL}/chunk_{k:04d}/chain_{k}_to_{k}.json')); jd = json.load(open(f'{PULL}/chunk_{k:04d}/job_done.json'))
+        if jd.get('rc') == 0 and verify(rj):
+            done[k] = dict(box=jd.get('host'), gpu=jd.get('gpu'), seconds=jd['seconds'], cost=0.0, steps_s=None, resumed=True); queue = collections.deque(c for c in queue if c != k)
+    except Exception: pass
+log(f'startup: {len(done)} chunks already done on disk, queue={list(queue)[:6]}...')
 threading.Thread(target=status, daemon=True).start()
 workers = {}
 while True:
