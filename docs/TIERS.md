@@ -1,4 +1,4 @@
-# Tier leaderboard: Qwen3-0.6B as a program on the RV32IM CPU inside a real Qwen3.5
+# Tier leaderboard: Qwen3-0.6B as a program on the RV32IM CPU inside a Qwen3.5-style outer model (a Qwen3_5-architecture model widened to hidden 7680 with 12 added chip layers; see the README)
 
 Maintained by the integration lead. Rule: a number in a **measured** column comes from a committed log/JSON of a run of that exact build; everything else is **projected** and says how it was derived. The final-contract CF+RAM build was run end to end on 2026-11-07 (section below); the tier rows further down are the earlier projections and are kept as written, so treat them as superseded where they disagree with that section. Definition of the goal and the arithmetic: [`CIRCUIT_ROUTE_PLAN.md`](CIRCUIT_ROUTE_PLAN.md).
 

@@ -12,13 +12,13 @@
 
 <!-- VISUAL:hero-gif -->
 <p align="center">
-  <img src="docs/assets/circuit_hero.gif" alt="A real Qwen3-0.6B token, computed inside another Qwen: the prompt token enters a Qwen3.5-4B-geometry model, the circuit inside runs the firmware while the weights are fetched from the model's own embedding table, then halts with 15846" width="900">
+  <img src="docs/assets/circuit_hero.gif" alt="A real Qwen3-0.6B token, computed inside another Qwen: the prompt token enters a Qwen3.5-style outer model, the circuit inside runs the firmware while the weights are fetched from the model's own embedding table, then halts with 15846" width="900">
   <br><sub>🎞️ <a href="docs/assets/circuit_hero.mp4">mp4</a> · a visualization of the real run (layer widths, counts and the answer are real data)</sub>
 </p>
 
 <!-- VISUAL:demo-video -->
 <p align="center">
-  <a href="docs/demo/demo.mp4"><img src="docs/demo/demo.gif" alt="Demo: one Qwen3-0.6B token computed by a circuit inside Qwen3.5-4B (click for the full video)" width="720"></a>
+  <a href="docs/demo/demo.mp4"><img src="docs/demo/demo.gif" alt="Demo: one Qwen3-0.6B token computed by a circuit inside a Qwen3.5-style outer model (click for the full video)" width="720"></a>
   <br><sub>🎬 <a href="docs/demo/demo.mp4">Watch the full demo (mp4, ~70 s)</a> · a visualization of the real run; every number is mapped to a log in <a href="docs/demo/PROVENANCE.md">PROVENANCE.md</a></sub>
 </p>
 
@@ -41,7 +41,7 @@ A homage to [Qwenputer](https://github.com/divagr18/qwenputer), where a RISC-V C
 
 | | |
 |---|---|
-| Outer model | Qwen3.5-4B geometry, RV32IM CPU + vector-dot unit compiled into its weights (merged checkpoint: hidden size 7680, 12 chip layers + Qwen's 32) |
+| Outer model | a Qwen3_5-architecture model (HF `Qwen3_5ForCausalLM` classes, widened to hidden 7680 with 12 added chip layers and an extended 680,128-token vocabulary; derived from the Qwen3.5-4B layer design), with an RV32IM CPU + vector-dot unit compiled into its weights (merged checkpoint: 12 chip layers + Qwen's 32) |
 | Inner model | real Qwen3-0.6B as a C firmware, prompt token `[785]` ("The"), position 0 |
 | Run size | **96 chunks**, 199,287,158 trace tokens, 178,066,316 instructions |
 | Ending | the circuit's own `HALT` at step 57,705 of chunk 95; final word **15846** |
@@ -58,7 +58,7 @@ The verdict is in [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_
 
 <!-- VISUAL:architecture-svg -->
 <p align="center">
-  <img src="docs/assets/circuit_architecture.svg" alt="Architecture: the host boots the run and loops tokens; inside the Qwen3.5-4B-geometry outer model a RISC-V circuit executes a Qwen3-0.6B firmware, fetching weights as ROW tokens from the outer model's embedding table" width="100%">
+  <img src="docs/assets/circuit_architecture.svg" alt="Architecture: the host boots the run and loops tokens; inside the Qwen3.5-style outer model a RISC-V circuit executes a Qwen3-0.6B firmware, fetching weights as ROW tokens from the outer model's embedding table" width="100%">
   <br><sub>Schematic (box sizes are not to scale); numbers are from the run.</sub>
 </p>
 
@@ -66,9 +66,9 @@ The verdict is in [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_
 
 | | Outer model | Inner model |
 |---|---|---|
-| What | a Qwen3.5-4B-shaped transformer whose weights implement a CPU | the real Qwen3-0.6B (28 layers) |
+| What | a Qwen3_5-architecture transformer (widened, with added chip layers) whose weights implement a CPU | the real Qwen3-0.6B (28 layers) |
 | Role | executes the machine: every generated token is one CPU step | the program the machine runs (a C firmware with its weights as data) |
-| Code | stock `transformers` modules (`Qwen3_5` layers); only weights are written | compiled with a RISC-V toolchain, run on the circuit |
+| Code | the HF `transformers` `Qwen3_5` module classes, no custom layer code; only weights are written | compiled with a RISC-V toolchain, run on the circuit |
 
 The idea comes from Qwenputer: a Gated DeltaNet layer is an associative memory, so registers, RAM and the program counter can live in the model's recurrent state, and the MLP and attention layers can implement the instruction decode, the ALU and the next-token choice. The outer model reads its own previous output tokens as the machine's trace.
 
@@ -76,9 +76,9 @@ The idea comes from Qwenputer: a Gated DeltaNet layer is an associative memory, 
 
 | Property | Value |
 |---|---|
-| Base geometry | Qwen3.5-4B (hybrid Gated DeltaNet and full-attention layers) |
+| Layer design | derived from Qwen3.5-4B (hybrid Gated DeltaNet and full-attention layers) |
 | Merged checkpoint | hidden size **7680**, **12 chip layers** + Qwen's **32** layers |
-| Why wider than stock | the circuit's state slots and the 3,840 row cells need more residual width than stock Qwen3.5-4B's 2,560 |
+| Why wider than Qwen3.5-4B | the circuit's state slots and the 3,840 row cells need more residual width than the released Qwen3.5-4B's 2,560 |
 | Vocabulary | **680,128** tokens (511,444 non-row tokens + the 168,684 table rows) |
 | Weight table | **168,684 rows × 3,840 cells**, stored in `embed_tokens.weight` (168,684 rows × hidden 7680 × 2 bytes = **2.59 GB** in bf16) |
 | Table build | `quantfix/cf_gen_q.py` (generator, reproduces the earlier table bit for bit on the earlier config) |
@@ -263,7 +263,7 @@ What it shows: both finer weights and 16-bit activations at those three layers a
 
 ### Stock-module check
 
-The merged checkpoint (hidden 7680, 168,684 table rows, vocabulary 680,128) was run through the stock `Qwen3_5` modules on chunk 0, teacher-forced with the reference tokens, with the argmax taken over the **full vocabulary**:
+The merged checkpoint (hidden 7680, 168,684 table rows, vocabulary 680,128) was run through the HF `Qwen3_5` module classes on chunk 0, teacher-forced with the reference tokens, with the argmax taken over the **full vocabulary**:
 
 | | Positive check | Negative control (every table entry +1 mod 16) |
 |---|---|---|
@@ -336,13 +336,13 @@ Everything else runs in the circuit. Full audit with file and line references: [
 
 - One prompt token at position 0: the firmware is built for context length 1.
 - The 96 chunks ran in parallel. Each was seeded from the reference start state and checked for exact end-state equality with the next job's seed at all 95 seams.
-- The executor is the fused Triton kernel. The stock `Qwen3_5` modules were checked on chunk 0 (130,000 steps, with the negative control above).
-- The outer checkpoint carries the 2.59 GB table, so it is larger than stock Qwen3.5-4B. The chunks run on Vast read the same table from `rowtab_cf.npy`, checked bit-identical to the checkpoint's `embed_tokens.weight`.
+- The executor is the fused Triton kernel. The HF `Qwen3_5` module classes ran the check on chunk 0 (130,000 steps, with the negative control above).
+- The outer checkpoint carries the 2.59 GB table, so it is larger than the released Qwen3.5-4B. The chunks run on Vast read the same table from `rowtab_cf.npy`, checked bit-identical to the checkpoint's `embed_tokens.weight`.
 
 ## ❓ FAQ
 
 **What does "Qwen in Qwen" mean here, precisely?**
-A Qwen3-0.6B inference (the inner model) runs as a program on a CPU whose circuit is implemented by the weights of a Qwen3.5-4B-shaped model (the outer model). The outer model's own layers decode each instruction, do the arithmetic, hold the registers and RAM in recurrent state, and fetch the inner model's weights from its own embedding rows. The inner model's answer token appears as the circuit's output before `HALT`.
+A Qwen3-0.6B inference (the inner model) runs as a program on a CPU whose circuit is implemented by the weights of a Qwen3_5-architecture model (HF `Qwen3_5ForCausalLM` classes, widened to hidden 7680 with 12 added chip layers and an extended 680,128-token vocabulary; derived from the Qwen3.5-4B layer design) (the outer model). The outer model's own layers decode each instruction, do the arithmetic, hold the registers and RAM in recurrent state, and fetch the inner model's weights from its own embedding rows. The inner model's answer token appears as the circuit's output before `HALT`.
 
 **Why 15846, and why was it 13 before?**
 15846 is what Hugging Face's Qwen3-0.6B produces for this prompt (fp32 and bf16). The earlier firmware used int4 weights and int8 activations everywhere. It matched its own emulator exactly, but quantisation changes the answer at position 0, where a massive activation (about 6,540 at layer 2) sits in the residual. Raising layers 2, 26 and 27 to 8-bit weights and 16-bit activations gives 15846 ([study above](#quantisation-study)).
@@ -356,8 +356,8 @@ No. It is one token at position 0 of a single compile-time prompt token. The com
 **What does the host still do?**
 Boot, the `GO` token, the embed-and-append loop and `ecall` I/O, and it seeds each later chunk's start state ([table](#-what-the-host-does)).
 
-**Is the outer model a stock Qwen3.5-4B?**
-It uses stock `Qwen3_5` modules with only its weights written, but the merged checkpoint is wider (hidden size 7680) and carries the 2.59 GB table, so it is not the released checkpoint.
+**Is the outer model the released Qwen3.5-4B?**
+No. It is a Qwen3_5-architecture model (HF `Qwen3_5ForCausalLM` classes, widened to hidden 7680 with 12 added chip layers and an extended 680,128-token vocabulary; derived from the Qwen3.5-4B layer design). It uses the HF module classes with only its weights written, but it is wider than the real Qwen3.5-4B (hidden 2560, 32 layers) and carries the 2.59 GB table, so it is not the released checkpoint.
 
 **Why layers 2, 26 and 27?**
 They carry the position-0 massive activations. Quantising any one of them alone flips the answer; quantising any one of the other 25 does not ([`diag_quant`](experiments/circuit/fullrun/diag_quant/REPORT.md)).
@@ -371,7 +371,7 @@ Everything is logged in [`RUNS.md`](RUNS.md). Pipeline, in order (all under [`ex
 
 1. **Firmware and table:** `quantfix/gen_fx_q.py`, `quantfix/cf_gen_q.py`, `quantfix/fw_qwen3_ram_cf_q.c` build the final-contract CF+RAM firmware and the 168,684-row table ([`STEP2_REPORT.md`](experiments/circuit/fullrun/quantfix/STEP2_REPORT.md) has the exact commands and paths).
 2. **Reference trace:** `quantfix/modal_refq.py` generates the 96-chunk reference (argmax 15846, 0 injections).
-3. **Checkpoint:** `hfwf/merge_wf.py` merges the table into the Qwen3.5-4B checkpoint; `hfwf/check_wf.py` runs the stock-module check.
+3. **Checkpoint:** `hfwf/merge_wf.py` merges the table into a Qwen3_5-architecture checkpoint (hidden 7680, 12 added chip layers); `hfwf/check_wf.py` runs the stock-module check.
 4. **Parallel run and verdict** (full details and every flag in [`cf/README_parallel.md`](experiments/circuit/fullrun/cf/README_parallel.md)):
 
 ```sh
@@ -412,7 +412,7 @@ RUNS.md              log of every launched run
 ## 🙏 Credits
 
 - **Qwenputer** ([divagr18/qwenputer](https://github.com/divagr18/qwenputer)): the idea this repository is a homage to, a computer whose circuits are Qwen's own weights. Its compiler is vendored under `reference/nested-qwen-lab/qwentpu` with its license.
-- **Qwen** models by the Qwen team at Alibaba: Qwen3.5 geometry for the outer model, Qwen3-0.6B as the inner model (Apache-2.0).
+- **Qwen** models by the Qwen team at Alibaba: the Qwen3.5-4B layer design for the outer model, Qwen3-0.6B as the inner model (Apache-2.0).
 - Built on Hugging Face `transformers`, PyTorch and Triton; run on Modal and Vast.ai.
 
 ## 📜 License

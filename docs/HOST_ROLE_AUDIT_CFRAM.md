@@ -40,8 +40,8 @@ Every token the free-run feeds back is the circuit's own prediction (`fr.tok`) u
 ## 3. What cannot be removed, and why
 - **Boot, `GO` token, embedding of the circuit's own token, the autoregressive replay loop, ecall I/O** (roles 11, 12, 17): something outside the weights has to start and step a transformer. The plan allows exactly these.
 - **The reference comparison** (role 10): a run cannot certify itself. It stays as the check. What can change is what it is compared against (add G).
-- **Running the full 174.8M-step run through HF modules** for role 9: HF stock modules do 59-91 tok/s on an L4 (`CIRCUIT_ROUTE_PLAN.md`), so 174.8M steps is about 22-34 days on one GPU. Impractical; a sampled check with a negative control is the achievable form. "Same arithmetic, not same kernels" stays true for the bulk of the run.
-- **The table in the outer parameters** (roles 7, 15): nothing at stock size can hold 596 M int4 weights (state is 24x too small). The 2.38 GB embedding table is a parameter-count increase and is ruled acceptable by the user; it is not a stock Qwen3.5-4B.
+- **Running the full 174.8M-step run through HF modules** for role 9: the HF modules do 59-91 tok/s on an L4 (`CIRCUIT_ROUTE_PLAN.md`), so 174.8M steps is about 22-34 days on one GPU. Impractical; a sampled check with a negative control is the achievable form. "Same arithmetic, not same kernels" stays true for the bulk of the run.
+- **The table in the outer parameters** (roles 7, 15): nothing at the released Qwen3.5-4B size can hold 596 M int4 weights (state is 24x too small). The 2.38 GB embedding table is a parameter-count increase and is ruled acceptable by the user; it is not a stock Qwen3.5-4B.
 - **A zero-seam single chain**: possible but about 11-13 h on one GPU, limit 24 h. Feasible, not impossible; A addresses it.
 
 ## 4. Reading the final JSON
