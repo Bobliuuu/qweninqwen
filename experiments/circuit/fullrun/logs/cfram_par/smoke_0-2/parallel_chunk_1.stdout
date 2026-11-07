@@ -1,0 +1,33 @@
+ROW table decoded from checkpoint /wf/ckpt_cf: (156396, 3840) in 11s
+ROW table slice materialised for this run: rows 0..156395 of 156396
+ROW embedding loaded from cache /data/cfram/rowemb_cf.npy (156396, 7145)
+injections per row [0]... (RAM-type [0]), inj file inj, ramimg True, unaddressable-WROM VDOTs forced [0]...
+NO HOST WRITES: 0 injections, 0 forced tokens; _inject hook and token override removed from the graph
+/usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
+  warn_once(FP_FUSION_DEFAULT_WARNING)
+rows 1, steps/row 2,097,153, forced kinds [], forced fraction [0.0]
+[chain] step 100,000/2,097,153 (boundary 1/1, chunk 1) 26s 3,814 tok/s; free 100,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 200,000/2,097,153 (boundary 1/1, chunk 1) 52s 3,821 tok/s; free 200,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 300,000/2,097,153 (boundary 1/1, chunk 1) 78s 3,824 tok/s; free 300,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 400,000/2,097,153 (boundary 1/1, chunk 1) 105s 3,826 tok/s; free 400,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 500,000/2,097,153 (boundary 1/1, chunk 1) 131s 3,826 tok/s; free 500,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 600,000/2,097,153 (boundary 1/1, chunk 1) 157s 3,827 tok/s; free 600,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 700,000/2,097,153 (boundary 1/1, chunk 1) 183s 3,828 tok/s; free 700,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 800,000/2,097,153 (boundary 1/1, chunk 1) 209s 3,828 tok/s; free 800,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 900,000/2,097,153 (boundary 1/1, chunk 1) 235s 3,828 tok/s; free 900,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,000,000/2,097,153 (boundary 1/1, chunk 1) 261s 3,828 tok/s; free 1,000,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,100,000/2,097,153 (boundary 1/1, chunk 1) 287s 3,828 tok/s; free 1,100,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,200,000/2,097,153 (boundary 1/1, chunk 1) 313s 3,828 tok/s; free 1,200,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,300,000/2,097,153 (boundary 1/1, chunk 1) 340s 3,828 tok/s; free 1,300,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,400,000/2,097,153 (boundary 1/1, chunk 1) 366s 3,828 tok/s; free 1,400,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,500,000/2,097,153 (boundary 1/1, chunk 1) 392s 3,829 tok/s; free 1,500,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,600,000/2,097,153 (boundary 1/1, chunk 1) 418s 3,829 tok/s; free 1,600,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,700,000/2,097,153 (boundary 1/1, chunk 1) 444s 3,829 tok/s; free 1,700,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,800,000/2,097,153 (boundary 1/1, chunk 1) 470s 3,829 tok/s; free 1,800,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,900,000/2,097,153 (boundary 1/1, chunk 1) 496s 3,829 tok/s; free 1,900,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 2,000,000/2,097,153 (boundary 1/1, chunk 1) 522s 3,829 tok/s; free 2,000,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 2,097,153/2,097,153 (boundary 1/1, chunk 1) 548s 3,829 tok/s; free 2,097,152 mismatches 0, forced 0 raw-disagree 0
+BOUNDARY after chunk 1 (step 2,097,152): ok=True regs_rd_bad=0 (rs1 0, rs2 0) anchor/n (1226, 1226)/(23, 23) wb15 (31857, 31857) ref_wb27 134216817 high12_lost=True j,vcnt (128.0, 128.0) bn_bad 0 ram touched 7505 bad 0 untouched-nonzero 31 touched-by-op {'load': 6938, 'sb_sh': 0, 'sw': 567} bad-by-op {'load': 0, 'sb_sh': 0, 'sw': 0}
+  WF boundary after chunk 1: latch_bad 0/64 row-id reg a4 circuit/ref (5192, 5192) (hex 0x1448/0x1448)
+READOUT {"from_step": 2097088, "to_step": 2097152, "halt_in_tail": false, "circuit_halt_step": null, "tail_tokens_circuit": [99534, 32901, 32928, 32923, 33227, 262173, 268276, 32917, 32914, 32942, 32954, 32948, 32935, 32930, 32951, 268276, 32898, 32890, 32841, 32834, 32819, 32809, 32772, 65518], "tail_names_circuit": ["J(1226)", "F0(133)", "F0(160)", "F0(155)", "F0(459)", "WB(31857)", "ROW(5192)", "F0(149)", "F0(146)", "F0(174)", "F0(186)", "F0(180)", "F0(167)", "F0(162)", "F0(183)", "ROW(5192)", "F0(130)", "F0(122)", "F0(73)", "F0(66)", "F0(51)", "F0(41)", "F0(4)", "F0(32750)"], "circuit_bytes": [], "circuit_word": null, "tail_equals_reference": true}
+{"mode": "chain", "chunks": [1], "steps": 2097152, "steps_run": 2097153, "seconds": 547.9073083400726, "tok_per_s": 3827.568941730732, "free_tokens": 2097152, "free_mismatches": 0, "first_free_mismatch": null, "halt_step": null, "readout": {"from_step": 2097088, "to_step": 2097152, "halt_in_tail": false, "circuit_halt_step": null, "tail_tokens_circuit": [99534, 32901, 32928, 32923, 33227, 262173, 268276, 32917, 32914, 32942, 32954, 32948, 32935, 32930, 32951, 268276, 32898, 32890, 32841, 32834, 32819, 32809, 32772, 65518], "tail_names_circuit": ["J(1226)", "F0(133)", "F0(160)", "F0(155)", "F0(459)", "WB(31857)", "ROW(5192)", "F0(149)", "F0(146)", "F0(174)", "F0(186)", "F0(180)", "F0(167)", "F0(162)", "F0(183)", "ROW(5192)", "F0(130)", "F0(122)", "F0(73)", "F0(66)", "F0(51)", "F0(41)", "F0(4)", "F0(32750)"], "circuit_bytes": [], "circuit_word": null, "tail_equals_reference": true}, "fulltable": true, "forced_tokens": 0, "forced_raw_disagreements": 0, "diverged": false, "boundaries": [{"regs_rd_bad": [], "regs_rs1_bad": 0, "regs_rs2_bad": 0, "anchor": [1226, 1226], "n": [23, 23], "wb15": [31857, 31857], "wb_ref_full27": 134216817, "wb_high12_lost": true, "pc_ok": true, "wb15_ok": true, "j_vcnt": [128.0, 128.0], "bn_bad": 0, "ram_slots_touched": 7505, "ram_bad": 0, "ram_bad_first": [], "ram_touched_by_op": {"load": 6938, "sb_sh": 0, "sw": 567}, "ram_bad_by_op": {"load": 0, "sb_sh": 0, "sw": 0}, "ram_untouched_nonzero": 31, "ok": true, "latch_bad": 0, "row_reg_a4": [5192, 5192], "boundary_after_chunk": 1, "step": 2097152}], "gpu": "NVIDIA A100 80GB PCIe"}

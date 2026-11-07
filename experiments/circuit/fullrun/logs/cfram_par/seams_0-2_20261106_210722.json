@@ -1,0 +1,112 @@
+{
+ "verdict": "PASS: chunks 0-2: 3/3 jobs clean (0 mismatches, 0 forced, 0 injections); seams exact 3/3; final word from circuit tokens: None (reference 13); 0s to collect",
+ "ok": true,
+ "chunks": [
+  0,
+  2
+ ],
+ "rows": [
+  {
+   "chunk": 0,
+   "problems": [],
+   "injections": 0,
+   "rc": 0,
+   "steps_run": 2097152,
+   "seconds": 551,
+   "free_tokens": 2097151,
+   "free_mismatches": 0,
+   "forced_tokens": 0,
+   "diverged": false,
+   "halt_step": null,
+   "seam": {
+    "regs_bad": [],
+    "anchor": [
+     509,
+     509
+    ],
+    "n": [
+     1,
+     1
+    ],
+    "wb15": [
+     31996,
+     31996
+    ],
+    "latch_equal": true,
+    "ram_words": 8192,
+    "ram_bad": 0,
+    "exact": true,
+    "bn_bad_informational": 0
+   },
+   "clean": true
+  },
+  {
+   "chunk": 1,
+   "problems": [],
+   "injections": 0,
+   "rc": 0,
+   "steps_run": 2097153,
+   "seconds": 548,
+   "free_tokens": 2097152,
+   "free_mismatches": 0,
+   "forced_tokens": 0,
+   "diverged": false,
+   "halt_step": null,
+   "seam": {
+    "regs_bad": [],
+    "anchor": [
+     1226,
+     1226
+    ],
+    "n": [
+     23,
+     23
+    ],
+    "wb15": [
+     31857,
+     31857
+    ],
+    "latch_equal": true,
+    "ram_words": 8192,
+    "ram_bad": 0,
+    "exact": true,
+    "bn_bad_informational": 0
+   },
+   "clean": true
+  },
+  {
+   "chunk": 2,
+   "problems": [],
+   "injections": 0,
+   "rc": 0,
+   "steps_run": 2097153,
+   "seconds": 548,
+   "free_tokens": 2097152,
+   "free_mismatches": 0,
+   "forced_tokens": 0,
+   "diverged": false,
+   "halt_step": null,
+   "seam": {
+    "regs_bad": [],
+    "anchor": [
+     1226,
+     1226
+    ],
+    "n": [
+     44,
+     44
+    ],
+    "wb15": [
+     31569,
+     31569
+    ],
+    "latch_equal": true,
+    "ram_words": 8192,
+    "ram_bad": 0,
+    "exact": true,
+    "bn_bad_informational": 0
+   },
+   "clean": true
+  }
+ ]
+}

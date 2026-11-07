@@ -55,7 +55,7 @@ for k in range(lo, hi + 1):
     r['clean'] = not r['problems']; ok_all &= r['clean']; rows.append(r)
 n = len(rows); nclean = sum(r['clean'] for r in rows); nseam = sum(1 for r in rows if r.get('seam', {}).get('exact')); nseam_chk = sum(1 for r in rows if 'seam' in r)
 word = next((r['readout'].get('circuit_word') for r in rows if r.get('readout')), None)
-verdict = f"{'PASS' if ok_all else 'FAIL'}: chunks {lo}-{hi}: {nclean}/{n} jobs clean (0 mismatches, 0 forced, 0 injections); seams exact {nseam}/{nseam_chk}; final word from circuit tokens: {word} (reference {a.expect_word}); {time.time() - t0:.0f}s to collect"
+verdict = f"{'PASS' if ok_all else 'FAIL'}: chunks {lo}-{hi}: {nclean}/{n} jobs clean (0 mismatches, 0 forced, 0 injections); seams exact {nseam}/{nseam_chk}; final word from circuit tokens: {word if word is not None else 'n/a (last chunk not in this subset)'} (reference {a.expect_word}); {time.time() - t0:.0f}s to collect"
 print(verdict)
 for r in rows:
     if r['problems']: print(f"  chunk {r['chunk']}: {r['problems']}")

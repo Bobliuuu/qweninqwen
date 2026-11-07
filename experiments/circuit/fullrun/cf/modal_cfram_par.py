@@ -10,7 +10,8 @@ img = modal.Image.debian_slim(python_version='3.11').pip_install('torch', 'numpy
 data = modal.Volume.from_name('qfr-data'); out = modal.Volume.from_name('qfr-out', create_if_missing=True); wfhf = modal.Volume.from_name('qfr-wfhf')
 MAXC = int(os.environ.get('CFRAM_MAX_CONTAINERS', '25'))
 
-@app.function(image=img, gpu='A100-40GB', timeout=3 * 3600, volumes={'/data': data, '/out': out, '/wf': wfhf}, retries=0, max_containers=MAXC)
+@app.function(image=img, gpu=['A100-40GB', 'A100-80GB', 'L40S'],   # fallback list: A100-40GB capacity was short during the 3-chunk smoke test (a job waited ~10 min); same circuit, only speed differs
+               timeout=3 * 3600, volumes={'/data': data, '/out': out, '/wf': wfhf}, retries=0, max_containers=MAXC)
 def chunk_job(k, steps=0, root='cfram_par', elf='/data/cfram/ramcf.elf', refdir='/data/cfram/refRC', ckpt='/wf/ckpt_cf', rowtab='/data/rowtab_cf.npy', rowemb='/data/cfram/rowemb_cf.npy', write_cache=False, extra=(), env_extra=()):
     """One chunk. All paths are parameters (defaults = the CF+RAM firmware). elf/refdir/rowtab/rowemb are paths on volume qfr-data (/data/..), ckpt on qfr-wfhf (/wf/..), outputs go to qfr-out /<root>/chunk_NNNN.
     ckpt='' reads the table from `rowtab` (npy) instead of the checkpoint. write_cache=True builds the row-embedding cache at `rowemb` (use ONE job, e.g. chunk 0 with steps=2000); otherwise the cache is REQUIRED (ROWEMB_STRICT)."""

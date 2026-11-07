@@ -1,0 +1,17 @@
+{
+ "ckpt": "/wf/ckpt_cf",
+ "npy": "/data/rowtab_cf.npy",
+ "shape_ckpt": [
+  156396,
+  3840
+ ],
+ "shape_npy": [
+  156396,
+  3840
+ ],
+ "cells_different": 0,
+ "bit_identical": true,
+ "load_seconds": 11.9,
+ "md5_ckpt": "9165bcbb177c9bc19930e17e8e24e65b",
+ "md5_npy": "9165bcbb177c9bc19930e17e8e24e65b"
+}

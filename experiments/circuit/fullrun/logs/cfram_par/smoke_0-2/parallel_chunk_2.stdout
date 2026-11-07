@@ -1,0 +1,18 @@
+ROW table decoded from checkpoint /wf/ckpt_cf: (156396, 3840) in 8s
+ROW table slice materialised for this run: rows 0..156395 of 156396
+ROW embedding loaded from cache /data/cfram/rowemb_cf.npy (156396, 7145)
+injections per row [0]... (RAM-type [0]), inj file inj, ramimg True, unaddressable-WROM VDOTs forced [0]...
+NO HOST WRITES: 0 injections, 0 forced tokens; _inject hook and token override removed from the graph
+/usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
+  warn_once(FP_FUSION_DEFAULT_WARNING)
+rows 1, steps/row 2,097,153, forced kinds [], forced fraction [0.0]
+[chain] step 100,000/2,097,153 (boundary 1/1, chunk 2) 26s 3,813 tok/s; free 100,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 200,000/2,097,153 (boundary 1/1, chunk 2) 52s 3,819 tok/s; free 200,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 300,000/2,097,153 (boundary 1/1, chunk 2) 79s 3,821 tok/s; free 300,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 400,000/2,097,153 (boundary 1/1, chunk 2) 105s 3,822 tok/s; free 400,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 500,000/2,097,153 (boundary 1/1, chunk 2) 131s 3,823 tok/s; free 500,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 600,000/2,097,153 (boundary 1/1, chunk 2) 157s 3,824 tok/s; free 600,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 700,000/2,097,153 (boundary 1/1, chunk 2) 183s 3,825 tok/s; free 700,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 800,000/2,097,153 (boundary 1/1, chunk 2) 209s 3,825 tok/s; free 800,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 900,000/2,097,153 (boundary 1/1, chunk 2) 235s 3,824 tok/s; free 900,000 mismatches 0, forced 0 raw-disagree 0
+[chain] step 1,000,000/2,097,153 (boundary 1/1, chunk 2) 261s 3,825 tok/s; free 1,000,000 mismatches 0, forced 0 raw-disagree 0
