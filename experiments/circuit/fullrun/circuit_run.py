@@ -55,6 +55,7 @@ ap.add_argument('--save-state', action='store_true', help='CHAIN: at every chunk
 ap.add_argument('--resume-state', default='', help='start the first chunk from a circuit_state_NNNN.pkl written by --save-state of an earlier segment (the circuit\'s own state), not from the reference snapshot')
 ap.add_argument('--fulltable', action='store_true', help='WF/CF: load the WHOLE row table (rows 0..len-1) instead of the slice of rows the REFERENCE trace touches (removes the reference look-ahead on table-row selection)')
 ap.add_argument('--stop-on-halt', action='store_true', help='stop when the CIRCUIT\'s own raw prediction is the HALT token (ecall exit), instead of only running the reference-defined step count; the reference still supplies the comparator and chunk boundaries')
+ap.add_argument('--no-host-writes', action='store_true', help='FINAL PATH: assert there is NO host injection (all injection rows empty) and NO forced token, then remove the host write path from the CUDA graph entirely: no _inject hook, and _override replaced by a record-only kernel (the circuit\'s raw token is stored, never replaced)')
 ap.add_argument('--noforce', action='store_true', help='do NOT force (override) the tokens of VDOT records whose weights are in the 128 unaddressable WROM words: the circuit free-runs through them (first divergence is then measured)')
 ap.add_argument('--nodrom', action='store_true', help='drop all type-3 (DROM-class constant) injections')
 ap.add_argument('--novdot', action='store_true', help='drop all VDOT weight injections (type 2) and zone forcing')
@@ -73,6 +74,13 @@ def _override(tok, fid, p, pay, f_fid, f_p, mask, ctr, raw, N, NPB: tl.constexpr
         tl.store(fid + bat, nf); tl.store(p + bat, npay.to(tl.int64))
         j = tl.arange(0, 32)
         tl.store(pay + bat * 32 + j, ((npay >> j) & 1).to(tl.float32))
+    tl.store(ctr + bat, c + 1)
+
+@triton.jit
+def _record(tok, ctr, raw, N):   # --no-host-writes: only RECORD the circuit's own raw token (the comparison needs it); nothing is ever written back into the circuit
+    bat = tl.program_id(0)
+    c = tl.load(ctr + bat)
+    tl.store(raw + bat * N + c, tl.load(tok + bat).to(tl.int32))
     tl.store(ctr + bat, c + 1)
 
 @triton.jit
@@ -259,10 +267,11 @@ _orig_step = fr._step
 def _step_inj():
     _inject[(B,)](*Ss, **{f'SV{i}': SVs[i] for i in range(8)}, kind=I_kind, base0=I_base, cc0=I_cc, data=I_dat, ictr=ICTR, N=N)
     _orig_step()
-fr._step = _step_inj
+if not a.no_host_writes: fr._step = _step_inj
 print(f'injections per row {n_inj.tolist()[:4]}... (RAM-type {n_ramin.tolist()[:4]}), inj file {a.inj}, ramimg {a.ramimg}, unaddressable-WROM VDOTs forced {n_zone.tolist()[:4]}...', flush=True)
 if a.forcewin:
     lo, hi = (int(x) for x in a.forcewin.split(',')); MASK[:, lo:hi] = 1
+if a.no_host_writes: assert int(n_inj.sum()) == 0 and int(MASK.sum()) == 0, f'--no-host-writes: reference has {int(n_inj.sum())} injections / {int(MASK.sum())} forced tokens'; print('NO HOST WRITES: 0 injections, 0 forced tokens; _inject hook and token override removed from the graph', flush=True)
 F_fid, F_p, MASK, TREF = (x.to(dev) for x in (F_fid, F_p, MASK, TREF))
 CTR = torch.zeros(B, dtype=torch.int32, device=dev); RAW = torch.zeros(B, N, dtype=torch.int32, device=dev)
 orig = fusedexec._decode_embed
@@ -270,7 +279,8 @@ class OV:
     def __getitem__(self, grid):
         inner = orig[grid]
         def call(*args, **kw):
-            _override[(B,)](fr.tok, args[5], args[6], args[7], F_fid, F_p, MASK, CTR, RAW, N, NPB=32)
+            if a.no_host_writes: _record[(B,)](fr.tok, CTR, RAW, N)
+            else: _override[(B,)](fr.tok, args[5], args[6], args[7], F_fid, F_p, MASK, CTR, RAW, N, NPB=32)
             return inner(*args, **kw)
         return call
 fusedexec._decode_embed = OV()

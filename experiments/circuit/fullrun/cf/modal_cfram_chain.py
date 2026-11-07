@@ -27,7 +27,7 @@ def _run(chunks, extra, outname='', resume=False, write_cache=False):
     os.makedirs('/out/cfram_chain', exist_ok=True); o = f'/out/cfram_chain/{tag}'; os.makedirs(o, exist_ok=True)
     env = dict(os.environ, PYTHONPATH='.:/data/circuit_wf/engine', WF='1', REALMAP='1', REALDECODE='1', WF_ROW_CELLS='3840', ROWEMB_CACHE='/data/cfram/rowemb_cf.npy')   # FINAL PATH: real in_ram/in_drom decode (no bring-up patch), cached circuit embedding of the whole row table
     if write_cache: env['ROWEMB_WRITE'] = '1'
-    cmd = ['python', '-u', '/data/circuit_wfram/fullrun/circuit_run.py', '/data/cfram/ramcf.elf', '/data/cfram/refRC', o, '--chunks', chunks, '--ramimg', '--block', '100000', '--rowtab', '/data/rowtab_cf.npy', '--rowtab-ckpt', '/wf/ckpt_cf', '--chain', '--save-state', '--fulltable', '--stop-on-halt'] + list(extra)
+    cmd = ['python', '-u', '/data/circuit_wfram/fullrun/circuit_run.py', '/data/cfram/ramcf.elf', '/data/cfram/refRC', o, '--chunks', chunks, '--ramimg', '--block', '100000', '--rowtab', '/data/rowtab_cf.npy', '--rowtab-ckpt', '/wf/ckpt_cf', '--chain', '--save-state', '--fulltable', '--stop-on-halt', '--no-host-writes'] + list(extra)
     if resume:
         st = f'{o}/circuit_state_{int(first):04d}.pkl'; assert os.path.exists(st), f'no circuit state {st}: cannot resume at chunk {first}'
         cmd += ['--resume-state', st]

@@ -15,7 +15,7 @@ def chunk_job(k, steps=0, root='cfram_par'):
     data.reload(); wfhf.reload(); o = f'/out/{root}/chunk_{k:04d}'; os.makedirs(o, exist_ok=True)
     env = dict(os.environ, PYTHONPATH='.:/data/circuit_wf/engine', WF='1', REALMAP='1', REALDECODE='1', WF_ROW_CELLS='3840', ROWEMB_CACHE='/data/cfram/rowemb_cf.npy')
     cmd = ['python', '-u', '/data/circuit_wfram/fullrun/circuit_run.py', '/data/cfram/ramcf.elf', '/data/cfram/refRC', o, '--chunks', str(k), '--ramimg', '--block', '100000', '--rowtab', '/data/rowtab_cf.npy', '--rowtab-ckpt', '/wf/ckpt_cf',
-           '--chain', '--save-state', '--fulltable', '--stop-on-halt'] + (['--reset0'] if k == 0 else []) + (['--steps', str(steps)] if steps else [])
+           '--chain', '--save-state', '--fulltable', '--stop-on-halt', '--no-host-writes'] + (['--reset0'] if k == 0 else []) + (['--steps', str(steps)] if steps else [])
     t0 = time.time()
     with open(f'{o}/job.stdout', 'w') as f:
         p = subprocess.Popen(cmd, cwd='/data/qpriscv_wf', env=env, stdout=f, stderr=subprocess.STDOUT)
