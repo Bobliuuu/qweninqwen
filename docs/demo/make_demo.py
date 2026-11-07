@@ -139,7 +139,7 @@ def scene_title():
     im.paste(e, (left, 168), e); text(d, (left + e.width + 26, 148), label, f, FG)
     d.line((W // 2 - 40, 296, W // 2 + 40, 296), fill=ACC, width=3)
     text(d, (W // 2, 328), 'one Qwen3-0.6B token, computed by a circuit', font(30), DIM, 'ma')
-    text(d, (W // 2, 372), 'living in the weights of Qwen3.5-4B', font(30), DIM, 'ma')
+    text(d, (W // 2, 372), 'living in the weights of a Qwen3.5-style outer model', font(30), DIM, 'ma')
     card(im, (220, 470, W - 220, 590), 16, SOFT, LINE)
     text(d, (W // 2, 490), 'A visualization of a real run', font(24, 'Semibold'), FG, 'ma')
     para(d, 256, 530, 'Every number comes from the repo logs: one prompt token at position 0, 96 chunk-jobs, 95 exact state seams, 0 host injections.', font(19), DIM, W - 512, 26)

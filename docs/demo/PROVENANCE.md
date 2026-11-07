@@ -14,7 +14,7 @@ Footer on every frame: *Visualization of a real run | one token at position 0 | 
 ## Scene 1: title
 | Shown | Source |
 |---|---|
-| "one Qwen3-0.6B token computed by a circuit living in the weights of Qwen3.5-4B" | project definition: `docs/CIRCUIT_ROUTE_PLAN.md` (stock Qwen3.5 outer, Qwen3-0.6B inner program), `docs/HOST_ROLE_AUDIT_CFRAM.md` |
+| "one Qwen3-0.6B token computed by a circuit living in the weights of a Qwen3.5-style outer model" | project definition: `docs/CIRCUIT_ROUTE_PLAN.md` (a Qwen3_5-architecture outer model, Qwen3-0.6B inner program; the plan said 'stock Qwen3.5'), `docs/HOST_ROLE_AUDIT_CFRAM.md` |
 | 96 chunk-jobs, 95 exact seams, 0 host injections | `experiments/circuit/fullrun/logs/cfram_q_vast/seams_0-95_20261107_004845.json` (`verdict`, `rows[*]`) |
 
 ## Scene 2: why the first answer was wrong
@@ -69,7 +69,7 @@ Caveat shown in the data: these are emulator runs of the real integer firmware a
 Items that were removed from the host are deliberately not listed in this scene.
 
 **Not shown in the video, but true (kept out to stay short; they are in the README and the audit):**
-the executor is a fused Triton kernel, not the stock HF forward (audit row 9; HF-module checks cover chunk 0 only: `quantfix/results/hfcheck_cfq_pos_130k.json`, 130,000 steps, 0 mismatches, 2,320 ROW tokens, and the table+1 control `hfcheck_cfq_neg.json` diverges at step 41);
+the executor is a fused Triton kernel, not the HF-module forward (audit row 9; HF-module checks cover chunk 0 only: `quantfix/results/hfcheck_cfq_pos_130k.json`, 130,000 steps, 0 mismatches, 2,320 ROW tokens, and the table+1 control `hfcheck_cfq_neg.json` diverges at step 41);
 the table lives in a bigger checkpoint (hidden 7680, 168,684 rows; decoded copy bit-identical, `docs/demo/data/verify_ckpt_vs_npy.log`);
 the firmware is single-position (ctx=1; audit row 16; the footer on every frame says "one token at position 0");
 a full HF check of the 199,287,253 steps is infeasible (about 155 steps/s per the sampled-check agent's report, not a data file).
