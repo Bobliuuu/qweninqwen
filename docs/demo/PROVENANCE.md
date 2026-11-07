@@ -1,83 +1,46 @@
-# Provenance of every number in `demo.mp4` / `demo.gif`
+# Provenance of `demo.mp4` / `demo_silent.mp4` / `demo.gif` / `stills/`
 
-`make_demo.py` reads each value below from the listed file at build time and asserts the key ones
-(it refuses to build if the verdict, the 15846/13 answers, the halt step, 95 exact seams or 0/0/0 counters differ).
-Paths are relative to the repo root unless they start with `docs/demo/data/` (small copies of files that live outside the repo in `~/qweninqwen-work/cfram_q_vast_out/`).
-Nothing in the video is simulated. The only synthetic things are presentation: easing, cross-fades between scenes, and the **reveal order** of the chunk grid (chunk number order, because per-chunk completion wall-clock times were not logged). Counters in the run scene count up with the reveal and end at the logged totals.
+`make_demo.py` builds everything. It reads the numbers from the files below and **asserts** the key ones (it refuses to build if the
+verdict, the 13 / 15846 answers, the halt step 57,705, 95 exact seams, the 0 / 0 / 0 counters or the 199,287,158 token total differ).
+Paths are relative to the repo root. Style: white, one accent (indigo) plus greys, soft shadows, SF type, emojis only in the title/end cards.
+The scenes reuse the README animations (`docs/assets/viz/make_anim.py`, see `docs/assets/PROVENANCE.md`), re-rendered at their native 1920x1080,
+and the static figures in `docs/assets/` animated with Ken-Burns moves and reveals.
 
-Style: white background, one accent colour (blue) plus greys, thin lines, soft shadows, one sans typeface (SF), emojis only in scene titles. `docs/demo/stills/*.png` are the last frame of each scene.
+## Scenes (96.6 s, 1080p, 30 fps; 0.6 s cross-dissolves, two slide transitions)
+| # | Scene | Length | Built from | Data-driven or schematic |
+|---|---|---|---|---|
+| 1 | Hero: "A real Qwen3-0.6B token, computed inside another Qwen." | 10 s | `make_anim.hero` | Layout is **schematic**; layer widths, counts (199,287,158 trace tokens, 168,684 table rows) and the answer are real |
+| 2 | Title card | 4.5 s | `make_demo.py` | text only; repo URL |
+| 3 | Architecture: the host shrinks to boot / GO / loop / ecall while table, RAM, VDOT and argmax glow | 12.5 s | `docs/assets/circuit_architecture.png` (Ken-Burns pan/zoom, host card scaled down, glow rectangles drawn over the boxes) | The figure is **schematic** (box sizes not to scale); the glow and the host shrink are **animation only**. The numbers in the figure are real (see its caption and `docs/assets/PROVENANCE.md`) |
+| 4 | How one token is generated | 24 s | `make_anim.one_token` (data: `docs/assets/viz/one_token_data.json`, from the CF+RAM reference `logs/refQ/`) | Layer shares of the trace and the 18 shown trace tokens are real (chunk 0 steps 98,170 to 98,187 etc., see the asset provenance); the pacing is animation |
+| 5 | Why the first answer was 13, and the fix | 13 s | `make_anim.quantfix` | Real: `diag_quant/diag_quant2.json` (cosine and answer per quantised layer), `quantfix/results/*.json` (answers 15846 / 13 / 9 / 408, +17.1% instructions) |
+| 6 | The answer rolls 13 to 15846 | 5.5 s | `make_demo.py` | **Animation**: the rolling number is a count between two measured values (13 = `quantfix/results/ctrl_w4.json`, 15846 = `b8_apl2.json` = HF fp32 in `diag_quant/diag_quant.json`); the video says so on screen |
+| 7 | Run the 96 chunk jobs in parallel | 11 s | `make_anim.seam_grid` | Real per-job durations and counters from `logs/cfram_q_vast/seams_0-95_20261107_004845.json`, replayed as if all jobs started together (it says so on screen) |
+| 8 | The whole run in numbers: 199,287,158 / 96 of 96 / 95 of 95 / 0, 0, 0 + per-chunk job time | 9 s | counters in `make_demo.py`; strip: `docs/assets/circuit_heatstrip.png` | Counters count up to the logged totals (count-up easing is animation); the strip is real per-chunk job time |
+| 9 | How it was run: fleet timeline | 6.5 s | `docs/assets/circuit_fleet.png` | Real fleet-manager status lines (`logs/cfram_q_vast/status.txt`), including the restarts and vanished boxes |
+| 10 | End card | 6 s | `make_demo.py` | text only: 96 / 96, 95 / 95, final word 15846, repo URL |
 
-No clips from `docs/assets/` were spliced in: at build time that folder held only the earlier (Nov 6) tier/pipeline figures, and the new 'how one token is generated' animation from the visuals agent did not exist yet.
+Lower-third captions (scenes 3, 8, 9) carry the scope line: **"One token at position 0 · parallel jobs seeded from the reference, verified at 95 exact seams"**.
 
-Footer on every frame: *Visualization of a real run | one token at position 0 | parallel jobs seeded from the reference, verified at 95 exact seams*.
-
-## Scene 1: title
-| Shown | Source |
+## Where each number comes from
+| Number | Source |
 |---|---|
-| "one Qwen3-0.6B token computed by a circuit living in the weights of a Qwen3.5-style outer model" | project definition: `docs/CIRCUIT_ROUTE_PLAN.md` (a Qwen3_5-architecture outer model, Qwen3-0.6B inner program; the plan said 'stock Qwen3.5'), `docs/HOST_ROLE_AUDIT_CFRAM.md` |
-| 96 chunk-jobs, 95 exact seams, 0 host injections | `experiments/circuit/fullrun/logs/cfram_q_vast/seams_0-95_20261107_004845.json` (`verdict`, `rows[*]`) |
+| 96 / 96 chunks clean, 95 / 95 seams exact, 0 mismatches, 0 forced tokens, 0 host injections | `experiments/circuit/fullrun/logs/cfram_q_vast/seams_0-95_20261107_004845.json` (`verdict`, `rows[*].free_mismatches / forced_tokens / injections / seam.exact`; summed and asserted in `make_demo.py`); `docs/demo/data/FINAL_VERDICT.json` |
+| 199,287,158 trace tokens | `docs/assets/viz/one_token_data.json` `total_tokens` (= `quantfix/logs/refQ/summary.json`), asserted equal to the constant in `make_anim.py` |
+| chunk 95: 57,707 steps, HALT at step 57,705, answer bytes [230, 61, 0, 0] = 15846, tail equals the reference | `seams_0-95_...json` `rows[95]` (asserted) |
+| 15846 = `' Question'` = Qwen3-0.6B's own answer for prompt 785 ("The") | `experiments/circuit/fullrun/logs/final_token/REPORT.md`, `diag_quant/diag_quant.json` (`hf_argmax`) |
+| 13 = the first (int4) firmware's answer; 9 / 408 for one fix knob alone; +17.1% instructions per token | `quantfix/results/{ctrl_w4,b8_apl1,w4_apl2only,b8_apl2}.json` (exact counts 161,511,713 and 189,109,345; `quantfix/REPORT.md` rounds this to +19%) |
+| per-layer cosine, answers 838 / 3405 / 12 at layers 2 / 26 / 27 | `diag_quant/diag_quant2.json` |
+| per-machine medians in the strip | median of `rows[*].seconds` per machine (job time, not billed time) |
 
-## Scene 2: why the first answer was wrong
-| Shown | Source |
-|---|---|
-| 28 bars: cosine of the final hidden state vs fp32 when ONLY layer k is quantised (int4 weights, int8 activations) | `experiments/circuit/fullrun/diag_quant/diag_quant2.json`, keys `W4+act ONLY layer 0..27`, field `cos_final` |
-| red bars / wrong answers 838 (layer 2), 3405 (layer 26), 12 (layer 27) | same file, field `argmax` (a bar is red when `argmax != 15846`) |
-| first firmware answer 13 `'.'` (drawn as text), rank of 15846 = 38,852 | `quantfix/results/ctrl_w4.json` (`argmax_fw`, `rank_15846_in_fw`); the `'.'` text is from `diag_quant/REPORT.md` title |
-| HF fp32 answer 15846 `' Question'` | `diag_quant/diag_quant.json` (`hf_argmax`); token text from `logs/final_token/REPORT.md` and `diag_quant/REPORT.md` |
-| "layer 2 writes a ~6541 channel" | `diag_quant/diag_quant.json`, `fp32_profile[2].dmax` = 6540.8 (rounded) |
-| "the circuit reproduced this" | the CF+RAM circuit run before the fix reproduced the emulator's 13 (`quantfix/REPORT.md`, control row; `diag_quant/REPORT.md`). The pre-fix 13-token circuit run itself is described in the repo history, not re-plotted here |
+## Not shown in the video, but true (they are in the README and `docs/HOST_ROLE_AUDIT_CFRAM.md`)
+- The executor is a fused Triton kernel, not the stock HF forward. HF-module checks cover chunk 0 only (`quantfix/results/hfcheck_cfq_pos_130k.json`: 130,000 steps, 0 mismatches, 2,320 ROW tokens; the table+1 control `hfcheck_cfq_neg.json` diverges at step 41).
+- The table lives in a bigger checkpoint (hidden 7680, 168,684 rows). A decoded copy used by the Vast jobs was checked bit-identical to the checkpoint table (md5 `5072e52537e840ae8541941a85721360`, from the agent's check log, not re-run for the final firmware's Modal chunks).
+- The firmware is single-position (ctx = 1).
+- A full HF check of 199,287,158 steps is infeasible (about 155 steps/s per the sampled-check agent's report).
 
-All under `experiments/circuit/fullrun/`. Prompt = the single token 785 ("The").
+## Audio
+Generated locally by `make_demo.py` with numpy (slow chords, soft pulse at 72 bpm, quiet chimes at the transitions); no samples, no third-party music. `demo_silent.mp4` has the same picture without it.
 
-## Scene 3: the fix
-| Shown | Source |
-|---|---|
-| 5 variants, argmax, cos(logits, HF), rank of 15846, top-1 gap | `quantfix/results/{ctrl_w4,b8_apl1,w4_apl2only,b8_apl2,b12_apl2}.json` (`argmax_fw`, `cos_logits_fw_vs_hf`, `rank_15846_in_fw`, `gap_fw_top1_top2`) |
-| "+17.1% instructions per token (161,511,713 -> 189,109,345)" | same JSONs, `instr[0]` of `ctrl_w4` and `b8_apl2`. **`quantfix/REPORT.md` says "+19%"** (it rounds 0.160G / 0.19G); the video uses the exact counts |
-| "+7.9% weight words (74,498,048 -> 80,396,288)" | same JSONs, `blob.wrom_words` |
-| "weights alone give 9, activations alone give 408" | `b8_apl1.json` (9), `w4_apl2only.json` (408) |
-
-Caveat shown in the data: these are emulator runs of the real integer firmware at the compiler level (`quantfix/REPORT.md`), single prompt token.
-
-## Scene 4: the run
-| Shown | Source |
-|---|---|
-| 96 cells, 2,097,153 steps per chunk, chunk 95 = 57,707 steps | `seams_0-95_20261107_004845.json` `rows[*].steps_run` |
-| cell color = machine | Modal for chunks 32-70: `docs/demo/data/FINAL_VERDICT.json` `modal_chunks`. Vast GPU for the other 57: `docs/demo/data/fleet_result.json` `done[chunk].gpu` (RTX 4090 / A100 PCIE / L40S). Modal GPU type was not recorded |
-| counters: chunks verified, seams exact, free-token mismatches, forced tokens, host injections | running sums over `rows[*]` (`clean`, `seam.exact`, `free_mismatches`, `forced_tokens`, `injections`); final values 96/96, 95/95, 0, 0, 0 |
-| per-machine median minutes (RTX 4090 5.5, A100 PCIE 9.2, L40S 6.1, Modal 9.2) | median of `rows[*].seconds` per group, chunks 0-94 (chunk 95 is the 15 s HALT chunk and is excluded; stated on screen). Note: the fleet manager's own status lines quote 6.0 min for 4090s and 4.9-9.7 for A100s at different moments; the video uses the final per-chunk values |
-| 199,287,253 steps, 11.4 GPU-hours | sum of `rows[*].steps_run` and sum of `rows[*].seconds` (41,143 s) = job time, **not billed time or cost** |
-
-## Scene 5: the last chunk
-| Shown | Source |
-|---|---|
-| last 24 circuit tokens, HALT | `seams_0-95_...json` `rows[95].readout.tail_names_circuit` |
-| steps 57,642..57,706, halt_step 57,705 | `rows[95].readout.from_step/to_step/circuit_halt_step` |
-| answer bytes [230, 61, 0, 0] -> 230 + 61 x 256 = 15846 | `rows[95].readout.circuit_bytes`, `circuit_word` (arithmetic done on screen) |
-| "tail equals the reference trace: True", 0/0/0 | `rows[95].readout.tail_equals_reference`, `free_mismatches`, `forced_tokens`, `injections` |
-| collector verdict line | `seams_0-95_...json` `verdict` (the trailing "0s to collect" is trimmed) |
-| 15846 = ' Question' = Qwen3-0.6B's own answer | `logs/final_token/REPORT.md`, `diag_quant/diag_quant.json` |
-
-## Scene 6: what the host does (only the remaining roles)
-| Shown | Source |
-|---|---|
-| subline "Everything else runs in the circuit: 0 injections, 0 forced tokens, 0 mismatches in all 96 chunks" | `seams_0-95_...json` `rows[*].injections`, `forced_tokens`, `free_mismatches` (summed by `make_demo.py`, asserted 0) |
-| cards "Boot the program", "The GO token", "The embed-and-append loop", "ecall I/O" (allowed by the design) | `docs/HOST_ROLE_AUDIT_CFRAM.md` rows 11, 12, 17 (boot / GO token + embed loop / ecall services); plan: `docs/CIRCUIT_ROUTE_PLAN.md` ("Host is allowed to") |
-| card "Reference comparison: the test, not an input" | `docs/HOST_ROLE_AUDIT_CFRAM.md` row 10 |
-| card "Later chunks' start state: seeded from the reference, verified by exact end-state equality at 95 seams" | `rows[*].seam.exact` count = 95 (registers, anchor, n, wb15, latch, 8,192 RAM words); `docs/HOST_ROLE_AUDIT_CFRAM.md` row 5 |
-
-Items that were removed from the host are deliberately not listed in this scene.
-
-**Not shown in the video, but true (kept out to stay short; they are in the README and the audit):**
-the executor is a fused Triton kernel, not the HF-module forward (audit row 9; HF-module checks cover chunk 0 only: `quantfix/results/hfcheck_cfq_pos_130k.json`, 130,000 steps, 0 mismatches, 2,320 ROW tokens, and the table+1 control `hfcheck_cfq_neg.json` diverges at step 41);
-the table lives in a bigger checkpoint (hidden 7680, 168,684 rows; decoded copy bit-identical, `docs/demo/data/verify_ckpt_vs_npy.log`);
-the firmware is single-position (ctx=1; audit row 16; the footer on every frame says "one token at position 0");
-a full HF check of the 199,287,253 steps is infeasible (about 155 steps/s per the sampled-check agent's report, not a data file).
-
-## Scene 7: end card
-`seams_0-95_20261107_004845.json` (`verdict`, `ok`), `docs/demo/data/FINAL_VERDICT.json`.
-
-## Open points (not sourced from a data file, said plainly)
-- The `hfcheck` result is for chunk 0 only. The 'same table in the checkpoint' statement for the final run rests on `verify_ckpt_vs_npy.log`, which compares the checkpoint table (168,684 x 3,840) with `rowtab_cf.npy`; the log's timestamp (23:14 on 2026-11-06) is from the Vast agent's check, run before the final jobs.
-- The per-chunk wall-clock completion times were not logged, so the grid does not claim an order of completion.
-- 'Real Qwen3-0.6B says 15846' is HF fp32/bf16 for this one prompt token ("The" at position 0); not a statement about other prompts.
+## Privacy scan
+Frames, data copies and this file contain no IP addresses, machine hostnames, `user@host` strings or keys. `data/` holds only `FINAL_VERDICT.json`.
