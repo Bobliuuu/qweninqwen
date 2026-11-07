@@ -61,7 +61,7 @@ def build(spec_json='', outroot='/data/cfram_q', ext=False):
     # build the ELF exactly like cf/build_fw_ram_cf.sh but with the quantfix firmware (PMAX=2 planes)
     C = '/root/circuit/compiler/fw'; H = '/root/circuit/ramown'; PICO = '/usr/lib/picolibc/riscv64-unknown-elf'; GCC = 'riscv64-unknown-elf-gcc'
     libgcc = subprocess.check_output([GCC, '-march=rv32im', '-mabi=ilp32', '-print-libgcc-file-name'], text=True).strip(); elf = '/tmp/ramcf_q.elf'
-    cmd = [GCC, '-march=rv32im', '-mabi=ilp32', '-O2', '-DNOMARK', '-DPUTCHAR', '-DWF', '-DPMAX=2', '-isystem', PICO + '/include', '-I' + cfg, '-I' + cfd, '-I' + C, '-nostdlib', '-nostartfiles', '-static', '-T' + H + '/fw_rom.ld',
+    cmd = [GCC, '-march=rv32im', '-mabi=ilp32', '-O2', '-DNOMARK', '-DPUTCHAR', '-DWF', '-DPMAX=2', '-DTILE=128', '-isystem', PICO + '/include', '-I' + cfg, '-I' + cfd, '-I' + C, '-nostdlib', '-nostartfiles', '-static', '-T' + H + '/fw_rom.ld',
            '-o', elf, C + '/env/crt0.S', '/root/circuit/fullrun/quantfix/fw_qwen3_ram_cf_q.c', C + '/vdk_wf.S', cfd + '/cfetch.S', '-Wl,--start-group', PICO + '/lib/rv32im/ilp32/libc.a', libgcc, '-Wl,--end-group']
     r = subprocess.run(cmd, capture_output=True, text=True); rep.append('gcc rc %d\n%s' % (r.returncode, (r.stdout + r.stderr)[-3000:])); assert r.returncode == 0, rep[-1]
     rep.append(subprocess.check_output(['riscv64-unknown-elf-size', '-A', elf], text=True)); rep.append(subprocess.check_output('riscv64-unknown-elf-nm -S --size-sort ' + elf + ' | tail -14', shell=True, text=True))
