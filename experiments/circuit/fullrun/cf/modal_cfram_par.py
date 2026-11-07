@@ -7,14 +7,14 @@ Deployed app (functions spawned from a deployed app survive the laptop dying; co
 import modal, subprocess, os, json, time
 app = modal.App('qwen-in-qwen-cfram-par')
 img = modal.Image.debian_slim(python_version='3.11').pip_install('torch', 'numpy', 'triton', 'safetensors')
-data = modal.Volume.from_name('qfr-data'); out = modal.Volume.from_name('qfr-out', create_if_missing=True)
+data = modal.Volume.from_name('qfr-data'); out = modal.Volume.from_name('qfr-out', create_if_missing=True); wfhf = modal.Volume.from_name('qfr-wfhf')
 MAXC = int(os.environ.get('CFRAM_MAX_CONTAINERS', '25'))
 
-@app.function(image=img, gpu='A100-40GB', timeout=3 * 3600, volumes={'/data': data, '/out': out}, retries=0, max_containers=MAXC)
+@app.function(image=img, gpu='A100-40GB', timeout=3 * 3600, volumes={'/data': data, '/out': out, '/wf': wfhf}, retries=0, max_containers=MAXC)
 def chunk_job(k, steps=0, root='cfram_par'):
-    data.reload(); o = f'/out/{root}/chunk_{k:04d}'; os.makedirs(o, exist_ok=True)
+    data.reload(); wfhf.reload(); o = f'/out/{root}/chunk_{k:04d}'; os.makedirs(o, exist_ok=True)
     env = dict(os.environ, PYTHONPATH='.:/data/circuit_wf/engine', WF='1', REALMAP='1', REALDECODE='1', WF_ROW_CELLS='3840', ROWEMB_CACHE='/data/cfram/rowemb_cf.npy')
-    cmd = ['python', '-u', '/data/circuit_wfram/fullrun/circuit_run.py', '/data/cfram/ramcf.elf', '/data/cfram/refRC', o, '--chunks', str(k), '--ramimg', '--block', '100000', '--rowtab', '/data/rowtab_cf.npy',
+    cmd = ['python', '-u', '/data/circuit_wfram/fullrun/circuit_run.py', '/data/cfram/ramcf.elf', '/data/cfram/refRC', o, '--chunks', str(k), '--ramimg', '--block', '100000', '--rowtab', '/data/rowtab_cf.npy', '--rowtab-ckpt', '/wf/ckpt_cf',
            '--chain', '--save-state', '--fulltable', '--stop-on-halt'] + (['--reset0'] if k == 0 else []) + (['--steps', str(steps)] if steps else [])
     t0 = time.time()
     with open(f'{o}/job.stdout', 'w') as f:

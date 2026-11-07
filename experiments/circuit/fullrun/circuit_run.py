@@ -46,6 +46,7 @@ ap = argparse.ArgumentParser(); ap.add_argument('elf'); ap.add_argument('refdir'
 ap.add_argument('--steps', type=int, default=0); ap.add_argument('--block', type=int, default=50000); ap.add_argument('--kinds', default=''); ap.add_argument('--tuned', default='autotune.json'); ap.add_argument('--forcewin', default=''); ap.add_argument('--wrom', default='')
 ap.add_argument('--ramimg', action='store_true', help='restore the snapshot RAM image (refdir/ramimg_NNNN.npy, 8192 aliased words) into the circuit RAM head state at chunk start')
 ap.add_argument('--rowtab', default='/data/rowtab.npy', help='WF mode: full row table (npy uint8 [rows, 3840])')
+ap.add_argument('--rowtab-ckpt', default='', help='WF/CF: take the row table FROM THE MERGED CHECKPOINT\'s embed_tokens.weight (ckpt_table.load_rowtab; the model\'s own parameters) instead of --rowtab')
 ap.add_argument('--inj', default='inj', help='injection file prefix in refdir: inj (all, legacy), injF (filtered), injB (blob-only), injN (no RAM injection)')
 ap.add_argument('--chain', action='store_true', help='ONE continuous circuit run over consecutive chunks (no snapshot restore between chunks); compare circuit state to the reference snapshot at every chunk boundary')
 ap.add_argument('--handoff', action='store_true', help='like --chain, but at each boundary READ the circuit state back (regs, pc, n, wb, bn, 32KB RAM) and re-snapshot the circuit from that read-back state (hidden lag history reset, as a chunk restart)')
@@ -144,7 +145,10 @@ if WF:
         def __init__(s_, full, lo, hi): s_.lo, s_.hi, s_.n = lo, hi, len(full); s_.a = np.ascontiguousarray(full[lo:hi + 1]); s_.a = (s_.a + 1) & ((1 << S.ROW_ENT_BITS) - 1) if os.environ.get('WF_NEG') else s_.a   # WF_NEG=1: NEGATIVE CONTROL, every table entry +1, the circuit must then diverge
         def __len__(s_): return s_.n
         def __getitem__(s_, p): return s_.a[p - s_.lo] if s_.lo <= p <= s_.hi else np.zeros(s_.a.shape[1], np.uint8)
-    _tab = np.load(a.rowtab, mmap_mode='r'); _lo = _hi = None; _b0, _sz = S.FAMILIES['ROW']
+    if a.rowtab_ckpt:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import ckpt_table; _t0 = time.time(); _tab = ckpt_table.load_rowtab(a.rowtab_ckpt); print(f'ROW table decoded from checkpoint {a.rowtab_ckpt}: {_tab.shape} in {time.time() - _t0:.0f}s', flush=True)
+    else: _tab = np.load(a.rowtab, mmap_mode='r')
+    _lo = _hi = None; _b0, _sz = S.FAMILIES['ROW']
     for r_ in range(B):
         tt_ = toks[r_][(toks[r_] >= _b0) & (toks[r_] < _b0 + _sz)] - _b0
         if len(tt_): _lo = int(tt_.min()) if _lo is None else min(_lo, int(tt_.min())); _hi = int(tt_.max()) if _hi is None else max(_hi, int(tt_.max()))
