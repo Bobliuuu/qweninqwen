@@ -1,18 +1,18 @@
 """CF + REMAPPED RAM CHAINED run on Modal: the final-token run (no weight, RAM or blob host injection; circuit carries its own state across chunk boundaries).
-Firmware /data/cfram/ramcf.elf, reference /data/cfram/refRC (73 chunks), table /data/rowtab_cf.npy. Derived from modal_wf_cfram.py (per-chunk) + modal_wf_chain.py (--chain).
-Only the FIRST chunk of each segment is seeded from the reference snapshot (registers, pc, RAM image, latch); every later chunk continues from the circuit's own state.
-A single 73-chunk chain is ~12 h on one GPU (> 4 h function timeout), so split into SEGMENTS: each segment is one chained run, and the seams are the only host-seeded chunk starts.
+Firmware /data/cfram/ramcf.elf, reference /data/cfram/refRC (75 chunks, 0..74), table /data/rowtab_cf.npy. Derived from modal_wf_cfram.py (per-chunk) + modal_wf_chain.py (--chain).
+Only chunk 0 of a fresh start is seeded from the reference; a resumed run starts from the circuit's OWN saved state (circuit_state_NNNN.pkl, --save-state); every later chunk continues from the circuit's own state.
+One unbroken 75-chunk chain is ~11-13 h on one GPU; function timeout is the Modal max (24 h) and a crash resumes from the last saved boundary (cf/chain_resume.py). spawn_cfram_chain.py (parallel segments) still seeds each segment from the reference.
 
   modal run --detach cf/modal_cfram_chain.py --chunks 0-9            (one segment, smoke / first segment)
-  python cf/spawn_cfram_chain.py 8                                    (73 chunks as 8 segments, spaced launches; Modal rate-limits AppCreate)
-  python cf/chain_resume.py launch 0-72                               (ONE unbroken chain, all 73 chunks, ~11-13 h, timeout 24 h; if it dies: python cf/chain_resume.py launch   -> resumes from the last circuit_state_NNNN.pkl)
+  python cf/spawn_cfram_chain.py 8                                    (75 chunks as 8 segments, spaced launches; Modal rate-limits AppCreate)
+  python cf/chain_resume.py launch 0-74                               (ONE unbroken chain, all 75 chunks, ~11-13 h, timeout 24 h; if it dies: python cf/chain_resume.py launch   -> resumes from the last circuit_state_NNNN.pkl)
 Outputs: qfr-out /cfram_chain/chain_<first>_<last>(.stdout|/). Pull with `modal volume get qfr-out cfram_chain/<name>.stdout`.
 NOT YET RUN. Open: confirm circuit_run.py --chain works with REALMAP + --ramimg (ramimg is applied to the first chunk only); if it asserts, run with --reset0 on chunk 0 only."""
 import modal, subprocess, os, json
 app = modal.App('qwen-in-qwen-cfram-chain')
 img = modal.Image.debian_slim(python_version='3.11').pip_install('torch', 'numpy', 'triton', 'safetensors')
 data = modal.Volume.from_name('qfr-data'); out = modal.Volume.from_name('qfr-out', create_if_missing=True)
-KW = dict(image=img, timeout=24 * 3600 - 60,   # Modal max 24 h: one unbroken 73-chunk chain is ~11-13 h at ~3.8k steps/s
+KW = dict(image=img, timeout=24 * 3600 - 60,   # Modal max 24 h: one unbroken 75-chunk chain is ~11-13 h at ~3.8k steps/s
            volumes={'/data': data, '/out': out}, retries=0)
 
 def _run(chunks, extra, outname='', resume=False):

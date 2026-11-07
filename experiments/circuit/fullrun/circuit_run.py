@@ -50,6 +50,8 @@ ap.add_argument('--handoff', action='store_true', help='like --chain, but at eac
 ap.add_argument('--reset0', action='store_true', help='chunk 0 starts from the PROGRAM ONLY (ref.Machine.from_program: reset registers/pc/n/wb, initial .data RAM), asserted equal to the reference state_0000 pickle; no host snapshot of state')
 ap.add_argument('--save-state', action='store_true', help='CHAIN: at every chunk boundary write the circuit\'s OWN read-back state (extract(): regs, pc, n, wb, wb27, bn, latch, 32KB RAM) to OUT/circuit_state_<next chunk>.pkl so a later run can resume from it with --resume-state (no reference state involved)')
 ap.add_argument('--resume-state', default='', help='start the first chunk from a circuit_state_NNNN.pkl written by --save-state of an earlier segment (the circuit\'s own state), not from the reference snapshot')
+ap.add_argument('--fulltable', action='store_true', help='WF/CF: load the WHOLE row table (rows 0..len-1) instead of the slice of rows the REFERENCE trace touches (removes the reference look-ahead on table-row selection)')
+ap.add_argument('--stop-on-halt', action='store_true', help='stop when the CIRCUIT\'s own raw prediction is the HALT token (ecall exit), instead of only running the reference-defined step count; the reference still supplies the comparator and chunk boundaries')
 ap.add_argument('--noforce', action='store_true', help='do NOT force (override) the tokens of VDOT records whose weights are in the 128 unaddressable WROM words: the circuit free-runs through them (first divergence is then measured)')
 ap.add_argument('--nodrom', action='store_true', help='drop all type-3 (DROM-class constant) injections')
 ap.add_argument('--novdot', action='store_true', help='drop all VDOT weight injections (type 2) and zone forcing')
@@ -145,6 +147,7 @@ if WF:
         tt_ = toks[r_][(toks[r_] >= _b0) & (toks[r_] < _b0 + _sz)] - _b0
         if len(tt_): _lo = int(tt_.min()) if _lo is None else min(_lo, int(tt_.min())); _hi = int(tt_.max()) if _hi is None else max(_hi, int(tt_.max()))
     _lo, _hi = max((_lo or 0) - 2, 0), (_hi or 0) + 2
+    if a.fulltable: _lo, _hi = 0, len(_tab) - 1   # whole table: row selection no longer read off the reference trace
     S.ROW_TABLE = SliceTab(_tab, _lo, _hi); print(f'ROW table slice materialised for this run: rows {_lo}..{_hi} of {len(_tab)}', flush=True)
     _fs = open(_fe.__file__).read(); _o = "            if size <= 4096:\n"
     assert _o in _fs
@@ -329,6 +332,7 @@ if CHAIN:
             d['row_reg_a4'] = (o['x_rd'][14], rs['x'][14] & 0xFFFFFFFF); d['ok'] = d['ok'] and d['latch_bad'] == 0
         return d
     bl = []; done = 0; cmp_ = 0; t0 = time.time(); log = open(a.out + '/chain_progress.log', 'a'); diverged = False
+    HALT_TOK = S.tok('HALT'); halt_step = None   # the circuit's own exit (ecall 93) token
     n_free0 = n_forced0 = nbad_free0 = nbad_forced0 = 0; first_bad0 = None
     TT = len(toks[0])
     def cmp_slice(lo, hi):
@@ -343,11 +347,15 @@ if CHAIN:
             k = min(a.block, tgt - done)
             for _ in range(k): fr.graph.replay()
             torch.cuda.synchronize(); done += k; cmp_slice(cmp_, min(done, bnd)); cmp_ = max(cmp_, min(done, bnd)); el = time.time() - t0
+            if a.stop_on_halt:
+                hh_ = (RAW[0, done - k:done] == HALT_TOK).nonzero()
+                if len(hh_): halt_step = done - k + int(hh_[0, 0]); print(f'CIRCUIT HALT token at step {halt_step:,} (circuit\'s own raw prediction)', flush=True)
             msg = f'[{"handoff" if a.handoff else "chain"}] step {done:,}/{tgt:,} (boundary {bi + 1}/{len(bounds)}, chunk {chunk_list[bi]}) {el:.0f}s {done/el:,.0f} tok/s; free {n_free0:,} mismatches {nbad_free0}, forced {n_forced0:,} raw-disagree {nbad_forced0:,}'
             print(msg, flush=True); log.write(msg + '\n'); log.flush()
-            if first_bad0 is not None: break
+            if first_bad0 is not None or halt_step is not None: break
         if first_bad0 is not None:
             fb = first_bad0; print(f'FIRST FREE-TOKEN MISMATCH at step {fb} (chunk {chunk_list[min(np.searchsorted(bounds, fb, side="right"), len(bounds) - 1)]}): ' + ' | '.join(f'{j}:{S.name(int(TREF[0,j]))}/{S.name(int(RAW[0,j]))}/f{int(MASK[0,j])}' for j in range(max(0, fb - 16), fb + 2)), flush=True); diverged = True; break
+        if halt_step is not None: break   # circuit ended the program itself; no end-of-chunk boundary to compare
         o = extract(); rstate = nxt_states[bi]
         if a.save_state:   # the circuit's own state at this boundary (read back from its head states), for resume by a later segment
             pickle.dump(dict(next_chunk=chunk_list[bi] + 1, step=bnd, stt=dict(x=o['x_rd'], anchor=o['anchor'], n=o['n'] or 0, wb=o['wb'], wb27=o.get('wb27', o['wb']), latch=o.get('latch', [])), ram=[int(v) for v in o['ram']], bn=[list(r) for r in o['bn']]), open(a.out + f'/circuit_state_{chunk_list[bi] + 1:04d}.pkl', 'wb')); 
@@ -363,7 +371,7 @@ if CHAIN:
             mm = machine(dict(x=o['x_rd'], anchor=o['anchor'], n=o['n'] or 0, wb=o['wb'], wb27=o.get('wb27', o['wb']))); mm.ram = [int(v) for v in o['ram']]; mm.bn = [list(r) for r in o['bn']]
             core.snapshot(c, mm); fr.load(0, S.tok('GO')); CTR.fill_(bnd); ICTR.fill_(bnd); done = bnd; torch.cuda.synchronize()
     res = dict(mode='handoff' if a.handoff else 'chain', chunks=chunk_list, steps=TT, steps_run=done, seconds=time.time() - t0, tok_per_s=done / (time.time() - t0), free_tokens=n_free0, free_mismatches=nbad_free0,
-               first_free_mismatch=first_bad0, forced_tokens=n_forced0, forced_raw_disagreements=nbad_forced0, diverged=diverged, boundaries=bl, gpu=torch.cuda.get_device_name())
+               first_free_mismatch=first_bad0, halt_step=halt_step, fulltable=a.fulltable, forced_tokens=n_forced0, forced_raw_disagreements=nbad_forced0, diverged=diverged, boundaries=bl, gpu=torch.cuda.get_device_name())
     json.dump(res, open(a.out + f'/{res["mode"]}_{chunk_list[0]}_to_{chunk_list[-1]}.json', 'w'), indent=1, default=str); print(json.dumps(res, default=str), flush=True); sys.exit(0)
 while done < N:
     k = min(a.block, N - done)
@@ -379,6 +387,7 @@ while done < N:
     msg = f'step {done:,}/{N:,} {el:.0f}s {done*B/el:,.0f} agg tok/s; free-token mismatches {int(nbad_free.sum())} (rows with any: {sum(x is not None for x in first_bad)}), forced-token raw disagreements {int(nbad_forced.sum())} of {int(n_forced.sum()):,}'
     print(msg, flush=True); log.write(msg + '\n'); log.flush()
     if all(x is not None for x in first_bad): print('all rows diverged; stop', flush=True); break
+    if a.stop_on_halt and (RAW[:, sl] == S.tok('HALT')).any(): print('CIRCUIT HALT token seen; stop', flush=True); break
 if os.environ.get('DUMPREG'):   # debug: the three register-file ports' view of registers (comma list)
     for rg in (int(x) for x in os.environ['DUMPREG'].split(',')):
         out_ = []

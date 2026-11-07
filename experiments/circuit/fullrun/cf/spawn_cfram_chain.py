@@ -1,8 +1,8 @@
-"""Split the 73-chunk CF+RAM reference into N chained segments and launch each as `modal run --detach cf/modal_cfram_chain.py` (25 s apart: Modal rate-limits AppCreate).
+"""Split the 75-chunk CF+RAM reference into N chained segments and launch each as `modal run --detach cf/modal_cfram_chain.py` (25 s apart: Modal rate-limits AppCreate).
 usage: python cf/spawn_cfram_chain.py N [--dry]   (N=8 -> segments of 9-10 chunks, ~1.6-1.8 h each at ~10 min/chunk)
 Logs: ~/qweninqwen-work/cfram_chain_out/launch_<first>.log. NOT launched automatically; run only after the user says go."""
 import subprocess, sys, time, os
-N = int(sys.argv[1]); dry = '--dry' in sys.argv; TOTAL = 73
+N = int(sys.argv[1]); dry = '--dry' in sys.argv; TOTAL = 75
 base, rem = divmod(TOTAL, N); segs = []; s = 0
 for i in range(N):
     n = base + (1 if i < rem else 0); segs.append((s, s + n - 1)); s += n
