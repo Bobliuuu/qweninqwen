@@ -3,7 +3,11 @@
 `make_demo.py` reads each value below from the listed file at build time and asserts the key ones
 (it refuses to build if the verdict, the 15846/13 answers, the halt step, 95 exact seams or 0/0/0 counters differ).
 Paths are relative to the repo root unless they start with `docs/demo/data/` (small copies of files that live outside the repo in `~/qweninqwen-work/cfram_q_vast_out/`).
-Nothing in the video is simulated; the only synthetic thing is the **animation order** of the chunk grid (chunk number order, because per-chunk completion wall-clock times were not logged).
+Nothing in the video is simulated. The only synthetic things are presentation: easing, cross-fades between scenes, and the **reveal order** of the chunk grid (chunk number order, because per-chunk completion wall-clock times were not logged). Counters in the run scene count up with the reveal and end at the logged totals.
+
+Style: white background, one accent colour (blue) plus greys, thin lines, soft shadows, one sans typeface (SF), emojis only in scene titles. `docs/demo/stills/*.png` are the last frame of each scene.
+
+No clips from `docs/assets/` were spliced in: at build time that folder held only the earlier (Nov 6) tier/pipeline figures, and the new 'how one token is generated' animation from the visuals agent did not exist yet.
 
 Footer on every frame: *Visualization of a real run | one token at position 0 | parallel jobs seeded from the reference, verified at 95 exact seams*.
 
@@ -18,7 +22,7 @@ Footer on every frame: *Visualization of a real run | one token at position 0 | 
 |---|---|
 | 28 bars: cosine of the final hidden state vs fp32 when ONLY layer k is quantised (int4 weights, int8 activations) | `experiments/circuit/fullrun/diag_quant/diag_quant2.json`, keys `W4+act ONLY layer 0..27`, field `cos_final` |
 | red bars / wrong answers 838 (layer 2), 3405 (layer 26), 12 (layer 27) | same file, field `argmax` (a bar is red when `argmax != 15846`) |
-| first firmware answer 13 `'.'`, rank of 15846 = 38,852 | `quantfix/results/ctrl_w4.json` (`argmax_fw`, `rank_15846_in_fw`); the `'.'` text is from `diag_quant/REPORT.md` title |
+| first firmware answer 13 `'.'` (drawn as text), rank of 15846 = 38,852 | `quantfix/results/ctrl_w4.json` (`argmax_fw`, `rank_15846_in_fw`); the `'.'` text is from `diag_quant/REPORT.md` title |
 | HF fp32 answer 15846 `' Question'` | `diag_quant/diag_quant.json` (`hf_argmax`); token text from `logs/final_token/REPORT.md` and `diag_quant/REPORT.md` |
 | "layer 2 writes a ~6541 channel" | `diag_quant/diag_quant.json`, `fp32_profile[2].dmax` = 6540.8 (rounded) |
 | "the circuit reproduced this" | the CF+RAM circuit run before the fix reproduced the emulator's 13 (`quantfix/REPORT.md`, control row; `diag_quant/REPORT.md`). The pre-fix 13-token circuit run itself is described in the repo history, not re-plotted here |
@@ -54,16 +58,20 @@ Caveat shown in the data: these are emulator runs of the real integer firmware a
 | collector verdict line | `seams_0-95_...json` `verdict` (the trailing "0s to collect" is trimmed) |
 | 15846 = ' Question' = Qwen3-0.6B's own answer | `logs/final_token/REPORT.md`, `diag_quant/diag_quant.json` |
 
-## Scene 6: host roles and limits
+## Scene 6: what the host still does (short checklist)
 | Shown | Source |
 |---|---|
-| 0 injections / 0 forced / 0 mismatches in all 96 chunks | `seams_0-95_...json` |
-| table 168,684 rows, hidden 7680, HF-module check chunk 0: 130,000 steps, 0 mismatches, 2,320 ROW tokens; table+1 control diverges at step 41 | `quantfix/results/hfcheck_cfq_pos_130k.json` (`table_rows`, `steps_checked`, `n_mismatch`, `n_row_tokens_checked`), `quantfix/results/hfcheck_cfq_neg.json` (`first_mismatch.step`) |
-| "the 96 jobs loaded a bit-identical decoded copy" | `docs/demo/data/verify_ckpt_vs_npy.log` (checkpoint table vs `rowtab_cf.npy`, identical, md5 5072e525...) for the Vast jobs; shape 168,684 x 3,840 is the final-contract table; see Open points |
-| chunk 0 boots from the program alone; real in_ram/in_drom decode | `docs/HOST_ROLE_AUDIT_CFRAM.md` rows 8, 5; `ramown/logs/realdecode/`, `logs/cfram_reset0/` |
-| allowed by the plan: boot, GO token, embed-and-append loop, ecall I/O; reference comparison is the test | `docs/HOST_ROLE_AUDIT_CFRAM.md` rows 10-12, 17 |
-| limits: ctx=1, parallel seeded jobs, fused Triton executor, bigger checkpoint, 4-bit | `docs/HOST_ROLE_AUDIT_CFRAM.md` rows 5, 9, 15, 16; seam count from `rows[*].seam.exact` |
-| "199M steps full HF check infeasible" | 199,287,253 steps (above) at the measured HF-module rate of about 155 steps/s (agent report for `hfwf/hfcheck_sampled.py`; that sampled check was stopped partway on the old firmware and is not claimed) |
+| subtitle "0 injections, 0 forced tokens, 0 mismatches in all 96 chunks"; ticks "Weight, RAM and blob injections: 0", "Forced tokens: 0" | `seams_0-95_...json` `rows[*].injections`, `forced_tokens`, `free_mismatches` (summed by `make_demo.py`, asserted 0) |
+| tick "Table-window look-ahead from the reference" removed | `docs/HOST_ROLE_AUDIT_CFRAM.md` row 6 (owner: `--fulltable`, commit `b5378f7`) |
+| tick "Bring-up patch (in_ram / in_drom)" removed | `docs/HOST_ROLE_AUDIT_CFRAM.md` row 8; `ramown/logs/realdecode/` (agent D) |
+| tick "Chunk 0 boots from the program alone" | `docs/HOST_ROLE_AUDIT_CFRAM.md` row 5; `logs/cfram_reset0/`; the collector row for chunk 0 (`seam` exact) |
+| allowed by the plan: boot the program, the GO token, the embed-and-append loop, ecall I/O; "the reference comparison is the test, not an input" | `docs/HOST_ROLE_AUDIT_CFRAM.md` rows 10-12, 17 |
+| one slim line: "One token at position 0 . parallel jobs seeded from the reference, verified at 95 exact seams" | `rows[*].seam.exact` count (95); ctx=1 firmware: `docs/HOST_ROLE_AUDIT_CFRAM.md` row 16 |
+
+**Not shown in the video, but true (kept out to stay short; they are in the README and the audit):**
+the executor is a fused Triton kernel, not the stock HF forward (audit row 9; HF-module checks cover chunk 0 only: `quantfix/results/hfcheck_cfq_pos_130k.json`, 130,000 steps, 0 mismatches, 2,320 ROW tokens, and the table+1 control `hfcheck_cfq_neg.json` diverges at step 41);
+the table lives in a bigger checkpoint (hidden 7680, 168,684 rows; decoded copy bit-identical, `docs/demo/data/verify_ckpt_vs_npy.log`);
+a full HF check of the 199,287,253 steps is infeasible (about 155 steps/s per the sampled-check agent's report, not a data file).
 
 ## Scene 7: end card
 `seams_0-95_20261107_004845.json` (`verdict`, `ok`), `docs/demo/data/FINAL_VERDICT.json`.
