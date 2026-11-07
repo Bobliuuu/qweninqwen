@@ -10,7 +10,8 @@ lo, hi = (int(x) for x in a.chunks.split('-')); HOME = os.path.expanduser('~'); 
 KEY = f'{HOME}/.ssh/vast_qiq'; SSHO = ['-i', KEY, '-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=20', '-o', 'ServerAliveInterval=30', '-o', 'BatchMode=yes']
 RELAY_PUB = open(f'{OUT}/relay_pub.txt').read().strip(); VD = os.path.dirname(os.path.abspath(__file__))
 PRIO = {hi: None}   # last chunk (HALT / final word) is claimed only by the hub (reliable A100 PCIE), first
-lock = threading.Lock(); queue = collections.deque([hi] + list(range(lo, hi))); attempts = collections.Counter(); done = {}; failed = {}; boxes = {}; stop = threading.Event(); relay_sem = threading.Semaphore(a.relay_par); best = [None]; T0 = time.time()
+lock = threading.Lock(); queue = collections.deque([hi] + list(range(hi - 1, lo - 1, -1)));   # top-down: Modal's queue works bottom-up
+attempts = collections.Counter(); done = {}; failed = {}; boxes = {}; stop = threading.Event(); relay_sem = threading.Semaphore(a.relay_par); best = [None]; T0 = time.time()
 def log(m):
     with open(f'{OUT}/fleet.log', 'a') as f: f.write(f'{time.strftime("%F %T")} {m}\n')
 def ssh(b, cmd, timeout=120):
@@ -35,13 +36,16 @@ def prep(b):
     ssh(b, f'mkdir -p /data/cfram_q/cf /data/cfram_q/refQ /out/cfram_q_par_full /root/.ssh; grep -q "{RELAY_PUB.split()[1]}" /root/.ssh/authorized_keys || echo "{RELAY_PUB}" >> /root/.ssh/authorized_keys')
     scp(b, [f'{VD}/box_setup.sh', f'{VD}/run_chunks.sh'], '/root/'); ssh(b, 'chmod +x /root/*.sh; grep -q SETUP_OK /root/setup.log 2>/dev/null || (nohup /root/box_setup.sh > /root/setup.log 2>&1 < /dev/null &)')
     while 'HUBSYNC_DONE' not in open(f'{OUT}/hub_sync.log').read(): time.sleep(10)   # Mac -> hub copy (incl. the 4.8 GB cache) must be complete before anyone relays from the hub
-    if b['id'] != a.hub:
+    rc, o = ssh(b, 'stat -c %s /data/cfram_q/rowemb_q.npy /data/cfram_q/cf/rowtab_cf.npy 2>/dev/null; test -f /data/circuit_wfram/fullrun/circuit_run.py && test -f /data/cfram_q/ramcf_q.elf && ls /data/cfram_q/refQ | wc -l')
+    have = o.split(); has_data = rc == 0 and len(have) >= 3 and have[0] == '4820988848' and have[1] == '647746688' and int(have[2]) >= 500   # box already holds the full data set
+    if b['id'] != a.hub and not has_data and a.hub in boxes and not boxes[a.hub].get('dead'):
         with relay_sem:
             for k in range(2):
                 hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
                 if 'RELAY_DONE' in o: break
                 log(f'relay {b["id"]} attempt {k} failed: {o[-200:]}')
             else: return False
+    elif not has_data and b['id'] != a.hub: log(f'box {b["id"]} lacks data and the hub is gone'); return False
     t = time.time()
     while time.time() - t < 1200:
         rc, o = ssh(b, 'tail -n 3 /root/setup.log')
@@ -57,6 +61,8 @@ def run_chunk(b, k, launch=True):
     if launch: ssh(b, f'rm -rf {d}; nohup /root/run_chunks.sh {k} > /root/run_{k}.log 2>&1 < /dev/null &')
     while time.time() - t0 < 4200 and not stop.is_set():
         time.sleep(20); rc, o = ssh(b, f'cat {d}/job_done.json 2>/dev/null', 60)
+        bad = b.get('bad', 0) + 1 if rc in (255, 124) else 0; b['bad'] = bad
+        if bad >= 8: log(f'box {b["id"]} unreachable (instance gone?), giving up on chunk {k}'); return None, None
         if rc == 0 and re.search(r'\{[^{}]*"rc"[^{}]*\}', o):
             mm = re.search(r'\{[^{}]*"rc"[^{}]*\}', o); jd = json.loads(mm.group(0)); loc = f'{PULL}/chunk_{k:04d}'; os.makedirs(loc, exist_ok=True)
             subprocess.run(['rsync', '-a', '-e', 'ssh ' + ' '.join(SSHO) + f' -p {b["port"]}', f'root@{b["host"]}:{d}/', loc + '/'], capture_output=True, timeout=600)
@@ -77,6 +83,8 @@ def worker_inner(b):
     if rc == 0 and o.strip().startswith('run_chunks.sh'):
         try: adopt = int(o.split()[1]); log(f'ADOPT chunk {adopt} running on {b["id"]}')
         except Exception: adopt = None
+    if adopt is not None and adopt in done:   # that chunk is already complete elsewhere: stop wasting the GPU on it
+        ssh(b, 'pkill -f circuit_run.py; pkill -f run_chunks.sh; true'); log(f'KILLED duplicate chunk {adopt} on {b["id"]} (already done)'); adopt = None
     while not stop.is_set():
         with lock:
             cand = [c for c in queue if not (c in PRIO and b['id'] != a.hub)]
@@ -162,4 +170,19 @@ stop.set(); time.sleep(2)
 for i in v.callv1('/instances/').get('instances', []):
     if str(i.get('label', '')).startswith('qiq-'): destroy(dict(id=i['id'], label=i['label']), 'fleet finished')
 time.sleep(5); left = [i['id'] for i in v.callv1('/instances/').get('instances', []) if str(i.get('label', '')).startswith('qiq-')]
+def finish():
+    allk = set(range(lo, hi + 1)); have = {k for k in allk if os.path.exists(f'{PULL}/chunk_{k:04d}/chain_{k}_to_{k}.json')}
+    if have != allk: log(f'FINISH: not all chunks present, missing {sorted(allk - have)}'); return
+    R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # .../fullrun/cf
+    outd = os.path.join(os.path.dirname(R), 'logs', 'cfram_q_vast'); os.makedirs(outd, exist_ok=True)
+    r = subprocess.run([sys.executable, f'{R}/collect_seams.py', '--no-pull', '--pull', f'{W}/cfram_q_vast_pull', '--root', 'cfram_q_par_full', '--n', str(hi + 1), '--refvol-dir', 'cfram_q/refQ', '--expect-word', '15846', '--out', outd], capture_output=True, text=True, timeout=1800)
+    verdict = (r.stdout.strip().splitlines() or [''])[0]; log(f'COLLECTOR: {verdict}')
+    json.dump(dict(verdict=verdict, passed=verdict.startswith('PASS'), chunks=f'{lo}-{hi}', modal_chunks=sorted(k for k in allk if os.path.exists(f'{PULL}/chunk_{k:04d}/SOURCE_MODAL')), collector_stdout_tail=r.stdout[-3000:], collector_stderr_tail=r.stderr[-500:], time=time.strftime('%F %T')), open(f'{OUT}/FINAL_VERDICT.json', 'w'), indent=1)
+    subprocess.run(['modal', 'app', 'stop', '-y', 'qwen-in-qwen-cfram-par'], capture_output=True, text=True, timeout=120)
+    for f in (f'{OUT}/FINAL_VERDICT.json', f'{OUT}/status.txt', f'{OUT}/fleet.log', f'{OUT}/instances.log', f'{OUT}/fleet_result.json'):
+        if os.path.exists(f): subprocess.run(['cp', f, outd + '/'])
+    g = ['git', '-C', os.path.dirname(R)]
+    subprocess.run([*g, 'add', 'logs/cfram_q_vast', 'cf/vast/fleet.py']); subprocess.run([*g, 'commit', '-q', '-m', f'result(circuit-cfram): final-contract 96-chunk run, Vast+Modal union, collector: {verdict[:120]}\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>']); subprocess.run([*g, 'push', '-q'])
+
 open(f'{OUT}/status.txt', 'a').write(f'{time.strftime("%F %T")} FINISHED chunks done={len(done)} failed={sorted(k for k in failed if k not in done)} instances_left={left}\n'); json.dump(dict(done=done, failed=failed), open(f'{OUT}/fleet_result.json', 'w'), indent=1)
+finish()
