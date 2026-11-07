@@ -10,7 +10,11 @@
 
 </div>
 
-> 🎬 **Demo video:** _in production; it will be linked here from `docs/demo/`._
+<!-- VISUAL:demo-video -->
+<p align="center">
+  <a href="docs/demo/demo.mp4"><img src="docs/demo/demo.gif" alt="Demo: one Qwen3-0.6B token computed by a circuit inside Qwen3.5-4B (click for the full video)" width="720"></a>
+  <br><sub>🎬 <a href="docs/demo/demo.mp4">Watch the full demo (mp4, ~70 s)</a> · a visualization of the real run; every number is mapped to a log in <a href="docs/demo/PROVENANCE.md">PROVENANCE.md</a></sub>
+</p>
 
 A homage to [Qwenputer](https://github.com/divagr18/qwenputer), where a RISC-V CPU is compiled into Qwen's weights and runs as the model generates tokens. Here that CPU runs **another language model**: a C firmware of Qwen3-0.6B (int4 weights) executes on the circuit, one instruction per generated trace token, and finishes by emitting its answer word.
 
