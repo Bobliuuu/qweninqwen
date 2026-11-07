@@ -5,34 +5,41 @@ A single 73-chunk chain is ~12 h on one GPU (> 4 h function timeout), so split i
 
   modal run --detach cf/modal_cfram_chain.py --chunks 0-9            (one segment, smoke / first segment)
   python cf/spawn_cfram_chain.py 8                                    (73 chunks as 8 segments, spaced launches; Modal rate-limits AppCreate)
-  python cf/spawn_cfram_chain.py 1                                    (ONE segment of all 73 chunks: needs timeout raise, ~12-13 h)
+  python cf/chain_resume.py launch 0-72                               (ONE unbroken chain, all 73 chunks, ~11-13 h, timeout 24 h; if it dies: python cf/chain_resume.py launch   -> resumes from the last circuit_state_NNNN.pkl)
 Outputs: qfr-out /cfram_chain/chain_<first>_<last>(.stdout|/). Pull with `modal volume get qfr-out cfram_chain/<name>.stdout`.
 NOT YET RUN. Open: confirm circuit_run.py --chain works with REALMAP + --ramimg (ramimg is applied to the first chunk only); if it asserts, run with --reset0 on chunk 0 only."""
 import modal, subprocess, os, json
 app = modal.App('qwen-in-qwen-cfram-chain')
 img = modal.Image.debian_slim(python_version='3.11').pip_install('torch', 'numpy', 'triton', 'safetensors')
 data = modal.Volume.from_name('qfr-data'); out = modal.Volume.from_name('qfr-out', create_if_missing=True)
-KW = dict(image=img, timeout=4 * 3600 - 60, volumes={'/data': data, '/out': out}, retries=0)
+KW = dict(image=img, timeout=24 * 3600 - 60,   # Modal max 24 h: one unbroken 73-chunk chain is ~11-13 h at ~3.8k steps/s
+           volumes={'/data': data, '/out': out}, retries=0)
 
-def _run(chunks, extra):
-    data.reload(); first, last = chunks.split(',')[0], chunks.split(',')[-1]; tag = f'chain_{int(first):04d}_{int(last):04d}' + ''.join(extra).replace('-', '')
+def _run(chunks, extra, outname='', resume=False):
+    """chunks: 'a,b,c' consecutive. outname: shared out dir name (all segments of one unbroken chain share it so circuit_state_NNNN.pkl accumulates). resume: start from the circuit's OWN saved state for chunks[0] (written by --save-state of the previous run), never the reference."""
+    data.reload(); out.reload(); first, last = chunks.split(',')[0], chunks.split(',')[-1]
+    tag = outname or (f'chain_{int(first):04d}_{int(last):04d}' + ''.join(extra).replace('-', ''))
     os.makedirs('/out/cfram_chain', exist_ok=True); o = f'/out/cfram_chain/{tag}'; os.makedirs(o, exist_ok=True)
     env = dict(os.environ, PYTHONPATH='.:/data/circuit_wf/engine', WF='1', REALMAP='1', WF_ROW_CELLS='3840')
-    cmd = ['python', '-u', '/data/circuit_wfram/fullrun/circuit_run.py', '/data/cfram/ramcf.elf', '/data/cfram/refRC', o, '--chunks', chunks, '--ramimg', '--block', '100000', '--rowtab', '/data/rowtab_cf.npy', '--chain'] + list(extra)
-    with open(o + '.stdout', 'w') as f:
+    cmd = ['python', '-u', '/data/circuit_wfram/fullrun/circuit_run.py', '/data/cfram/ramcf.elf', '/data/cfram/refRC', o, '--chunks', chunks, '--ramimg', '--block', '100000', '--rowtab', '/data/rowtab_cf.npy', '--chain', '--save-state'] + list(extra)
+    if resume:
+        st = f'{o}/circuit_state_{int(first):04d}.pkl'; assert os.path.exists(st), f'no circuit state {st}: cannot resume at chunk {first}'
+        cmd += ['--resume-state', st]
+    with open(f'{o}/run_{int(first):04d}_{int(last):04d}.stdout', 'w') as f:
         p = subprocess.Popen(cmd, cwd='/data/qpriscv_wf', env=env, stdout=f, stderr=subprocess.STDOUT)
-        while p.poll() is None:   # commit the log every 5 min so progress is readable from outside
+        while p.poll() is None:   # commit the log + circuit states every 5 min so progress is readable and a crash loses at most a few chunks
             try: p.wait(timeout=300)
             except subprocess.TimeoutExpired: pass
             out.commit()
     out.commit()
-    return dict(tag=tag, rc=p.returncode, tail=open(o + '.stdout').read()[-3000:])
+    return dict(tag=tag, rc=p.returncode, tail=open(f'{o}/run_{int(first):04d}_{int(last):04d}.stdout').read()[-3000:])
 
 @app.function(gpu='A100-40GB', **KW)
-def a100(chunks, extra=()): return _run(chunks, list(extra))
+def a100(chunks, extra=(), outname='', resume=False): return _run(chunks, list(extra), outname, resume)
 
 @app.local_entrypoint()
-def main(chunks: str = '0-9', reset0: bool = False):
+def main(chunks: str = '0-9', outname: str = 'unbroken', resume: bool = False, reset0: bool = False):
+    """--resume: chunks[0] starts from the circuit's own circuit_state_<chunks[0]>.pkl in the shared outname dir (written by --save-state of the previous run). Use cf/chain_resume.py to find the chunk to resume at."""
     a, b = chunks.split('-') if '-' in chunks else (chunks, chunks)
     cl = ','.join(str(c) for c in range(int(a), int(b) + 1))
-    print(json.dumps(a100.remote(cl, ('--reset0',) if reset0 else ())), flush=True)
+    print(json.dumps(a100.remote(cl, ('--reset0',) if reset0 else (), outname, resume)), flush=True)

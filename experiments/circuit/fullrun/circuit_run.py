@@ -48,6 +48,8 @@ ap.add_argument('--inj', default='inj', help='injection file prefix in refdir: i
 ap.add_argument('--chain', action='store_true', help='ONE continuous circuit run over consecutive chunks (no snapshot restore between chunks); compare circuit state to the reference snapshot at every chunk boundary')
 ap.add_argument('--handoff', action='store_true', help='like --chain, but at each boundary READ the circuit state back (regs, pc, n, wb, bn, 32KB RAM) and re-snapshot the circuit from that read-back state (hidden lag history reset, as a chunk restart)')
 ap.add_argument('--reset0', action='store_true', help='chunk 0 starts from the PROGRAM ONLY (ref.Machine.from_program: reset registers/pc/n/wb, initial .data RAM), asserted equal to the reference state_0000 pickle; no host snapshot of state')
+ap.add_argument('--save-state', action='store_true', help='CHAIN: at every chunk boundary write the circuit\'s OWN read-back state (extract(): regs, pc, n, wb, wb27, bn, latch, 32KB RAM) to OUT/circuit_state_<next chunk>.pkl so a later run can resume from it with --resume-state (no reference state involved)')
+ap.add_argument('--resume-state', default='', help='start the first chunk from a circuit_state_NNNN.pkl written by --save-state of an earlier segment (the circuit\'s own state), not from the reference snapshot')
 ap.add_argument('--noforce', action='store_true', help='do NOT force (override) the tokens of VDOT records whose weights are in the 128 unaddressable WROM words: the circuit free-runs through them (first divergence is then measured)')
 ap.add_argument('--nodrom', action='store_true', help='drop all type-3 (DROM-class constant) injections')
 ap.add_argument('--novdot', action='store_true', help='drop all VDOT weight injections (type 2) and zone forcing')
@@ -116,6 +118,11 @@ for ch in chunks:
     if a.steps: t, k = t[:a.steps], k[:a.steps]
     toks.append(t.astype(np.int64)); kinds.append(k); states.append(pickle.load(open(f'{a.refdir}/state_{ch:04d}.pkl', 'rb')))
 N = max(len(t) for t in toks)
+RESUME = pickle.load(open(a.resume_state, 'rb')) if a.resume_state else None
+if RESUME is not None:
+    assert CHAIN and not a.reset0 and len(chunks) >= 1, '--resume-state needs --chain and no --reset0'
+    assert RESUME['next_chunk'] == chunks[0], f'resume state is for chunk {RESUME["next_chunk"]}, run starts at {chunks[0]}'
+    states[0] = RESUME['stt']   # the circuit's own boundary state (same dict shape as a reference state for machine())
 if CHAIN:
     chunk_list, chunk_lens = list(chunks), [len(t) for t in toks]; assert chunk_list == list(range(chunk_list[0], chunk_list[0] + len(chunk_list))), 'chain needs consecutive chunks'
     INJ, off = [], 0
@@ -159,6 +166,7 @@ def machine(stt, ch=None):
         return m
     if WF: m.wrow_w = 8; m.latch = [list(w) for w in stt.get('latch', [])]   # chunk-start snapshot of the latched 8-word window (host-seeded here; a chained run carries it itself)
     m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF; m.wb27 = stt.get('wb27', stt['wb'])   # wb27: only read by the WB27 snapshot (wbase_hi init)
+    if RESUME is not None and ch == chunks[0]: m.ram = [int(v) for v in RESUME['ram']]; m.bn = [list(r) for r in RESUME['bn']]   # circuit's own RAM + bn state, not ramimg_NNNN
     if os.environ.get('INITWROM'): m.wrom = bytes(np.memmap(a.wrom, dtype=np.uint8, mode='r')[:8 * 32640])
     return m
 core.snapshot(c, machine(states[0], chunks[0]))
@@ -341,6 +349,8 @@ if CHAIN:
         if first_bad0 is not None:
             fb = first_bad0; print(f'FIRST FREE-TOKEN MISMATCH at step {fb} (chunk {chunk_list[min(np.searchsorted(bounds, fb, side="right"), len(bounds) - 1)]}): ' + ' | '.join(f'{j}:{S.name(int(TREF[0,j]))}/{S.name(int(RAW[0,j]))}/f{int(MASK[0,j])}' for j in range(max(0, fb - 16), fb + 2)), flush=True); diverged = True; break
         o = extract(); rstate = nxt_states[bi]
+        if a.save_state:   # the circuit's own state at this boundary (read back from its head states), for resume by a later segment
+            pickle.dump(dict(next_chunk=chunk_list[bi] + 1, step=bnd, stt=dict(x=o['x_rd'], anchor=o['anchor'], n=o['n'] or 0, wb=o['wb'], wb27=o.get('wb27', o['wb']), latch=o.get('latch', [])), ram=[int(v) for v in o['ram']], bn=[list(r) for r in o['bn']]), open(a.out + f'/circuit_state_{chunk_list[bi] + 1:04d}.pkl', 'wb')); 
         if rstate is None: print(f'boundary {bi + 1}: no reference snapshot (end of trace), circuit state: anchor {o["anchor"]} n {o["n"]} wb {o["wb"]}', flush=True); continue
         d = compare(o, rstate); d['boundary_after_chunk'] = chunk_list[bi]; d['step'] = bnd; bl.append(d)
         msg = f'BOUNDARY after chunk {chunk_list[bi]} (step {bnd:,}): ok={d["ok"]} regs_rd_bad={len(d["regs_rd_bad"])} (rs1 {d["regs_rs1_bad"]}, rs2 {d["regs_rs2_bad"]}) anchor/n {d["anchor"]}/{d["n"]} wb15 {d["wb15"]} ref_wb27 {d["wb_ref_full27"]} high12_lost={d["wb_high12_lost"]} j,vcnt {d["j_vcnt"]} bn_bad {d.get("bn_bad")} ram touched {d.get("ram_slots_touched")} bad {d.get("ram_bad")} untouched-nonzero {d.get("ram_untouched_nonzero")} touched-by-op {d.get("ram_touched_by_op")} bad-by-op {d.get("ram_bad_by_op")}'
