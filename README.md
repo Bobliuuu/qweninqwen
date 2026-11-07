@@ -6,9 +6,11 @@
 
 `prompt token 785` → `circuit` → **`15846`** (the token Hugging Face's Qwen3-0.6B produces)
 
-[Verdict](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) · [Reproduce](#-reproduce) · [Host roles](#-what-the-host-still-does) · [Quantisation fix](#-the-quantisation-fix) · [Credits](#-credits)
+[Verdict](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) · [Architecture](#-architecture) · [Tiers](#-the-tier-ladder) · [Metrics](#-metrics) · [Host roles](#-what-the-host-does) · [FAQ](#-faq) · [Reproduce](#-reproduce)
 
 </div>
+
+<!-- VISUAL:hero-gif -->
 
 <!-- VISUAL:demo-video -->
 <p align="center">
@@ -16,7 +18,20 @@
   <br><sub>🎬 <a href="docs/demo/demo.mp4">Watch the full demo (mp4, ~70 s)</a> · a visualization of the real run; every number is mapped to a log in <a href="docs/demo/PROVENANCE.md">PROVENANCE.md</a></sub>
 </p>
 
-A homage to [Qwenputer](https://github.com/divagr18/qwenputer), where a RISC-V CPU is compiled into Qwen's weights and runs as the model generates tokens. Here that CPU runs **another language model**: a C firmware of Qwen3-0.6B (int4 weights) executes on the circuit, one instruction per generated trace token, and finishes by emitting its answer word.
+A homage to [Qwenputer](https://github.com/divagr18/qwenputer), where a RISC-V CPU is compiled into Qwen's weights and runs as the model generates tokens. Here that CPU runs **another language model**: a C firmware of Qwen3-0.6B (int4 weights, three layers at higher precision) executes on the circuit, one instruction per generated trace token, fetches its weights from the outer model's own embedding rows, keeps its working memory in circuit-owned RAM, and finishes by emitting its answer word.
+
+## 📑 Contents
+
+1. [Result](#-result)
+2. [Architecture](#-architecture): [two models](#two-models) · [outer geometry](#the-outer-model) · [the circuit](#the-circuit) · [trace tokens](#trace-tokens) · [weights as ROW fetches](#weights-as-row-fetches) · [firmware](#the-firmware) · [the loop](#the-loop) · [chunks and seams](#chunks-and-seams)
+3. [The tier ladder](#-the-tier-ladder)
+4. [Metrics](#-metrics): [run totals](#run-totals) · [correctness](#correctness) · [quantisation study](#quantisation-study) · [stock-module check](#stock-module-check) · [speed and cost](#speed-and-cost) · [timeline](#wall-clock-timeline) · [history](#history)
+5. [What the host does](#-what-the-host-does)
+6. [Scope](#-scope)
+7. [FAQ](#-faq)
+8. [Reproduce](#-reproduce)
+9. [Repository map](#-repository-map)
+10. [Credits and license](#-credits)
 
 ## ✅ Result
 
@@ -33,46 +48,246 @@ A homage to [Qwenputer](https://github.com/divagr18/qwenputer), where a RISC-V C
 
 The verdict is in [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) and [`seams_0-95_20261107_004845.md`](experiments/circuit/fullrun/logs/cfram_q_vast/seams_0-95_20261107_004845.md); every command and run is logged in [`RUNS.md`](RUNS.md).
 
-> 💡 **Before the fix** the same pipeline ended with **13** (`'.'`): the firmware matched its own emulator exactly, but int4 weights with int8 activations are not faithful to the real model at this prompt. See [the quantisation fix](#-the-quantisation-fix).
+> 💡 **Before the fix** the same pipeline ended with **13** (`'.'`): the firmware matched its own emulator exactly, but int4 weights with int8 activations are not faithful to the real model at this prompt. See [the quantisation study](#quantisation-study).
 
-## 🔬 How it works
+## 🧱 Architecture
+
+<!-- VISUAL:architecture-svg -->
+
+### Two models
+
+| | Outer model | Inner model |
+|---|---|---|
+| What | a Qwen3.5-4B-shaped transformer whose weights implement a CPU | the real Qwen3-0.6B (28 layers) |
+| Role | executes the machine: every generated token is one CPU step | the program the machine runs (a C firmware with its weights as data) |
+| Code | stock `transformers` modules (`Qwen3_5` layers); only weights are written | compiled with a RISC-V toolchain, run on the circuit |
+
+The idea comes from Qwenputer: a Gated DeltaNet layer is an associative memory, so registers, RAM and the program counter can live in the model's recurrent state, and the MLP and attention layers can implement the instruction decode, the ALU and the next-token choice. The outer model reads its own previous output tokens as the machine's trace.
+
+### The outer model
+
+| Property | Value |
+|---|---|
+| Base geometry | Qwen3.5-4B (hybrid Gated DeltaNet and full-attention layers) |
+| Merged checkpoint | hidden size **7680**, **12 chip layers** + Qwen's **32** layers |
+| Why wider than stock | the circuit's state slots and the 3,840 row cells need more residual width than stock Qwen3.5-4B's 2,560 |
+| Vocabulary | **680,128** tokens (511,444 non-row tokens + the 168,684 table rows) |
+| Weight table | **168,684 rows × 3,840 cells**, stored in `embed_tokens.weight` (168,684 rows × hidden 7680 × 2 bytes = **2.59 GB** in bf16) |
+| Table build | `quantfix/cf_gen_q.py` (generator, reproduces the earlier table bit for bit on the earlier config) |
+
+### The circuit
+
+A small RISC-V machine, compiled into the outer weights, whose full state is carried between steps:
+
+| Component | Where it lives |
+|---|---|
+| 32 general registers, program counter | recurrent state of the outer model |
+| **RAM: 32 KB, circuit-owned** | recurrent state; loads read what the circuit's own stores wrote; real `in_ram` / `in_drom` address decode, no patch |
+| Program ROM and read-only data | the firmware's code, read through the real DROM window |
+| Weight and constant fetch | `ROW` tokens (below) |
+| Instructions | RV32IM (+Zba) with the vector-dot instruction `VDOT` and its pointer setup `WB`; the nonlinearities run as fixed-point integer code in the firmware |
+| Argmax | computed by the firmware itself with `VDOT`; a taken branch in the common case |
+| Output | the firmware writes its answer word and executes the exit `ecall`; the circuit emits `HALT` |
+
+### Trace tokens
+
+Every instruction emits one or more tokens (the cost rules are in [`experiments/circuit/kernels/README.md`](experiments/circuit/kernels/README.md)):
+
+| Instruction | Trace tokens |
+|---|---|
+| an instruction writing `rd != x0` | one value record: 1 token if `-2^14 <= v < 2^14`, 2 if `|v| < 2^29`, else 3 |
+| `rd = x0`, not-taken branch, `SW` | 1 |
+| taken branch, `jal`, `jalr` | 1 |
+| `SB`, `SH` | 4 |
+| `VDOT` | 1 record of the accumulator for 8 multiply-accumulates |
+| `WB` | 1 |
+| every 63rd record without a taken jump | +1 refresh token |
+
+This run: **199,287,158 trace tokens for 178,066,316 instructions, about 1.12 tokens per instruction.**
+
+### Weights as ROW fetches
+
+The firmware never gets weights from a host. To read a weight row it emits a **`ROW` token** naming a row of the table. On the next step the outer model embeds that row (its `embed_tokens.weight` entry), which places 3,840 int4 cells (480 words of eight cells; an 8-bit weight uses two planes) into the residual stream. `VDOT` then consumes the latched words eight cells at a time. The earlier weight-fetch run replaced 74.5M host-supplied weight words this way ([`docs/WEIGHT_FETCH_PATH.md`](docs/WEIGHT_FETCH_PATH.md)). The constants of the firmware blob are fetched the same way ([`docs/CONST_FETCH_PATH.md`](docs/CONST_FETCH_PATH.md)), so no blob load remains.
+
+### The firmware
+
+| | Old contract | Final contract |
+|---|---|---|
+| Model | real Qwen3-0.6B, 28 layers, prompt `[785]`, ctx 1 | same |
+| Weights | int4 everywhere | int4, except layers **2, 26 and 27 at 8-bit weights** |
+| Activations | int8 | int8, except layers **2, 26 and 27 at 16-bit** |
+| Instructions (compiler-level count) | 161,511,713 | **189,109,345** (+17%) |
+| Weight stream | 74,498,048 words (595,984,384 weights) | **80,396,288 words** (643,170,304 weights, +7.9%) |
+| CF+RAM trace (this run's reference) | 157,076,451 tokens, 138,513,317 instructions, 75 chunks | **199,287,158 tokens, 178,066,316 instructions, 96 chunks** |
+| Answer for `[785]` | 13 | **15846** |
+
+The compiler-level counts and the CF+RAM trace counts come from different builds and are not comparable across the two rows. Sources: [`quantfix/REPORT.md`](experiments/circuit/fullrun/quantfix/REPORT.md), [`quantfix/results/`](experiments/circuit/fullrun/quantfix/results/).
+
+### The loop
 
 ```mermaid
 flowchart LR
-  P["prompt token 785"] --> F["Qwen3-0.6B firmware<br/>(C program, RV32IM + VDOT)"]
-  F -->|"ROW token = row id"| E["outer model's own<br/>embedding rows<br/>(the weight table)"]
-  E -->|"8 int4 cells per row"| F
-  F <--> R["circuit-owned RAM<br/>32 KB, real address decode"]
-  F --> A["circuit's own argmax"]
-  A --> H["HALT"]
-  H --> W["answer word 15846"]
+  P["prompt token 785<br/>(compile-time constant)"] --> G["GO token (host)"]
+  G --> F["firmware runs on the circuit<br/>one instruction per trace token"]
+  F -->|"ROW token = row id"| E["outer model's own<br/>embedding rows"]
+  E -->|"3,840 int4 cells"| F
+  F <-->|"loads and stores"| R["circuit-owned RAM<br/>32 KB, real address decode"]
+  F --> A["firmware argmax over the LM head<br/>(VDOT + taken branches)"]
+  A --> W["answer word written, exit ecall"]
+  W --> H["HALT"]
+  H --> O["output word 15846"]
+  F -.->|"each emitted token is embedded<br/>and appended by the host loop"| F
 ```
 
-- 🖥️ **The CPU is the model.** Registers, RAM, ROM and the program counter live in the outer model's DeltaNet state. Each generated trace token is one CPU step (about 1.12 trace tokens per instruction here).
-- 📦 **Weights come from the model's own parameters.** The firmware never loads weights from a host. It emits a `ROW` token naming a row; the next step embeds that row of the outer checkpoint's `embed_tokens.weight` (168,684 rows, hidden size 7680, 2.59 GB in bf16). `VDOT` consumes the row's int4 cells eight at a time. Blob constants are fetched the same way.
-- 🧮 **RAM is the circuit's.** Loads read what the circuit's own stores wrote. The address decode is the real one: no `in_ram := 1` patch, no widened `in_drom`.
-- 🏁 **The answer is the circuit's.** The final argmax runs in the firmware; the run stops on the circuit's own `HALT`, and the word is decoded from the circuit's own output tokens.
-- ⚡ **Parallel by chunk, checked at every seam.** A chunk is 2,097,152 steps. Each of the 96 jobs runs on its own GPU and saves the circuit's own end state; the collector checks it equals the next job's seed exactly.
+<!-- VISUAL:one-token-animation -->
 
-## 🎯 The quantisation fix
+The host loop only boots the machine, embeds each emitted token and appends it, and handles the `ecall` I/O. Everything between `GO` and `HALT` is decided by the circuit.
 
-The old firmware (int4 weights everywhere, int8 activations) reproduced its emulator exactly but answered **13**, not the real model's token. Position 0 is an attention sink: the layer-2 MLP writes a massive channel (about 6,540) that stays in the residual, and layer 27 writes about 4,872.
+### Chunks and seams
 
-| Variant (prompt `[785]`, real Qwen3-0.6B) | argmax |
+A **chunk** is 2,097,152 steps (the jobs report 2,097,153 including the boundary step). The 199.3M-step trace is 96 chunks; the last one ends at its `HALT` after 57,705 steps. Each job runs one chunk on one GPU and saves **the circuit's own end state**. Job k+1 starts from the reference's start state for chunk k+1, and the collector checks that job k's end state equals that start state exactly: registers, pc, anchor, `n`, `wb`, the 8-word latch window, all 8,192 RAM words, and `bn`. 95 seams, 95 exact matches.
+
+<!-- VISUAL:seam-grid -->
+
+## 🪜 The tier ladder
+
+The project is organised as tiers: each is a harder claim or a faster build than the one before. The first tiers came from the planning documents ([`docs/TIERS.md`](docs/TIERS.md), [`docs/CIRCUIT_ROUTE_PLAN.md`](docs/CIRCUIT_ROUTE_PLAN.md)); instruction counts below are from the compiler emulator, and seconds are computed, not run, unless the row says measured.
+
+| Tier | Build | Status | Evidence |
+|---|---|---|---|
+| **T0** | literal: fp32 soft-float firmware on RV32IM, real Qwen3-0.6B weights, ctx 1: 1.10e11 instructions/token | instructions **measured** (argmax == HF at 3 positions, including position 0); seconds **computed** at 0.71 to 0.98 years/token, not run | [`compiler/res_full_f32.json`](experiments/circuit/compiler/res_full_f32.json) |
+| **T1** | T0 + fused executor (Triton + CUDA graph) | the fused executor is used by every run below; the fp32 firmware itself was **projected** only (4.0e9 instr) and is superseded | [`TIERS.md`](docs/TIERS.md) |
+| **T2** | + `SMAQA` int8 matvec build | **projected** (5.4e8 instr, matvec only); an int8 build was counted at 2.41e8 instructions with about 80% top-1 agreement with HF on diverse text | [`TIERS.md`](docs/TIERS.md) |
+| **T3** | + `VDOT` int4 + fixed-point nonlinears + algorithmic cuts | **projected** for the matvec part (1.05e8 instr) | [`TIERS.md`](docs/TIERS.md) |
+| **T3m** | T3 as built (compiler kernel) | instructions **measured**: 1.346e8 at ctx 1; seconds **computed** (7.9 to 10.3 h); top-1 agreement with HF only 37 to 51% for int4 on diverse text | [`compiler/RESULTS.md`](experiments/circuit/compiler/RESULTS.md) |
+| **T3m-run** | the T3m-style int4 firmware with weights and constants as `ROW` fetches, circuit-owned RAM, real address decode, layers 2/26/27 at higher precision, **run end to end** | ✅ **reached, measured**: one token, 96 chunks, 199,287,158 trace tokens, 96/96 clean, 95/95 exact seams, word 15846 | [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) |
+| **T4** | + persistent kernel, faster GPU | 📋 plan, projected | [`TIERS.md`](docs/TIERS.md) |
+| **T5** | + in-forward-pass lanes (SIMT) | 📋 plan, projected (needs the 4B base; bounded gain) | [`multicore/res_model.json`](experiments/circuit/multicore/res_model.json) |
+| **T5b** | + independent sessions splitting matvec rows | 📋 plan, projected (needs cross-session data transport, a ruling is open) | [`scaleout/model_out.json`](experiments/circuit/scaleout/model_out.json) |
+| **T6** | T5 on several GPUs, layer pipelining | 📋 plan, speculative | [`TIERS.md`](docs/TIERS.md) |
+
+**Where the measured run sits.** The final build is a T3m-class firmware: int4 `VDOT` weights, fixed-point nonlinears in integer code, executed on the fused executor. It adds weights and constants as `ROW` fetches, circuit-owned RAM, real address decode and the layers 2/26/27 fix. Its measured cost is 199.3M trace tokens (more than the 1.55e8 T3m model, because of the table fetches and the higher-precision layers). A single GPU would need about 9.6 hours at the 4090's 6.0 min per chunk, or 15.4 hours at the Modal A100's 9.6 min per chunk (computed from the measured chunk times), the same order as the T3m projection. The measured run used **about 12 GPU-hours of job time** in total, spread over up to a dozen GPUs.
+
+The parallel run splits the trace **in time**, not the matvecs, so it is a different parallelisation from T5, T5b and T6. It works because every seam between jobs is checked for exact state equality.
+
+### The host-role ladder
+
+The second axis is how much the host still supplies. Each step below moved a role into the circuit; the evidence column points at the run or document.
+
+| Step | What moved into the circuit | Evidence |
+|---|---|---|
+| H0 baseline | the host supplied every `LOAD`/`SB`/`SH` word and every `VDOT` weight word (about 1.0 to 1.2M injections per chunk), the injection schedule and each chunk's start state | [`docs/HOST_ROLE_AUDIT.md`](docs/HOST_ROLE_AUDIT.md) |
+| H1 weights as `ROW` fetches | 74.5M weight words from the outer model's own embedding rows | 84 chunks, 174,823,694 free tokens, 0 mismatches ([audit](docs/HOST_ROLE_AUDIT.md)) |
+| H2 circuit-owned RAM | RAM loads and stores handled by the circuit's 32 KB map | [`experiments/circuit/ramown`](experiments/circuit/ramown/) |
+| H3 constants as rows | the firmware's blob constants (`CF`) | [`docs/CONST_FETCH_PATH.md`](docs/CONST_FETCH_PATH.md), chunks 0 to 2: 0 injections of any kind |
+| H4 real address decode | the `in_ram` / `in_drom` bring-up patch removed | [`ramown/realdecode`](experiments/circuit/ramown/realdecode/); the earlier firmware with blob loads diverges at step 32 under the real decode (negative control) |
+| H5 look-ahead removed | whole row table, the circuit's own `HALT`, chunk 0 from the ELF alone | [`docs/HOST_ROLE_AUDIT_CFRAM.md`](docs/HOST_ROLE_AUDIT_CFRAM.md) |
+| H6 table inside the checkpoint | the table is `embed_tokens.weight` of the merged checkpoint | [stock-module check](#stock-module-check) |
+| H7 faithful numerics | layers 2/26/27 at 8-bit weights and 16-bit activations: the token equals the real model's | [quantisation study](#quantisation-study) |
+
+## 📊 Metrics
+
+All numbers below come from committed files. Sources are linked in each table.
+
+### Run totals
+
+| Quantity | Value | Source |
+|---|---|---|
+| Chunks | 96 (chunk size 2,097,152 steps) | [`seams_0-95_….md`](experiments/circuit/fullrun/logs/cfram_q_vast/seams_0-95_20261107_004845.md) |
+| Trace tokens | 199,287,158 | [`quantfix/STEP2_REPORT.md`](experiments/circuit/fullrun/quantfix/STEP2_REPORT.md) |
+| Instructions | 178,066,316 | same |
+| Final chunk | halts at step 57,705 | [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) |
+| Total job time | about 12.1 GPU-hours (sum of the 96 recorded job times) | [`fleet_result.json`](experiments/circuit/fullrun/logs/cfram_q_vast/fleet_result.json) |
+| Where chunks ran | Vast.ai: chunks 0 to 31 and 71 to 95 (57); Modal A100-40GB: chunks 32 to 70 (39) | [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) |
+
+### Correctness
+
+| Check | Result |
 |---|---|
-| Hugging Face fp32 / bf16 | **15846** |
-| HF fp32 + int4 per-row weights | 454 |
-| Firmware, int4 everywhere (old) | 13 |
-| Layers 2/26/27: 8-bit weights, int8 activations | 9 |
-| Layers 2/26/27: int4 weights, 16-bit activations | 408 |
-| **Layers 2/26/27: 8-bit weights + 16-bit activations** | **15846** |
-| Layers 2/26/27: 12-bit weights + 16-bit activations | 15846 |
+| Jobs clean | **96 / 96** |
+| Free-token mismatches (circuit token != reference token) | **0** |
+| Forced tokens | **0** |
+| Host injections (weight, RAM, blob words) | **0** in all 96 chunks; the injection hook is not in the graph (`--no-host-writes`) |
+| Seams exact | **95 / 95** |
+| Final word from the circuit's own output tokens | **15846** (reference 15846), read from the tokens before `HALT` |
+| Chunk 0 | boots from the firmware ELF alone |
 
-Both knobs are needed. The fix costs about +19% instructions per token and +7.9% weight words. Reports: [`diag_quant/REPORT.md`](experiments/circuit/fullrun/diag_quant/REPORT.md) (where the error enters), [`quantfix/REPORT.md`](experiments/circuit/fullrun/quantfix/REPORT.md) and [`quantfix/STEP2_REPORT.md`](experiments/circuit/fullrun/quantfix/STEP2_REPORT.md) (firmware, reference, checkpoint).
+<!-- VISUAL:quant-chart -->
 
-The merged checkpoint passes the stock-module check: 130,000 teacher-forced steps of chunk 0 through the stock `Qwen3_5` modules, the argmax taken over the full 680,128-token vocabulary, **0 mismatches** over 2,320 ROW tokens. A copy of the same check with every table entry +1 diverges at step 41 ([`hfcheck_cfq_pos_130k.json`](experiments/circuit/fullrun/quantfix/results/hfcheck_cfq_pos_130k.json), [`hfcheck_cfq_neg.json`](experiments/circuit/fullrun/quantfix/results/hfcheck_cfq_neg.json)).
+### Quantisation study
 
-## 🧑‍💻 What the host does
+Prompt `[785]`, real Qwen3-0.6B. The first rows are Hugging Face; the others are the firmware run in the compiler-level emulator. Position 0 is an attention sink: the layer-2 MLP writes a massive channel (about 6,540) that stays in the residual through layer 25, and layer 27 writes about 4,872.
+
+| Variant | argmax | rank of 15846 | cos(logits, HF) | top-1 gap | instr/token | weight stream |
+|---|---|---|---|---|---|---|
+| HF fp32 | **15846** (`' Question'`) | 0 | 1 | 0.136 | | |
+| HF bf16 | **15846** | 0 | | 0.125 | | |
+| HF fp32 + int4 per-row weights (fake-quant) | 454 | | | 0.059 | | |
+| HF fp32 + int4 weights + int8 activations (fake-quant) | 838 | | | 0.041 | | |
+| Firmware, int4 everywhere (old contract) | **13** | 38,852 | 0.296 | 0.167 | 161,511,713 | 74,498,048 |
+| Layers 2/26/27: 8-bit weights, int8 activations | 9 | 14 | 0.808 | 0.247 | 170,497,018 | 80,396,288 |
+| Layers 2/26/27: int4 weights, 16-bit activations | 408 | 12,077 | 0.339 | 0.148 | 171,138,874 | 74,498,048 |
+| **Layers 2/26/27: 8-bit weights + 16-bit activations (final)** | **15846** | 0 | 0.917 | 0.970 | 189,109,345 (+17%) | 80,396,288 (+7.9%) |
+| Layers 2/3/26/27: 8-bit + 16-bit | 15846 | 0 | 0.916 | 0.930 | 198,308,671 | 82,362,368 |
+| Layers 2/26/27: 12-bit weights + 16-bit activations | 15846 | 0 | 0.978 | 0.940 | 207,079,555 | 86,294,528 |
+
+What it shows: both finer weights and 16-bit activations at those three layers are needed (each alone fails with 9 or 408), and the final contract's top-1 gap (0.97) is wide, so the answer is not a coin flip. In the layer-by-layer study, quantising only layer 2, 26 or 27 flips the answer (838, 3405, 12) while quantising any one of the other 25 layers keeps 15846. Sources: [`quantfix/results/`](experiments/circuit/fullrun/quantfix/results/) (firmware rows), [`diag_quant/REPORT.md`](experiments/circuit/fullrun/diag_quant/REPORT.md) (the layer study), [`logs/final_token/hf_785.json`](experiments/circuit/fullrun/logs/final_token/hf_785.json) (HF rows). The HF fake-quant rows are torch simulations, not the firmware.
+
+### Stock-module check
+
+The merged checkpoint (hidden 7680, 168,684 table rows, vocabulary 680,128) was run through the stock `Qwen3_5` modules on chunk 0, teacher-forced with the reference tokens, with the argmax taken over the **full vocabulary**:
+
+| | Positive check | Negative control (every table entry +1 mod 16) |
+|---|---|---|
+| Steps checked | 130,000 | stopped after 20 mismatches |
+| `ROW` tokens / `VDOT` tokens | 2,320 / 23,817 | |
+| Mismatches | **0** | first at **step 41** (right after `WB`, `ROW(0)`) |
+| Injections | 0 | |
+| Source | [`hfcheck_cfq_pos_130k.json`](experiments/circuit/fullrun/quantfix/results/hfcheck_cfq_pos_130k.json) | [`hfcheck_cfq_neg.json`](experiments/circuit/fullrun/quantfix/results/hfcheck_cfq_neg.json) |
+
+The negative control shows the pass depends on the table contents held in the checkpoint's parameters.
+
+### Speed and cost
+
+Time per chunk from the 96 recorded job times ([`fleet_result.json`](experiments/circuit/fullrun/logs/cfram_q_vast/fleet_result.json)):
+
+| Hardware | Chunks | Mean time per chunk | Rate | Cost per chunk |
+|---|---|---|---|---|
+| RTX 4090 (Vast.ai) | 50 | 5.7 to 6.0 min (range 5.5 to 7.2) | about $0.47 to $0.50/h | about $0.05 |
+| A100 PCIE (Vast.ai) | 6 | 8.0 min (range 4.9 to 9.7; includes the short last chunk) | about $0.58 to $0.70/h | about $0.06 to $0.11 |
+| L40S (Vast.ai) | 1 | 8.8 min | about $0.61/h | about $0.09 |
+| A100-40GB (Modal) | 39 | 9.6 min (range 9.5 to 10.2) | n/a | n/a |
+
+The whole run cost about **$10 of rented Vast.ai GPUs** (an estimate from the fleet log, not from billing). The chunks on Modal ran on its A100s and are not priced here. The fleet used 11 RTX 4090s, an A100 PCIE and an L40S at its peak, about $6.6 per hour; three instances disappeared mid-run, and the fleet finished on the remaining nine RTX 4090s.
+
+### Wall-clock timeline
+
+All times are EST, 2026-11-06 to 2026-11-07.
+
+| Time | Event |
+|---|---|
+| 21:13 | new reference trace started (about 30 min): argmax 15846, 96 chunks, 0 injections |
+| 21:19 | stock-module check and negative control on the new checkpoint |
+| 21:38 | row-embedding cache built (about 20 min, once per table) |
+| 22:31 | 96 jobs queued on Modal (10-GPU workspace cap, shared with other work) |
+| 23:09 | Vast.ai fleet rented |
+| 23:41 | first Vast chunk finished (A100 PCIE, 9.7 min) |
+| 23:59 | chunk 95 finished on the hub: **`HALT` at step 57,705, word 15846** |
+| 00:48 | collector verdict **PASS**; all rented instances destroyed; Modal app stopped |
+
+<!-- VISUAL:fleet-timeline -->
+
+### History
+
+| Route | What it was | Per token | Host role |
+|---|---|---|---|
+| Compiled route ([older README](docs/older_compiled_route.md)) | custom giant outer (1006 layers, D=40775, 293,068 frames) doing real fp32 matvecs; the real Qwen3-0.6B at one position, 6 teacher-forced positions | **268.6 s** on a shared A100 | host streamed the weights and addresses |
+| Circuit, literal (T0) | fp32 soft-float firmware on the circuit | 1.10e11 instructions, computed 0.71 to 0.98 years | not run |
+| Circuit, weight fetch (WF) | weights as `ROW` fetches; replay from per-chunk reference snapshots | 84 chunks, 174,823,694 free tokens, 0 mismatches | RAM and blob words still host-injected (7% of steps) |
+| Circuit, CF+RAM, int4 everywhere | constants as rows, circuit-owned RAM | 75 chunks, 157,076,451 tokens; word **13** | 0 injections |
+| **Circuit, final contract** | layers 2/26/27 at 8-bit weights + 16-bit activations | **96 chunks, 199,287,158 tokens; word 15846; about 12 GPU-hours of job time** | 0 injections, real decode |
+
+## 👤 What the host does
 
 | Role | Why |
 |---|---|
@@ -82,23 +297,38 @@ The merged checkpoint passes the stock-module check: 130,000 teacher-forced step
 
 Everything else runs in the circuit. Full audit with file and line references: [`docs/HOST_ROLE_AUDIT_CFRAM.md`](docs/HOST_ROLE_AUDIT_CFRAM.md).
 
-## ⏱️ Speed and cost
-
-| Hardware | Time per chunk | Cost per chunk |
-|---|---|---|
-| RTX 4090 (Vast.ai) | 6.0 min | about $0.05 |
-| A100 PCIE (Vast.ai) | 4.9 to 9.7 min | about $0.06 to $0.11 |
-| L40S (Vast.ai) | 8.8 min | about $0.09 |
-| A100-40GB (Modal) | about 9.2 min | n/a |
-
-The whole run cost about **$10 of rented Vast.ai GPUs** (chunks 0 to 31 and 71 to 95; the estimate is from the fleet log, not from billing). Chunks 32 to 70 ran on Modal A100s. With enough GPUs the wall time is one chunk, about 10 minutes.
-
 ## 📌 Scope
 
 - One prompt token at position 0: the firmware is built for context length 1.
 - The 96 chunks ran in parallel. Each was seeded from the reference start state and checked for exact end-state equality with the next job's seed at all 95 seams.
 - The executor is the fused Triton kernel. The stock `Qwen3_5` modules were checked on chunk 0 (130,000 steps, with the negative control above).
 - The outer checkpoint carries the 2.59 GB table, so it is larger than stock Qwen3.5-4B. The chunks run on Vast read the same table from `rowtab_cf.npy`, checked bit-identical to the checkpoint's `embed_tokens.weight`.
+
+## ❓ FAQ
+
+**What does "Qwen in Qwen" mean here, precisely?**
+A Qwen3-0.6B inference (the inner model) runs as a program on a CPU whose circuit is implemented by the weights of a Qwen3.5-4B-shaped model (the outer model). The outer model's own layers decode each instruction, do the arithmetic, hold the registers and RAM in recurrent state, and fetch the inner model's weights from its own embedding rows. The inner model's answer token appears as the circuit's output before `HALT`.
+
+**Why 15846, and why was it 13 before?**
+15846 is what Hugging Face's Qwen3-0.6B produces for this prompt (fp32 and bf16). The earlier firmware used int4 weights and int8 activations everywhere. It matched its own emulator exactly, but quantisation changes the answer at position 0, where a massive activation (about 6,540 at layer 2) sits in the residual. Raising layers 2, 26 and 27 to 8-bit weights and 16-bit activations gives 15846 ([study above](#quantisation-study)).
+
+**Why were the chunks run in parallel, and is that the same as one continuous run?**
+A single GPU would need about 10 to 15 hours for the 199M steps. Each of the 96 jobs started from the reference's start state for its chunk and saved the circuit's own end state; the collector verified exact equality with the next job's start state at every seam. That is a seam-checked parallel run. A serial run through all 96 chunks was not done.
+
+**Is this free-running generation?**
+No. It is one token at position 0 of a single compile-time prompt token. The comparison against the reference trace is how the run is checked, token by token, and it is not an input to the run.
+
+**What does the host still do?**
+Boot, the `GO` token, the embed-and-append loop and `ecall` I/O, and it seeds each later chunk's start state ([table](#-what-the-host-does)).
+
+**Is the outer model a stock Qwen3.5-4B?**
+It uses stock `Qwen3_5` modules with only its weights written, but the merged checkpoint is wider (hidden size 7680) and carries the 2.59 GB table, so it is not the released checkpoint.
+
+**Why layers 2, 26 and 27?**
+They carry the position-0 massive activations. Quantising any one of them alone flips the answer; quantising any one of the other 25 does not ([`diag_quant`](experiments/circuit/fullrun/diag_quant/REPORT.md)).
+
+**Where is the earlier work?**
+The earlier compiled route (custom giant outer, host-streamed weights) is in [`docs/older_compiled_route.md`](docs/older_compiled_route.md).
 
 ## 🔁 Reproduce
 
@@ -122,18 +352,22 @@ For this run: `--elf /data/cfram_q/ramcf_q.elf --refdir /data/cfram_q/refQ --ckp
 
 Requirements: Python 3.11, `torch`, `triton`, `transformers` 5.x, `safetensors`, [Modal](https://modal.com) (or any CUDA GPU with the same scripts), and the Qwen checkpoints in the Hugging Face cache.
 
-## 🗺️ Repository map
+## 🧭 Repository map
 
 ```
 experiments/circuit/
   fullrun/           the circuit runs: circuit_run.py, firmware (fw/, cf/, quantfix/), hfwf/ (checkpoint merge + stock-module check),
                      cf/ (parallel runner, seam collector, Vast fleet), diag_quant/, logs/, RUNS.md
   ramown/            circuit-owned RAM, real address decode (realdecode/)
-  engine/ kernels/   the fused executor and Triton kernels
+  engine/ kernels/   the fused executor and Triton kernels, ISA and trace-token cost rules
   compiler/ algo/    firmware generator, quantisation studies
+  multicore/ scaleout/   projections for the speed tiers
 docs/
   HOST_ROLE_AUDIT_CFRAM.md   the host-role audit of the final path
+  HOST_ROLE_AUDIT.md         the earlier audit (baseline host roles)
   CIRCUIT_ROUTE_PLAN.md  TIERS.md  WEIGHT_FETCH_PATH.md  CONST_FETCH_PATH.md  RAM_FIT.md
+  RELEASE_NOTES.md           draft release notes
+  demo/                      the demo video and its provenance
   older_compiled_route.md    the earlier compiled route (superseded)
 audit/               HostGuard harness for the earlier route
 reference/ older/    vendored Qwenputer lab and earlier experiments

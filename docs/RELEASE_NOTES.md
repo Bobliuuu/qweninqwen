@@ -18,7 +18,7 @@ A real Qwen3-0.6B token, produced by a RISC-V circuit compiled into the weights 
 
 ## 🎯 What changed since the earlier result
 
-The earlier firmware (int4 weights, int8 activations everywhere) reproduced its emulator exactly but answered 13. Layers 2, 26 and 27 carry the position-0 massive activations; running those three layers at 8-bit weights with 16-bit activations gives 15846 (about +19% instructions per token, +7.9% weight words). Details: `experiments/circuit/fullrun/diag_quant/REPORT.md`, `quantfix/REPORT.md`, `quantfix/STEP2_REPORT.md`.
+The earlier firmware (int4 weights, int8 activations everywhere) reproduced its emulator exactly but answered 13. Layers 2, 26 and 27 carry the position-0 massive activations; running those three layers at 8-bit weights with 16-bit activations gives 15846 (about +17% instructions per token (compiler-level count), +7.9% weight words). Details: `experiments/circuit/fullrun/diag_quant/REPORT.md`, `quantfix/REPORT.md`, `quantfix/STEP2_REPORT.md`.
 
 ## 🧑‍💻 Host roles
 
