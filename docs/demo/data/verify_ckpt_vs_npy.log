@@ -1,0 +1,12 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/jerry-zhu/main/ap-2aL6BhuM45tupj3yOpyOqS
+✓ Created objects.
+├── ✓ Uploaded 
+│   /Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/verify
+│   _ckpt_vs_npy.py
+└── ✓ Created Function check.
+{"shape_ckpt": [168684, 3840], "shape_npy": [168684, 3840], "dtype": ["uint8", "uint8"], "identical": true, "md5_ckpt": "5072e52537e840ae8541941a85721360", "md5_npy": "5072e52537e840ae8541941a85721360"}
+[modal-client] 2026-11-06T23:14:01-0500 Timed out waiting for final app logs.
+✓ App completed. View run at 
+https://modal.com/apps/jerry-zhu/main/ap-2aL6BhuM45tupj3yOpyOqS
