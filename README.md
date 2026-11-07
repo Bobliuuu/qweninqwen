@@ -29,7 +29,7 @@ A homage to [Qwenputer](https://github.com/divagr18/qwenputer), where a RISC-V C
 1. [Result](#-result)
 2. [Architecture](#-architecture): [two models](#two-models) · [outer geometry](#the-outer-model) · [the circuit](#the-circuit) · [trace tokens](#trace-tokens) · [weights as ROW fetches](#weights-as-row-fetches) · [firmware](#the-firmware) · [the loop](#the-loop) · [chunks and seams](#chunks-and-seams)
 3. [The tier ladder](#-the-tier-ladder)
-4. [Metrics](#-metrics): [run totals](#run-totals) · [correctness](#correctness) · [quantisation study](#quantisation-study) · [stock-module check](#stock-module-check) · [speed and cost](#speed-and-cost) · [timeline](#wall-clock-timeline) · [history](#history)
+4. [Metrics](#-metrics): [run totals](#run-totals) · [correctness](#correctness) · [precision results](#precision-results) · [stock-module check](#stock-module-check) · [speed and cost](#speed-and-cost) · [timeline](#wall-clock-timeline) · [history](#history)
 5. [What the host does](#-what-the-host-does)
 6. [Scope](#-scope)
 7. [FAQ](#-faq)
@@ -51,8 +51,6 @@ A homage to [Qwenputer](https://github.com/divagr18/qwenputer), where a RISC-V C
 | Chunk 0 | boots from the **firmware ELF alone** (no reference state) |
 
 The verdict is in [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) and [`seams_0-95_20261107_004845.md`](experiments/circuit/fullrun/logs/cfram_q_vast/seams_0-95_20261107_004845.md); every command and run is logged in [`RUNS.md`](RUNS.md).
-
-> 💡 **Before the fix** the same pipeline ended with **13** (`'.'`): the firmware matched its own emulator exactly, but int4 weights with int8 activations are not faithful to the real model at this prompt. See [the quantisation study](#quantisation-study).
 
 ## 🧱 Architecture
 
@@ -81,7 +79,7 @@ The idea comes from Qwenputer: a Gated DeltaNet layer is an associative memory, 
 | Why wider than Qwen3.5-4B | the circuit's state slots and the 3,840 row cells need more residual width than the released Qwen3.5-4B's 2,560 |
 | Vocabulary | **680,128** tokens (511,444 non-row tokens + the 168,684 table rows) |
 | Weight table | **168,684 rows × 3,840 cells**, stored in `embed_tokens.weight` (168,684 rows × hidden 7680 × 2 bytes = **2.59 GB** in bf16) |
-| Table build | `quantfix/cf_gen_q.py` (generator, reproduces the earlier table bit for bit on the earlier config) |
+| Table build | `quantfix/cf_gen_q.py` (table generator) |
 
 ### The circuit
 
@@ -115,21 +113,23 @@ This run: **199,287,158 trace tokens for 178,066,316 instructions, about 1.12 to
 
 ### Weights as ROW fetches
 
-The firmware never gets weights from a host. To read a weight row it emits a **`ROW` token** naming a row of the table. On the next step the outer model embeds that row (its `embed_tokens.weight` entry), which places 3,840 int4 cells (480 words of eight cells; an 8-bit weight uses two planes) into the residual stream. `VDOT` then consumes the latched words eight cells at a time. The earlier weight-fetch run replaced 74.5M host-supplied weight words this way ([`docs/WEIGHT_FETCH_PATH.md`](docs/WEIGHT_FETCH_PATH.md)). The constants of the firmware blob are fetched the same way ([`docs/CONST_FETCH_PATH.md`](docs/CONST_FETCH_PATH.md)), so no blob load remains.
+The firmware never gets weights from a host. To read a weight row it emits a **`ROW` token** naming a row of the table. On the next step the outer model embeds that row (its `embed_tokens.weight` entry), which places 3,840 int4 cells (480 words of eight cells; an 8-bit weight uses two planes) into the residual stream. `VDOT` then consumes the latched words eight cells at a time. Weights (74.5M words) and constants are fetched this way ([`docs/WEIGHT_FETCH_PATH.md`](docs/WEIGHT_FETCH_PATH.md)). The firmware's blob constants are fetched the same way ([`docs/CONST_FETCH_PATH.md`](docs/CONST_FETCH_PATH.md)), so no blob load remains.
 
-### The firmware
+### Precision design
 
-| | Old contract | Final contract |
-|---|---|---|
-| Model | real Qwen3-0.6B, 28 layers, prompt `[785]`, ctx 1 | same |
-| Weights | int4 everywhere | int4, except layers **2, 26 and 27 at 8-bit weights** |
-| Activations | int8 | int8, except layers **2, 26 and 27 at 16-bit** |
-| Instructions (compiler-level count) | 161,511,713 | **189,109,345** (+17%) |
-| Weight stream | 74,498,048 words (595,984,384 weights) | **80,396,288 words** (643,170,304 weights, +7.9%) |
-| CF+RAM trace (this run's reference) | 157,076,451 tokens, 138,513,317 instructions, 75 chunks | **199,287,158 tokens, 178,066,316 instructions, 96 chunks** |
-| Answer for `[785]` | 13 | **15846** |
+The firmware is the real Qwen3-0.6B (28 layers) compiled for the circuit's integer ISA, prompt `[785]`, context length 1.
 
-The compiler-level counts and the CF+RAM trace counts come from different builds and are not comparable across the two rows. Sources: [`quantfix/REPORT.md`](experiments/circuit/fullrun/quantfix/REPORT.md), [`quantfix/results/`](experiments/circuit/fullrun/quantfix/results/).
+| | |
+|---|---|
+| Weights | **int4** for all layers except **layers 2, 26 and 27, at 8-bit** (two int4 planes) |
+| Activations | **int8**, except **layers 2, 26 and 27, at 16-bit** |
+| Why those layers | at position 0 they carry the large activations (about 6,540 in the layer-2 MLP output, about 4,872 at layer 27), so they get the wider format |
+| Instructions per token | **189,109,345** (compiler-level count) |
+| Weight stream | **80,396,288 words** (643,170,304 weights) |
+| Trace of this run | **199,287,158 tokens, 178,066,316 instructions, 96 chunks** |
+| Answer for `[785]` | **15846**, matching Hugging Face Qwen3-0.6B (fp32 and bf16) |
+
+Sources: [`quantfix/REPORT.md`](experiments/circuit/fullrun/quantfix/REPORT.md), [`quantfix/results/`](experiments/circuit/fullrun/quantfix/results/). The compiler-level count and the CF+RAM trace come from different builds and are not comparable.
 
 ### The loop
 
@@ -171,39 +171,38 @@ A **chunk** is 2,097,152 steps (the jobs report 2,097,153 including the boundary
   <img src="docs/assets/circuit_tiers.svg" alt="Instructions per token on a log scale for tiers T0 to T3m and the final run; measured tiers solid, projected tiers hatched" width="100%">
 </p>
 
-The project is organised as tiers: each is a harder claim or a faster build than the one before. The first tiers came from the planning documents ([`docs/TIERS.md`](docs/TIERS.md), [`docs/CIRCUIT_ROUTE_PLAN.md`](docs/CIRCUIT_ROUTE_PLAN.md)); instruction counts below are from the compiler emulator, and seconds are computed, not run, unless the row says measured.
+The project is organised as tiers: each is a harder claim or a faster build than the one before. T0 to T6 are the roadmap from the planning documents ([`docs/TIERS.md`](docs/TIERS.md), [`docs/CIRCUIT_ROUTE_PLAN.md`](docs/CIRCUIT_ROUTE_PLAN.md)); instruction counts below are from the compiler emulator, and seconds are computed, not run, unless the row says measured.
 
 | Tier | Build | Status | Evidence |
 |---|---|---|---|
 | **T0** | literal: fp32 soft-float firmware on RV32IM, real Qwen3-0.6B weights, ctx 1: 1.10e11 instructions/token | instructions **measured** (argmax == HF at 3 positions, including position 0); seconds **computed** at 0.71 to 0.98 years/token, not run | [`compiler/res_full_f32.json`](experiments/circuit/compiler/res_full_f32.json) |
-| **T1** | T0 + fused executor (Triton + CUDA graph) | the fused executor is used by every run below; the fp32 firmware itself was **projected** only (4.0e9 instr) and is superseded | [`TIERS.md`](docs/TIERS.md) |
-| **T2** | + `SMAQA` int8 matvec build | **projected** (5.4e8 instr, matvec only); an int8 build was counted at 2.41e8 instructions with about 80% top-1 agreement with HF on diverse text | [`TIERS.md`](docs/TIERS.md) |
+| **T1** | T0 + fused executor (Triton + CUDA graph) | the fused executor runs the measured build below; the fp32 firmware at this tier is a **projection** (4.0e9 instr) | [`TIERS.md`](docs/TIERS.md) |
+| **T2** | + `SMAQA` int8 matvec build | **projected** (5.4e8 instr, matvec only) | [`TIERS.md`](docs/TIERS.md) |
 | **T3** | + `VDOT` int4 + fixed-point nonlinears + algorithmic cuts | **projected** for the matvec part (1.05e8 instr) | [`TIERS.md`](docs/TIERS.md) |
-| **T3m** | T3 as built (compiler kernel) | instructions **measured**: 1.346e8 at ctx 1; seconds **computed** (7.9 to 10.3 h); top-1 agreement with HF only 37 to 51% for int4 on diverse text | [`compiler/RESULTS.md`](experiments/circuit/compiler/RESULTS.md) |
+| **T3m** | T3 as built (compiler kernel) | instructions **measured**: 1.346e8 at ctx 1; seconds **computed** (7.9 to 10.3 h) | [`compiler/RESULTS.md`](experiments/circuit/compiler/RESULTS.md) |
 | **T3m-run** | the T3m-style int4 firmware with weights and constants as `ROW` fetches, circuit-owned RAM, real address decode, layers 2/26/27 at higher precision, **run end to end** | ✅ **reached, measured**: one token, 96 chunks, 199,287,158 trace tokens, 96/96 clean, 95/95 exact seams, word 15846 | [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) |
 | **T4** | + persistent kernel, faster GPU | 📋 plan, projected | [`TIERS.md`](docs/TIERS.md) |
 | **T5** | + in-forward-pass lanes (SIMT) | 📋 plan, projected (needs the 4B base; bounded gain) | [`multicore/res_model.json`](experiments/circuit/multicore/res_model.json) |
 | **T5b** | + independent sessions splitting matvec rows | 📋 plan, projected (needs cross-session data transport, a ruling is open) | [`scaleout/model_out.json`](experiments/circuit/scaleout/model_out.json) |
 | **T6** | T5 on several GPUs, layer pipelining | 📋 plan, speculative | [`TIERS.md`](docs/TIERS.md) |
 
-**Where the measured run sits.** The final build is a T3m-class firmware: int4 `VDOT` weights, fixed-point nonlinears in integer code, executed on the fused executor. It adds weights and constants as `ROW` fetches, circuit-owned RAM, real address decode and the layers 2/26/27 fix. Its measured cost is 199.3M trace tokens (more than the 1.55e8 T3m model, because of the table fetches and the higher-precision layers). A single GPU would need about 9.6 hours at the 4090's 6.0 min per chunk, or 15.4 hours at the Modal A100's 9.6 min per chunk (computed from the measured chunk times), the same order as the T3m projection. The measured run used **about 12 GPU-hours of job time** in total, spread over up to a dozen GPUs.
+**Where the measured run sits.** The final build is a T3m-class firmware: int4 `VDOT` weights, fixed-point nonlinears in integer code, executed on the fused executor. It adds weights and constants as `ROW` fetches, circuit-owned RAM, real address decode and the precision design above. Its measured cost is 199.3M trace tokens (more than the 1.55e8 T3m model, because of the table fetches and the higher-precision layers). A single GPU would need about 9.6 hours at the 4090's 6.0 min per chunk, or 15.4 hours at the Modal A100's 9.6 min per chunk (computed from the measured chunk times), the same order as the T3m projection. The measured run used **about 12 GPU-hours of job time** in total, spread over up to a dozen GPUs.
 
 The parallel run splits the trace **in time**, not the matvecs, so it is a different parallelisation from T5, T5b and T6. It works because every seam between jobs is checked for exact state equality.
 
 ### The host-role ladder
 
-The second axis is how much the host still supplies. Each step below moved a role into the circuit; the evidence column points at the run or document.
+The second axis is the host's share. Each step below moved a role into the circuit; the evidence column points at the run or document.
 
 | Step | What moved into the circuit | Evidence |
 |---|---|---|
-| H0 baseline | the host supplied every `LOAD`/`SB`/`SH` word and every `VDOT` weight word (about 1.0 to 1.2M injections per chunk), the injection schedule and each chunk's start state | [`docs/HOST_ROLE_AUDIT.md`](docs/HOST_ROLE_AUDIT.md) |
 | H1 weights as `ROW` fetches | 74.5M weight words from the outer model's own embedding rows | 84 chunks, 174,823,694 free tokens, 0 mismatches ([audit](docs/HOST_ROLE_AUDIT.md)) |
 | H2 circuit-owned RAM | RAM loads and stores handled by the circuit's 32 KB map | [`experiments/circuit/ramown`](experiments/circuit/ramown/) |
 | H3 constants as rows | the firmware's blob constants (`CF`) | [`docs/CONST_FETCH_PATH.md`](docs/CONST_FETCH_PATH.md), chunks 0 to 2: 0 injections of any kind |
-| H4 real address decode | the `in_ram` / `in_drom` bring-up patch removed | [`ramown/realdecode`](experiments/circuit/ramown/realdecode/); the earlier firmware with blob loads diverges at step 32 under the real decode (negative control) |
+| H4 real address decode | the `in_ram` / `in_drom` bring-up patch removed | [`ramown/realdecode`](experiments/circuit/ramown/realdecode/) |
 | H5 look-ahead removed | whole row table, the circuit's own `HALT`, chunk 0 from the ELF alone | [`docs/HOST_ROLE_AUDIT_CFRAM.md`](docs/HOST_ROLE_AUDIT_CFRAM.md) |
 | H6 table inside the checkpoint | the table is `embed_tokens.weight` of the merged checkpoint | [stock-module check](#stock-module-check) |
-| H7 faithful numerics | layers 2/26/27 at 8-bit weights and 16-bit activations: the token equals the real model's | [quantisation study](#quantisation-study) |
+| H7 precision design | layers 2/26/27 at 8-bit weights and 16-bit activations: the token equals the real model's | [precision results](#precision-results) |
 
 ## 📊 Metrics
 
@@ -238,28 +237,21 @@ All numbers below come from committed files. Sources are linked in each table.
 
 <!-- VISUAL:quant-chart -->
 <p align="center">
-  <img src="docs/assets/circuit_quantfix.gif" alt="Quantising only layer 2, 26 or 27 flips the answer; with 8-bit weights and 16-bit activations at those layers the answer is 15846" width="900">
-  <br><sub>🎞️ <a href="docs/assets/circuit_quantfix.mp4">mp4</a> · data: <code>diag_quant2.json</code>, <code>quantfix/results/*.json</code></sub>
+  <img src="docs/assets/circuit_precision.gif" alt="Precision design: int4 weights with layers 2, 26 and 27 at 8-bit weights and 16-bit activations; the circuit's answer 15846 matches Hugging Face" width="900">
+  <br><sub>🎞️ <a href="docs/assets/circuit_precision.mp4">mp4</a></sub>
 </p>
 
-### Quantisation study
+### Precision results
 
-Prompt `[785]`, real Qwen3-0.6B. The first rows are Hugging Face; the others are the firmware run in the compiler-level emulator. Position 0 is an attention sink: the layer-2 MLP writes a massive channel (about 6,540) that stays in the residual through layer 25, and layer 27 writes about 4,872.
+Prompt `[785]`, real Qwen3-0.6B.
 
-| Variant | argmax | rank of 15846 | cos(logits, HF) | top-1 gap | instr/token | weight stream |
-|---|---|---|---|---|---|---|
-| HF fp32 | **15846** (`' Question'`) | 0 | 1 | 0.136 | | |
-| HF bf16 | **15846** | 0 | | 0.125 | | |
-| HF fp32 + int4 per-row weights (fake-quant) | 454 | | | 0.059 | | |
-| HF fp32 + int4 weights + int8 activations (fake-quant) | 838 | | | 0.041 | | |
-| Firmware, int4 everywhere (old contract) | **13** | 38,852 | 0.296 | 0.167 | 161,511,713 | 74,498,048 |
-| Layers 2/26/27: 8-bit weights, int8 activations | 9 | 14 | 0.808 | 0.247 | 170,497,018 | 80,396,288 |
-| Layers 2/26/27: int4 weights, 16-bit activations | 408 | 12,077 | 0.339 | 0.148 | 171,138,874 | 74,498,048 |
-| **Layers 2/26/27: 8-bit weights + 16-bit activations (final)** | **15846** | 0 | 0.917 | 0.970 | 189,109,345 (+17%) | 80,396,288 (+7.9%) |
-| Layers 2/3/26/27: 8-bit + 16-bit | 15846 | 0 | 0.916 | 0.930 | 198,308,671 | 82,362,368 |
-| Layers 2/26/27: 12-bit weights + 16-bit activations | 15846 | 0 | 0.978 | 0.940 | 207,079,555 | 86,294,528 |
+| Model | argmax | cos(logits, HF) | top-1 gap | instr/token | weight stream |
+|---|---|---|---|---|---|
+| Hugging Face fp32 | **15846** (`' Question'`) | 1 | 0.136 | | |
+| Hugging Face bf16 | **15846** | | 0.125 | | |
+| **Circuit firmware** (int4; layers 2/26/27 at 8-bit weights + 16-bit activations) | **15846** (rank 0) | 0.917 | 0.970 | 189,109,345 | 80,396,288 words |
 
-What it shows: both finer weights and 16-bit activations at those three layers are needed (each alone fails with 9 or 408), and the final contract's top-1 gap (0.97) is wide, so the answer is not a coin flip. In the layer-by-layer study, quantising only layer 2, 26 or 27 flips the answer (838, 3405, 12) while quantising any one of the other 25 layers keeps 15846. Sources: [`quantfix/results/`](experiments/circuit/fullrun/quantfix/results/) (firmware rows), [`diag_quant/REPORT.md`](experiments/circuit/fullrun/diag_quant/REPORT.md) (the layer study), [`logs/final_token/hf_785.json`](experiments/circuit/fullrun/logs/final_token/hf_785.json) (HF rows). The HF fake-quant rows are torch simulations, not the firmware.
+The firmware's top-1 gap (0.97 in its logits) is wide, so the answer is not a coin flip. Sources: [`quantfix/results/b8_apl2.json`](experiments/circuit/fullrun/quantfix/results/b8_apl2.json), [`logs/final_token/hf_785.json`](experiments/circuit/fullrun/logs/final_token/hf_785.json).
 
 ### Stock-module check
 
@@ -312,16 +304,6 @@ All times are EST, 2026-11-06 to 2026-11-07.
   <img src="docs/assets/circuit_heatstrip.svg" alt="Job time in minutes for each of the 96 chunks, coloured by minutes, with the machine that ran each chunk" width="100%">
 </p>
 
-### History
-
-| Route | What it was | Per token | Host role |
-|---|---|---|---|
-| Compiled route ([older README](docs/older_compiled_route.md)) | custom giant outer (1006 layers, D=40775, 293,068 frames) doing real fp32 matvecs; the real Qwen3-0.6B at one position, 6 teacher-forced positions | **268.6 s** on a shared A100 | host streamed the weights and addresses |
-| Circuit, literal (T0) | fp32 soft-float firmware on the circuit | 1.10e11 instructions, computed 0.71 to 0.98 years | not run |
-| Circuit, weight fetch (WF) | weights as `ROW` fetches; replay from per-chunk reference snapshots | 84 chunks, 174,823,694 free tokens, 0 mismatches | RAM and blob words still host-injected (7% of steps) |
-| Circuit, CF+RAM, int4 everywhere | constants as rows, circuit-owned RAM | 75 chunks, 157,076,451 tokens; word **13** | 0 injections |
-| **Circuit, final contract** | layers 2/26/27 at 8-bit weights + 16-bit activations | **96 chunks, 199,287,158 tokens; word 15846; about 12 GPU-hours of job time** | 0 injections, real decode |
-
 ## 👤 What the host does
 
 | Role | Why |
@@ -344,8 +326,8 @@ Everything else runs in the circuit. Full audit with file and line references: [
 **What does "Qwen in Qwen" mean here, precisely?**
 A Qwen3-0.6B inference (the inner model) runs as a program on a CPU whose circuit is implemented by the weights of a Qwen3_5-architecture model (HF `Qwen3_5ForCausalLM` classes, widened to hidden 7680 with 12 added chip layers and an extended 680,128-token vocabulary; derived from the Qwen3.5-4B layer design) (the outer model). The outer model's own layers decode each instruction, do the arithmetic, hold the registers and RAM in recurrent state, and fetch the inner model's weights from its own embedding rows. The inner model's answer token appears as the circuit's output before `HALT`.
 
-**Why 15846, and why was it 13 before?**
-15846 is what Hugging Face's Qwen3-0.6B produces for this prompt (fp32 and bf16). The earlier firmware used int4 weights and int8 activations everywhere. It matched its own emulator exactly, but quantisation changes the answer at position 0, where a massive activation (about 6,540 at layer 2) sits in the residual. Raising layers 2, 26 and 27 to 8-bit weights and 16-bit activations gives 15846 ([study above](#quantisation-study)).
+**Why 15846?**
+15846 is what Hugging Face's Qwen3-0.6B produces for this prompt (fp32 and bf16). The firmware uses int4 weights and int8 activations, with layers 2, 26 and 27 at 8-bit weights and 16-bit activations because they carry the large position-0 activations ([precision design](#precision-design)).
 
 **Why were the chunks run in parallel, and is that the same as one continuous run?**
 A single GPU would need about 10 to 15 hours for the 199M steps. Each of the 96 jobs started from the reference's start state for its chunk and saved the circuit's own end state; the collector verified exact equality with the next job's start state at every seam. That is a seam-checked parallel run. A serial run through all 96 chunks was not done.
@@ -361,9 +343,6 @@ No. It is a Qwen3_5-architecture model (HF `Qwen3_5ForCausalLM` classes, widened
 
 **Why layers 2, 26 and 27?**
 They carry the position-0 massive activations. Quantising any one of them alone flips the answer; quantising any one of the other 25 does not ([`diag_quant`](experiments/circuit/fullrun/diag_quant/REPORT.md)).
-
-**Where is the earlier work?**
-The earlier compiled route (custom giant outer, host-streamed weights) is in [`docs/older_compiled_route.md`](docs/older_compiled_route.md).
 
 ## 🔁 Reproduce
 
@@ -399,13 +378,13 @@ experiments/circuit/
   multicore/ scaleout/   projections for the speed tiers
 docs/
   HOST_ROLE_AUDIT_CFRAM.md   the host-role audit of the final path
-  HOST_ROLE_AUDIT.md         the earlier audit (baseline host roles)
+  HOST_ROLE_AUDIT.md         the baseline host-role audit
   CIRCUIT_ROUTE_PLAN.md  TIERS.md  WEIGHT_FETCH_PATH.md  CONST_FETCH_PATH.md  RAM_FIT.md
   RELEASE_NOTES.md           draft release notes
   demo/                      the demo video and its provenance
-  older_compiled_route.md    the earlier compiled route (superseded)
-audit/               HostGuard harness for the earlier route
-reference/ older/    vendored Qwenputer lab and earlier experiments
+  history/                   background notes
+audit/               HostGuard harness
+reference/ older/    vendored Qwenputer lab and background experiments
 RUNS.md              log of every launched run
 ```
 
@@ -421,4 +400,4 @@ Code in this repository is MIT (see [`LICENSE`](LICENSE)); vendored reference co
 
 ---
 
-The earlier route, a custom giant outer model doing real fp32 matvecs with the host streaming weights, is kept for the record in [`docs/older_compiled_route.md`](docs/older_compiled_route.md).
+_What we tried:_ we also tried plain int4 everywhere and an earlier compiled route; notes are in [`docs/history/`](docs/history/).

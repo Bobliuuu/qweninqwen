@@ -1,5 +1,5 @@
 """Generates the hand-laid-out static figures in docs/assets/ as PNG (needs rsvg-convert on PATH; no SVG files are kept).
-Run: python docs/make_figures.py. Animated/launch media: docs/launch/make_media.py."""
+Run: python docs/history/make_figures.py. Animated/launch media: docs/history/launch/make_media.py (history: earlier compiled route)."""
 import os, math
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
 

@@ -3,8 +3,8 @@
   circuit_hero        10 s  the whole idea (schematic layout; layer widths, counts and the answer are real)
   circuit_one_token   24 s  how the single token is generated: whole run -> chunk 0 -> 18 real trace tokens -> 28 layers -> HALT -> 15846
   circuit_seam_grid   11 s  96 chunk jobs, 95 seams (replay of real per-job durations as if all started together)
-  circuit_quantfix    13 s  why the first answer was 13 and what fixed it
-usage: python3 make_anim.py [hero|one_token|seam_grid|quantfix ...] [--stills]   (needs Pillow + ffmpeg)"""
+  circuit_precision   10 s  mixed precision of the 28 layers (layers 2/26/27 at 8-bit weights + 16-bit activations)
+usage: python3 make_anim.py [hero|one_token|seam_grid|precision ...] [--stills]   (needs Pillow + ffmpeg)"""
 import json, os, sys, statistics
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 from anim_lib import *
@@ -168,7 +168,7 @@ def one_token(t):
         text(d, 160, 330, f'{commas(round(g * T))} of {commas(T)} trace tokens', 30, INK, 'Semibold')
         la = smooth(P(tt, 2.5, 3.2))
         text(d, 160, 640, f'layer 2:  {span_text(0, 0).split(" ")[0] if False else commas(SPAN[2])} trace tokens', 28, ACCD, 'Semibold', alpha=la); text(d, 160, 684, f'a plain layer:  about {commas(round(plain))}', 28, G1, alpha=la)
-        text(d, 1000, 640, f'layers 2, 26, 27 take about {SPAN[2] / plain:.1f}x the trace tokens of a plain layer', 28, INK, alpha=la); text(d, 1000, 684, '(8-bit weights, 16-bit activations: the fix that gives 15846)', 24, G1, alpha=la)
+        text(d, 1000, 640, f'layers 2, 26, 27 take about {SPAN[2] / plain:.1f}x the trace tokens of a plain layer', 28, INK, alpha=la); text(d, 1000, 684, '(8-bit weights, 16-bit activations)', 24, G1, alpha=la)
         text(d, 160, 760, f'LM head: {commas(SPAN[28])} trace tokens = {SPAN[28] / T * 100:.0f}% of the run', 28, INK, alpha=la)
         foot(d)
     else:            # 5 final
@@ -216,37 +216,37 @@ def seam_grid(t):
     text(d, W / 2 + 200, 1040, 'a seam is exact when registers, pc, anchor, n, wb, latch, all 8,192 RAM words and bn match', 20, G2, 'Regular', 'mm', alpha=a)
     return img
 
-# ============================ QUANT FIX ============================
-dq = J(os.path.join(FR, 'diag_quant', 'diag_quant2.json')); LAY = [(dq[f'W4+act ONLY layer {l}']['cos_final'], dq[f'W4+act ONLY layer {l}']['argmax']) for l in range(28)]
-QR = os.path.join(FR, 'quantfix', 'results'); QF = {n: J(os.path.join(QR, n + '.json')) for n in ('ctrl_w4', 'b8_apl1', 'w4_apl2only', 'b8_apl2', 'b12_apl2')}
-HFARG = J(os.path.join(FR, 'diag_quant', 'diag_quant.json'))['hf_argmax']; assert HFARG == 15846 and QF['ctrl_w4']['argmax_fw'] == 13 and QF['b8_apl2']['argmax_fw'] == 15846
-INSTR = QF['b8_apl2']['instr'][0] / QF['ctrl_w4']['instr'][0] - 1
-def quantfix(t):
+# ============================ PRECISION ============================
+QR = os.path.join(FR, 'quantfix', 'results'); QB = J(os.path.join(QR, 'b8_apl2.json'))
+INSTR_TOK = QB['instr'][0]; WROM_WORDS = QB['blob']['wrom_words']; assert QB['argmax_fw'] == 15846 and (INSTR_TOK, WROM_WORDS) == (189109345, 80396288)
+assert J(os.path.join(FR, 'diag_quant', 'diag_quant.json'))['hf_argmax'] == 15846
+def precision(t):
     img, d = new()
-    text(d, 120, 70, 'Why the first answer was 13', 46, INK, 'Bold'); text(d, 120, 132, 'quantise one layer at a time (int4 weights, int8 activations) and watch the answer', 24, G1)
-    x0, x1, yb, ytop = 130, 1180, 860, 330; bw = (x1 - x0) / 28
-    text(d, x0, 290, 'cosine of the final hidden state vs fp32', 22, G1, 'Medium')
-    for v in (0.75, 0.8, 0.9, 1.0):
-        yy = yb - (v - .75) / .25 * (yb - ytop); line(d, x0 - 6, yy, x1, yy, G4, 2); text(d, x0 - 16, yy, f'{v:.2f}', 18, G2, 'Regular', 'rm')
-    for l, (cs, am) in enumerate(LAY):
-        a = smooth(P(t, .4 + l * .07, .7 + l * .07)); h = (cs - .75) / .25 * (yb - ytop) * a; bad = am != HFARG
-        rr(d, x0 + l * bw + 4, yb - h, x0 + (l + 1) * bw - 4, yb, 6, ACC if bad else ACCM, None)
-        text(d, x0 + l * bw + bw / 2, yb + 22, str(l), 16, ACC if bad else G2, 'Semibold' if bad else 'Regular', 'mm')
-        if bad and a > .9: text(d, x0 + l * bw + bw / 2, yb - h - 20, str(am), 24, ACC, 'Bold', 'mm', alpha=smooth(P(t, 2.6 + l * .02, 3.2)))
-    text(d, x0, yb + 62, 'layer index', 18, G2); text(d, x1, yb + 62, "the answer flips only when layer 2, 26 or 27 is quantised (position 0 is an attention sink)", 20, G1, 'Regular', 'ra', alpha=smooth(P(t, 2.8, 3.5)))
-    px = 1250; text(d, px, 290, 'the answer for prompt 785', 22, G1, 'Medium', alpha=smooth(P(t, 4.2, 4.8)))
-    VAR = [('Hugging Face fp32 / bf16', HFARG, True), ('int4 everywhere (old firmware)', QF['ctrl_w4']['argmax_fw'], False), ('layers 2/26/27: 8-bit weights, int8 acts', QF['b8_apl1']['argmax_fw'], False),
-           ('layers 2/26/27: int4 weights, 16-bit acts', QF['w4_apl2only']['argmax_fw'], False), ('layers 2/26/27: 8-bit weights + 16-bit acts', QF['b8_apl2']['argmax_fw'], True), ('layers 2/26/27: 12-bit weights + 16-bit acts', QF['b12_apl2']['argmax_fw'], True)]
-    for i, (lab, am, ok) in enumerate(VAR):
-        a = smooth(P(t, 4.6 + i * .9, 5.3 + i * .9)); yy = 340 + i * 82 + (1 - a) * 14; hl = i == 4
-        rr(d, px, yy, 1800, yy + 66, 14, ACC if hl else (ACCL if ok else WHITE), None if hl else (ACCM if ok else G3), 2, a)
-        text(d, px + 20, yy + 33, lab, 21, WHITE if hl else INK, 'Semibold' if hl else 'Regular', 'lm', alpha=a); text(d, 1780, yy + 33, str(am), 30, WHITE if hl else (ACC if ok else G1), 'Bold', 'rm', alpha=a)
-    a = smooth(P(t, 10.2, 11.0)); text(d, px, 860, f'both knobs are needed · +{INSTR * 100:.1f}% instructions', 24, INK, 'Semibold', alpha=a)
-    text(d, px, 898, f"the run with the fix ends in 15846, Qwen3-0.6B's own token", 22, ACC, 'Medium', alpha=a)
-    text(d, W / 2, 1030, 'Emulator runs of the real integer firmware at the compiler level, one prompt token. Sources: diag_quant2.json, quantfix/results/*.json', 20, G2, 'Regular', 'mm')
+    text(d, 120, 70, 'Mixed precision, one answer', 46, INK, 'Bold'); text(d, 120, 132, 'Qwen3-0.6B runs as int4 weights; three layers carry more precision', 24, G1)
+    x0, x1, y0, h = 130, 1790, 330, 150; bw = (x1 - x0) / 28
+    text(d, x0, 290, '28 layers of Qwen3-0.6B', 22, G1, 'Medium')
+    for l in range(28):
+        a = smooth(P(t, .3 + l * .04, .6 + l * .04)); big = l in BIG; hl = smooth(P(t, 2.6 + (0.25 if big else 0), 3.4 + (0.25 if big else 0))) if big else 0
+        xa, xb = x0 + l * bw + 3, x0 + (l + 1) * bw - 3; base = mix(ACCM, a)
+        rr(d, xa, y0 + (1 - a) * 20, xb, y0 + h + (1 - a) * 20, 8, ACCM if not big else (int(lerp(ACCM[0], ACCD[0], hl)), int(lerp(ACCM[1], ACCD[1], hl)), int(lerp(ACCM[2], ACCD[2], hl))), None, alpha=a)
+        text(d, (xa + xb) / 2, y0 + h + 30 + (1 - a) * 20, str(l), 16, ACC if big else G2, 'Semibold' if big else 'Regular', 'mm', alpha=a)
+    text(d, x0, y0 + h + 76, 'int4 weights, int8 activations', 22, G1, alpha=smooth(P(t, 1.8, 2.4)))
+    ca = smooth(P(t, 3.2, 4.0))
+    for l in BIG:
+        cx = x0 + (l + .5) * bw; line(d, cx, y0 + h + 52, cx, y0 + h + 130, ACC, 3, ca)
+    rr(d, 560, y0 + h + 130, 1420, y0 + h + 214, 18, ACC, None, 2, ca)
+    text(d, 990, y0 + h + 172, 'layers 2 · 26 · 27: 8-bit weights + 16-bit activations', 32, WHITE, 'Semibold', 'mm', alpha=ca)
+    na = smooth(P(t, 5.0, 5.8))
+    for i, (big_, lab) in enumerate([(commas(INSTR_TOK), 'instructions per token (ctx 1)'), (commas(WROM_WORDS), 'weight words (8 int4 cells each)')]):
+        x = 130 + i * 560; y = 700
+        rr(d, x, y, x + 520, y + 150, 20, WHITE, G3, 2, na); text(d, x + 30, y + 44, big_, 52, INK, 'Bold', alpha=na); text(d, x + 30, y + 106, lab, 24, G1, alpha=na)
+    fa = smooth(P(t, 7.6, 8.6)); rr(d, 1260, 700, 1790, 850, 20, ACCL, ACCM, 2, fa)
+    text(d, 1290, 748, '15846', 56, ACC, 'Bold', alpha=fa); text(d, 1290, 818, "matches Hugging Face's Qwen3-0.6B", 24, INK, 'Semibold', alpha=fa)
+    ga = smooth(P(t, 8.2, 9.0)); text(d, 1700 if False else 1760, 748, '✓', 56, ACC, 'Bold', 'ra', alpha=ga) if False else None
+    text(d, W / 2, 1030, 'Emulator figures for the final firmware (one prompt token). Sources: quantfix/results/b8_apl2.json, diag_quant.json', 20, G2, 'Regular', 'mm')
     return img
 
-SCENES = {'hero': (hero, 10.0), 'one_token': (one_token, ONE_TOKEN_S), 'seam_grid': (seam_grid, 11.0), 'quantfix': (quantfix, 13.0)}
+SCENES = {'hero': (hero, 10.0), 'one_token': (one_token, ONE_TOKEN_S), 'seam_grid': (seam_grid, 11.0), 'precision': (precision, 10.5)}
 if __name__ == '__main__':
     want = [a for a in sys.argv[1:] if not a.startswith('--')] or list(SCENES)
     if '--stills' in sys.argv:

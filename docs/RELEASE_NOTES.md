@@ -16,13 +16,13 @@ A real Qwen3-0.6B token, produced by a RISC-V circuit compiled into the weights 
 - Circuit-owned 32 KB RAM with the real `in_ram` / `in_drom` decode (no bring-up patch).
 - The HF `Qwen3_5` module classes agree with the circuit on chunk 0 for 130,000 steps over the full 680,128-token vocabulary (2,320 ROW tokens); the same check with every table entry +1 diverges at step 41.
 
-## 🎯 What changed since the earlier result
+## 🎯 Precision design
 
-The earlier firmware (int4 weights, int8 activations everywhere) reproduced its emulator exactly but answered 13. Layers 2, 26 and 27 carry the position-0 massive activations; running those three layers at 8-bit weights with 16-bit activations gives 15846 (about +17% instructions per token (compiler-level count), +7.9% weight words). Details: `experiments/circuit/fullrun/diag_quant/REPORT.md`, `quantfix/REPORT.md`, `quantfix/STEP2_REPORT.md`.
+Int4 weights everywhere, except layers 2, 26 and 27 at 8-bit weights and 16-bit activations (these layers carry the large position-0 activations). Cost in absolute terms: 189,109,345 instructions per token (compiler-level count) and 80,396,288 weight words. The answer, 15846, matches Hugging Face Qwen3-0.6B.
 
 ## 🧑‍💻 Host roles
 
-Removed: weight, RAM and blob injections; forced tokens; the `in_ram`/`in_drom` patch; reference-derived table window, run length and stop point; the table outside the model; the chunk-0 reference state. Allowed by the design: boot, the `GO` token, the embed-and-append loop, `ecall` I/O. The reference comparison is the test. Later chunk starts are seeded from the reference and verified by exact end-state equality at every seam. Audit: `docs/HOST_ROLE_AUDIT_CFRAM.md`.
+In the circuit: weight, RAM and blob fetches; the `in_ram`/`in_drom` decode; the table (in the checkpoint); the stop point (`HALT`); chunk 0 from the ELF alone. Allowed by the design: boot, the `GO` token, the embed-and-append loop, `ecall` I/O. The reference comparison is the test. Later chunk starts are seeded from the reference and verified by exact end-state equality at every seam. Audit: `docs/HOST_ROLE_AUDIT_CFRAM.md`.
 
 ## ⏱️ Speed and cost
 

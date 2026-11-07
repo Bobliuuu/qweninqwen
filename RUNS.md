@@ -1,4 +1,4 @@
-- **SUMMARY 2026-11-07:** final-contract CF+RAM run on the circuit PASSED: 96/96 chunk jobs clean, 95/95 exact seams, 0 mismatches / 0 forced / 0 host injections, circuit's own HALT, word 15846 = Hugging Face Qwen3-0.6B's token (the old int4 firmware gave 13). Verdict: experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json. Run detail below.
+- **SUMMARY 2026-11-07:** final-contract CF+RAM run on the circuit PASSED: 96/96 chunk jobs clean, 95/95 exact seams, 0 mismatches / 0 forced / 0 host injections, circuit's own HALT, word 15846 = Hugging Face Qwen3-0.6B's token. Verdict: experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json. Run detail below.
 
 # Run log
 

@@ -1,10 +1,10 @@
 """Generates every launch visual (PNG, GIF, MP4) for the README and the tweet thread.
 
-Run from the repo root:  python docs/launch/make_media.py [png] [gif] [video]   (default: all)
+Run from the repo root:  python docs/history/launch/make_media.py [png] [gif] [video]   (default: all)
 Needs: Pillow, numpy, matplotlib (only for its bundled DejaVu fonts), ffmpeg on PATH for mp4.
 
 Honesty rules baked in:
-  * every measured number is read from experiments/vslice/logs/*.json at render time (see docs/launch/PROVENANCE.md);
+  * every measured number is read from experiments/vslice/logs/*.json at render time (see docs/history/launch/PROVENANCE.md);
   * panels that show a mechanism (state memory, pipeline, tournament, hero) are drawn as ILLUSTRATIONS and say so on screen;
   * pending results live in STATUS below. Flip a value there, re-run, and every figure/video follows (see UPDATING.md).
 """
@@ -14,13 +14,13 @@ from PIL import Image, ImageDraw, ImageFont
 import matplotlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
-ASSETS = os.path.join(ROOT, 'docs', 'assets')
+ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
+ASSETS = os.path.join(ROOT, 'docs', 'history', 'assets')
 LOGS = os.path.join(ROOT, 'experiments', 'vslice', 'logs')
 os.makedirs(ASSETS, exist_ok=True)
 
 # ----------------------------------------------------------------------------- status (flip these when results land)
-# values: 'done' | 'in progress'.  Keep in sync with the README status table (docs/launch/UPDATING.md).
+# values: 'done' | 'in progress'.  Keep in sync with the README status table (docs/history/launch/UPDATING.md).
 STATUS = {
     'free_running': 'in progress',   # free-running generation vs HF greedy
     'hostguard':    'in progress',   # HostGuard audit of the real driver
@@ -281,7 +281,7 @@ def sc_result(c, p):
                            '    KV scratch truncation, lm_head eval through 36 columns',
                            'speed: untuned fp32, ~4.5 minutes per token (speedup work: ' + STATUS['speedup'] + ')']):
         c.text(80, 512 + i * 30, t, 18, fade(FG, b))
-    foot(c, 'Source: experiments/vslice/logs/res_vs2_real151936_L28(_tok1).json and real_L28_gen.log (see docs/launch/PROVENANCE.md)')
+    foot(c, 'Source: experiments/vslice/logs/res_vs2_real151936_L28(_tok1).json and real_L28_gen.log (see docs/history/launch/PROVENANCE.md)')
 
 # cost chart ---------------------------------------------------------------------------------------------
 def sc_cost(c, p=1.0):
@@ -463,7 +463,7 @@ def flow_png(name):
         else: pts = [(xa + bw / 2, ya + bh if yb_ > ya else ya), (xb + bw / 2, yb_ - 3 if yb_ > ya else yb_ + bh + 3)]
         c.arrow(pts, MUT, 2.5, 10)
         if t: c.text((pts[0][0] + pts[-1][0]) / 2, (pts[0][1] + pts[-1][1]) / 2 - 12, t, 14, MUT, anchor='mm')
-    c.text(30, H - 24, 'Rendered from the same node/edge list as the mermaid block in the README (docs/launch/make_media.py).', 13, MUT)
+    c.text(30, H - 24, 'Rendered from the same node/edge list as the mermaid block in the README (docs/history/launch/make_media.py).', 13, MUT)
     c.out((int(W * 1.6), int(H * 1.6))).save(os.path.join(ASSETS, name + '.png'), optimize=True)
     open(os.path.join(ASSETS, name + '.mmd'), 'w').write(mermaid(name) + '\n')
 

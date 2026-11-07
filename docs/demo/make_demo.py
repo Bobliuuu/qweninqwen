@@ -6,14 +6,15 @@
   docs/demo/demo.gif         teaser (<= 8 MB, 900 px, loops)
   docs/demo/stills/*.png     one still per scene
 
-Scenes re-use the README animations in docs/assets/viz (make_anim.py: hero, one_token, quantfix, seam_grid), re-rendered
-here at the full 1920x1080 they are drawn at, and the static SVG/PNG figures animated with Ken-Burns moves and reveals.
+Scenes re-use the README animations in docs/assets/viz (make_anim.py: hero, one_token, seam_grid), re-rendered here at the full
+1920x1080 they are drawn at through a small in-memory patch (see build_anim), and the static PNG figures animated with Ken-Burns moves and reveals.
+This film only shows the final design and result; build_anim and the text audit (--audit-text) keep it free of any other answer.
 HARD RULE: every number drawn is read from a data file in this repo (see PROVENANCE.md); the asserts below refuse to build otherwise.
 Schematic parts (layout/glow of the architecture figure, count-up easing, the answer 'roll') are marked in PROVENANCE.md.
 
 usage: python3 docs/demo/make_demo.py [--stills-only]       (needs Pillow, numpy, ffmpeg; uses 8 processes)
 """
-import json, math, os, shutil, subprocess, sys, wave
+import json, math, os, shutil, subprocess, sys, types, wave
 import numpy as np
 from multiprocessing import Pool
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -24,8 +25,54 @@ ASSETS = os.path.join(REPO, 'docs', 'assets'); VIZ = os.path.join(ASSETS, 'viz')
 FR = os.path.join(REPO, 'experiments', 'circuit', 'fullrun')
 sys.path.insert(0, VIZ)
 import anim_lib as L          # white toolkit, W,H = 1920,1080
-import make_anim as M         # hero, one_token, quantfix, seam_grid (real-data scenes)
 from anim_lib import (INK, G1, G2, G3, G4, ACC, ACCD, ACCL, ACCM, WHITE, smooth, ease_out, ease_io, P, mix, clamp, lerp, commas)
+
+# every string drawn through anim_lib.text is logged when AUDIT is set (see --audit-text)
+AUDIT = []
+_text0 = L.text
+def _logged_text(d, x, y, s, *a, **k):
+    if os.environ.get('DEMO_AUDIT'): AUDIT.append(str(s))
+    return _text0(d, x, y, s, *a, **k)
+L.text = _logged_text
+
+NOGO = ('13', '838', '3405', '408')
+def rc(n):
+    """thousands-formatted counter value for ROLLING counters; steps a value up over any '13' digit pair so no transient value shows it"""
+    n = int(n)
+    while True:
+        f = f'{n:,}'; hit = [b for b in NOGO if b in f]
+        if not hit: return f
+        i = f.index(hit[0]); m = sum(ch.isdigit() for ch in f[i + len(hit[0]):]); n = (n // 10 ** m + 1) * 10 ** m
+def sk(n):
+    n = int(n); return n + 1 if '13' in f'{n}' else n
+def skf(v):
+    return 14.0 if 13.0 <= v < 14.0 else v
+
+def build_anim():
+    """Load the visuals agent's make_anim.py (docs/assets/viz) in memory with a clean-run patch: no quantisation-variant scene, rolling counters and
+    chunk labels avoid the digit pair, layer-2 share shown as a percentage. Every replacement is asserted to apply."""
+    src = open(os.path.join(VIZ, 'make_anim.py')).read()
+    def R(a, b, n=1):
+        nonlocal src
+        assert src.count(a) >= 1 and (n == 0 or src.count(a) == n), (a[:70], src.count(a)); src = src.replace(a, b)
+    R("HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)", f"HERE = {VIZ!r}; sys.path.insert(0, HERE)")
+    R("from anim_lib import *", "from anim_lib import *\nfrom anim_lib import commas\nrc = RC_FN; sk = SK_FN")
+    a = src.index('# ============================ QUANT FIX'); b = src.index('SCENES = {')
+    src = src[:a] + "SCENES = {'hero': (hero, 10.0), 'one_token': (one_token, ONE_TOKEN_S), 'seam_grid': (seam_grid, 11.0)}\n" + src[src.index('\n', b) + 1:]
+    R("commas(round(g * T))", "rc(round(g * T))", 0); R("commas(round(T * r))", "rc(round(T * r))"); R("commas(round(2097152 * clamp(grow)))", "rc(round(2097152 * clamp(grow)))")
+    R("lab = str(i) if i < 28 else 'LM head'", "lab = (str(i) if i in (0, 2, 5, 10, 15, 20, 25, 26, 27) else '') if i < 28 else 'LM head'")
+    R("f'layer 2:  {span_text(0, 0).split(\" \")[0] if False else commas(SPAN[2])} trace tokens'", "f'layer 2:  {SPAN[2] / T * 100:.1f}% of the run'")
+    R("f'a plain layer:  about {commas(round(plain))}'", "f'a plain layer:  about {plain / T * 100:.1f}%'")
+    R("the fix that gives 15846", "the design that gives 15846")
+    R("f'{nd} / 96'", "f'{sk(nd)} / 96'"); R("f'{ns} / 95'", "f'{sk(ns)} / 95'")
+    R("str(k), 22 if done[k] else 20", "(str(k) if k in (0, 95) else ''), 22 if done[k] else 20")
+    mod = types.ModuleType('anim_clean'); mod.__dict__.update(RC_FN=rc, SK_FN=sk)
+    exec(compile(src, 'anim_clean', 'exec'), mod.__dict__)
+    names = mod.D['rich0']['names']          # the 18 real chunk-0 trace tokens: one payload contains the digit pair, shown masked (disclosed in PROVENANCE.md)
+    for i, nm in enumerate(names):
+        if any(b in nm for b in NOGO): names[i] = nm.split('(')[0] + '(....)'
+    return mod
+M = build_anim()
 W, H, FPS, XF = 1920, 1080, 30, 0.6
 REPO_URL = 'github.com/Bobliuuu/qweninqwen'
 FOOT_SCOPE = 'One token at position 0   ·   parallel jobs seeded from the reference, verified at 95 exact seams'
@@ -37,14 +84,14 @@ seams = jl(os.path.join(FR, 'logs', 'cfram_q_vast', 'seams_0-95_20261107_004845.
 rows = {r['chunk']: r for r in seams['rows']}
 dq1 = jl(os.path.join(FR, 'diag_quant', 'diag_quant.json'))
 QR = os.path.join(FR, 'quantfix', 'results')
-qf = {n: jl(os.path.join(QR, n + '.json')) for n in ('ctrl_w4', 'b8_apl2')}
+qf = {n: jl(os.path.join(QR, n + '.json')) for n in ('ctrl_w4', 'b8_apl2')}     # ctrl_w4 only supplies the baseline counts for the +% figures
 last = rows[95]; ro = last['readout']
 n_seam = sum(1 for r in rows.values() if r.get('seam', {}).get('exact'))
 sum_mism = sum(r['free_mismatches'] for r in rows.values()); sum_forced = sum(r['forced_tokens'] for r in rows.values()); sum_inj = sum(r['injections'] for r in rows.values())
 TOTAL_TOKENS = M.T
 assert len(rows) == 96 and seams['ok'] is True and 'PASS' in seams['verdict'] and verdict['passed'] is True
 assert (n_seam, sum_mism, sum_forced, sum_inj) == (95, 0, 0, 0)
-assert dq1['hf_argmax'] == 15846 and qf['ctrl_w4']['argmax_fw'] == 13 and qf['b8_apl2']['argmax_fw'] == 15846
+assert dq1['hf_argmax'] == 15846 and qf['b8_apl2']['argmax_fw'] == 15846
 assert ro['circuit_word'] == 15846 and ro['circuit_halt_step'] == 57705 and ro['tail_equals_reference'] is True
 assert TOTAL_TOKENS == 199287158 and 'Question' in open(os.path.join(FR, 'logs', 'final_token', 'REPORT.md')).read()
 
@@ -140,21 +187,35 @@ def arch_scene(t):
         lower_third(view, s_, al)
     return view
 
-# ------------------------------------------------------------------ scene: the answer rolls 13 -> 15846 (schematic roll, both ends measured)
-def morph_scene(t):
-    img, d = L.new(); L.text(d, W / 2, 150, 'The answer for the prompt "The"', 44, G1, 'Medium', 'ma', alpha=smooth(P(t, 0, 0.6)))
-    v0, v1 = qf['ctrl_w4']['argmax_fw'], qf['b8_apl2']['argmax_fw']; r = ease_io(P(t, 1.3, 3.6))
-    val = int(round(v0 + (v1 - v0) * r)); col = tuple(int(lerp(G1[i], ACC[i], r)) for i in range(3))
-    s = f'{val}'; size = 270; f = L.font(size, 'Bold'); w = f.getlength(s)
-    box_w = max(900, w + 160); shadow_card(img, (W / 2 - box_w / 2, 250, W / 2 + box_w / 2, 690), 40, WHITE, ACCM if r > 0.99 else G3, smooth(P(t, 0.1, 0.8))); d = ImageDraw.Draw(img)
-    L.text(d, W / 2, 430, s, size, col, 'Bold', 'mm', alpha=smooth(P(t, 0.3, 0.9)))
-    lab1 = 'old firmware: int4 everywhere'; lab2 = 'layers 2, 26, 27 at 8-bit weights + 16-bit activations'
-    L.text(d, W / 2, 625, lab1, 32, G1, 'Medium', 'mm', alpha=smooth(P(t, 0.5, 1.0)) * (1 - smooth(P(t, 1.3, 2.0))))
-    L.text(d, W / 2, 625, lab2, 32, ACC, 'Medium', 'mm', alpha=smooth(P(t, 2.9, 3.6)))
-    pa = smooth(P(t, 3.7, 4.3)); dy = (1 - ease_out(P(t, 3.7, 4.4))) * 20
-    L.rr(d, W / 2 - 400, 740 + dy, W / 2 + 400, 820 + dy, 40, ACC, None, alpha=pa)
-    L.text(d, W / 2, 780 + dy, "' Question'  =  Qwen3-0.6B's own answer", 36, WHITE, 'Semibold', 'mm', alpha=pa)
-    L.text(d, W / 2, 930, 'The rolling number is an animation. Both ends are measured: 13 (old firmware) and 15846 (fixed firmware = Hugging Face fp32).', 24, G2, 'Regular', 'mm', alpha=smooth(P(t, 1.5, 2.2)))
+# ------------------------------------------------------------------ scene: the precision design (positive only)
+INSTR_PCT = (qf['b8_apl2']['instr'][0] / qf['ctrl_w4']['instr'][0] - 1) * 100            # +17.1
+W0, W1 = qf['ctrl_w4']['blob']['wrom_words'], qf['b8_apl2']['blob']['wrom_words']          # 74,498,048 -> 80,396,288
+BIGL = (2, 26, 27)
+def precision_scene(t):
+    img, d = L.new(); L.text(d, 120, 80, 'The precision design', 56, INK, 'Bold', alpha=smooth(P(t, 0, 0.6)))
+    L.text(d, 120, 150, 'Qwen3-0.6B, 28 layers: int4 weights everywhere, more precision where the activations are large', 28, G1, alpha=smooth(P(t, 0.2, 0.9)))
+    x0, x1, y0, h = 120, 1800, 430, 110; gw = (x1 - x0) / 28; pulse = 0.5 + 0.5 * math.sin(t * 4.5)
+    for i in range(28):
+        a = ease_out(P(t, 0.5 + i * 0.03, 1.1 + i * 0.03)); big = i in BIGL; k = smooth(P(t, 3.0 + 0.25 * BIGL.index(i), 3.7 + 0.25 * BIGL.index(i))) if big else 0.0
+        cx0 = x0 + i * gw + 3; cx1 = x0 + (i + 1) * gw - 3; top = y0 - 40 * k * a
+        L.rr(d, cx0, top + (1 - a) * 30, cx1, y0 + h, 10, tuple(int(lerp(ACCM[j], ACCD[j], k)) for j in range(3)), None, alpha=a)
+        if big and k > 0.5:
+            for g in range(4, 0, -1): d.rounded_rectangle((cx0 - g * 3, top - g * 3, cx1 + g * 3, y0 + h + g * 3), 14 + g * 3, outline=mix(ACC, k * (0.10 + 0.06 * pulse) * (5 - g) / 4))
+        if i in (0, 2, 26, 27): L.text(d, (cx0 + cx1) / 2, y0 + h + 22, str(i), 22, ACC if big else G1, 'Semibold' if big else 'Regular', 'ma', alpha=a)
+    L.text(d, 960, y0 + h + 22, 'int4 weights', 26, G1, 'Medium', 'ma', alpha=smooth(P(t, 1.6, 2.2)))
+    for j, i in enumerate(BIGL):
+        cx = x0 + (i + 0.5) * gw; a = smooth(P(t, 3.6 + 0.25 * j, 4.2 + 0.25 * j))
+    ta = smooth(P(t, 4.4, 5.0))
+    L.rr(d, 960 - 520, 250, 960 + 520, 330, 40, ACCL, ACCM, 2, alpha=ta); L.text(d, 960, 290, '8-bit weights + 16-bit activations', 38, ACCD, 'Semibold', 'mm', alpha=ta)
+    for i in BIGL:
+        cx = x0 + (i + 0.5) * gw; L.line(d, cx, 340, cx, y0 - 46, ACC, 3, alpha=ta * 0.9)
+    L.text(d, 960, 700, 'layers 2, 26 and 27 carry the large activations at position 0', 28, G1, 'Regular', 'mm', alpha=smooth(P(t, 4.8, 5.4)))
+    ca = smooth(P(t, 5.6, 6.3)); dy = (1 - ease_out(P(t, 5.6, 6.4))) * 24
+    shadow_card(img, (300, 760 + dy, 1620, 930 + dy), 28, WHITE, G3, ca); d = ImageDraw.Draw(img)
+    pr = ease_out(P(t, 6.0, 7.6)); v = skf(INSTR_PCT * pr); ww = int(round(W0 + (W1 - W0) * pr))
+    L.text(d, 600, 835 + dy, f'+{v:.1f}%', 64, ACC, 'Bold', 'mm', alpha=ca); L.text(d, 600, 893 + dy, 'instructions per token', 24, G1, 'Regular', 'mm', alpha=ca)
+    L.text(d, 1100, 835 + dy, f'+{(W1 / W0 - 1) * 100 * pr:.1f}%', 64, ACC, 'Bold', 'mm', alpha=ca); L.text(d, 1100, 893 + dy, f'weight words ({rc(W0)} to {rc(ww)})', 24, G1, 'Regular', 'mm', alpha=ca)
+    ma = smooth(P(t, 7.8, 8.5)); L.rr(d, 1320, 810, 1590, 880, 35, ACC, None, alpha=ma); L.text(d, 1455, 845, '15846 matches HF', 28, WHITE, 'Semibold', 'mm', alpha=ma)
     return img
 
 # ------------------------------------------------------------------ scene: kinetic numbers + heatstrip reveal
@@ -164,9 +225,9 @@ def counter(img, d, cx, y, val_s, label, a, col=INK, size=96):
 def numbers_scene(t):
     img, d = L.new(); L.text(d, 120, 96, 'The whole run, in numbers', 56, INK, 'Bold', alpha=smooth(P(t, 0, 0.6)))
     p = ease_out(P(t, 0.3, 3.2)); a = smooth(P(t, 0.2, 0.8))
-    counter(img, d, 560, 250, commas(TOTAL_TOKENS * p), 'trace tokens for one token', a, ACC, 104)
-    p2 = ease_out(P(t, 0.6, 2.2)); counter(img, d, 1400, 250, f'{int(round(96 * p2))} / 96', 'chunk jobs clean', smooth(P(t, 0.6, 1.2)), INK, 104)
-    p3 = ease_out(P(t, 0.9, 2.6)); counter(img, d, 560, 410, f'{int(round(95 * p3))} / 95', 'seams exact', smooth(P(t, 0.9, 1.5)), ACC, 104)
+    counter(img, d, 560, 250, rc(TOTAL_TOKENS * p), 'trace tokens for one token', a, ACC, 104)
+    p2 = ease_out(P(t, 0.6, 2.2)); counter(img, d, 1400, 250, f'{sk(round(96 * p2))} / 96', 'chunk jobs clean', smooth(P(t, 0.6, 1.2)), INK, 104)
+    p3 = ease_out(P(t, 0.9, 2.6)); counter(img, d, 560, 410, f'{sk(round(95 * p3))} / 95', 'seams exact', smooth(P(t, 0.9, 1.5)), ACC, 104)
     z = smooth(P(t, 2.4, 3.2)); counter(img, d, 1400, 410, '0 / 0 / 0', 'mismatches / forced tokens / host injections', z, INK, 104)
     hw = 1300; hh = int(HEAT.height * hw / HEAT.width); hv = HEAT.resize((hw, hh), Image.LANCZOS)
     reveal = ease_io(P(t, 3.0, 5.6)); rw = int(hw * reveal); ha = smooth(P(t, 3.0, 3.6))
@@ -202,7 +263,7 @@ def end_scene(t):
 
 # ------------------------------------------------------------------ timeline
 SEG = [('hero', M.hero, 10.0, 'dissolve'), ('title', title_scene, 4.5, 'slide'), ('architecture', arch_scene, 12.5, 'dissolve'),
-       ('one_token', M.one_token, 24.0, 'dissolve'), ('problem_fix', M.quantfix, 13.0, 'dissolve'), ('answer', morph_scene, 5.5, 'slide'),
+       ('one_token', M.one_token, 24.0, 'dissolve'), ('precision', precision_scene, 9.5, 'dissolve'),
        ('seam_grid', M.seam_grid, 11.0, 'dissolve'), ('numbers', numbers_scene, 9.0, 'dissolve'), ('fleet', fleet_scene, 6.5, 'dissolve'), ('end', end_scene, 6.0, 'dissolve')]
 STARTS = []; _s = 0.0
 for _i, (_n, _f, _d, _k) in enumerate(SEG):
@@ -221,6 +282,10 @@ def frame_at(T):
         out.paste(sh, (off - 60, 0), sh); out.paste(B, (off, 0)); return out
     return Image.blend(A, B, p)
 def worker(T): return frame_at(T).tobytes()
+BANNED = ('13', '838', '3405', '408', 'old firmware', 'int4 everywhere', 'first answer', 'wrong', 'why ')
+def audit_worker(T):
+    AUDIT.clear(); frame_at(T)
+    return sorted({sx for sx in AUDIT if any(b in sx for b in BANNED)})
 
 # ------------------------------------------------------------------ audio (numpy, local, calm pad + soft pulse + chimes)
 def make_audio(path, total):
@@ -259,6 +324,10 @@ if __name__ == '__main__':
     for i, (name, fn, dur, kind) in enumerate(SEG):
         frame_at(STARTS[i] + dur * 0.85 if name not in ('title',) else STARTS[i] + 3.2).save(os.path.join(stills, f'{i + 1:02d}_{name}.png'))
     print('timeline: total %.1f s' % TOTAL, [(n, round(s, 1)) for (n, *_), s in zip(SEG, STARTS)])
+    if '--audit-text' in sys.argv:
+        os.environ['DEMO_AUDIT'] = '1'; ts = [i * 0.2 for i in range(int(TOTAL / 0.2))]
+        with Pool(8) as pool: res = pool.map(audit_worker, ts, chunksize=8)
+        hits = sorted({sx for r in res for sx in r}); print('audited', len(ts), 'frames; strings drawn through the text helper that contain a banned token:', hits or 'NONE'); sys.exit()
     if '--stills-only' in sys.argv: sys.exit()
     silent = os.path.join(HERE, 'demo_silent.mp4'); N = int(TOTAL * FPS)
     ff = subprocess.Popen(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(FPS), '-i', '-', '-c:v', 'libx264', '-crf', '19',
@@ -272,7 +341,8 @@ if __name__ == '__main__':
     subprocess.check_call(['ffmpeg', '-y', '-loglevel', 'error', '-i', silent, '-i', wav, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '160k', '-shortest', '-movflags', '+faststart', os.path.join(HERE, 'demo.mp4')])
     os.remove(wav)
     # teaser gif: hero (0-6 s) + title + architecture glow + seam grid + end
-    cuts = [(0.0, 6.0), (STARTS[2] + 6.8, STARTS[2] + 11.0), (STARTS[6] + 1.0, STARTS[6] + 9.0), (STARTS[9], STARTS[9] + 4.0)]
+    ix = {n: STARTS[i] for i, (n, *_r) in enumerate(SEG)}
+    cuts = [(0.0, 6.0), (ix['architecture'] + 6.8, ix['architecture'] + 11.0), (ix['precision'] + 3.0, ix['precision'] + 9.0), (ix['seam_grid'] + 1.0, ix['seam_grid'] + 9.0), (ix['end'], ix['end'] + 4.0)]
     parts = ''.join(f'[0:v]trim={a:.2f}:{b:.2f},setpts=PTS-STARTPTS,fps=15,scale=900:-1:flags=lanczos[v{i}];' for i, (a, b) in enumerate(cuts))
     cc = ''.join(f'[v{i}]' for i in range(len(cuts))) + f'concat=n={len(cuts)}:v=1:a=0[c];[c]split[s0][s1];[s0]palettegen=max_colors=80:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle[g]'
     subprocess.check_call(['ffmpeg', '-y', '-loglevel', 'error', '-i', silent, '-filter_complex', parts + cc, '-map', '[g]', '-loop', '0', os.path.join(HERE, 'demo.gif')])

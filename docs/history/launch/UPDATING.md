@@ -2,11 +2,11 @@
 
 All launch visuals are generated from one status switchboard and the committed logs.
 
-1. Edit `STATUS` at the top of `docs/launch/make_media.py` (values `'done'` or `'in progress'`), then run
-   `python docs/launch/make_media.py` (PNG + GIF + MP4; the MP4 step takes about 2 minutes of CPU on a laptop, run it under `nice`).
+1. Edit `STATUS` at the top of `docs/history/launch/make_media.py` (values `'done'` or `'in progress'`), then run
+   `python docs/history/launch/make_media.py` (PNG + GIF + MP4; the MP4 step takes about 2 minutes of CPU on a laptop, run it under `nice`).
    This refreshes: tier ladder, tier climb GIF, tier flow PNG and `.mmd`, hero GIF footer, results/caveat panels, both videos and square cuts.
 2. Edit the hand-written places listed below. Only flip a row when a result file is committed; cite its path.
-3. Add provenance rows in `docs/launch/PROVENANCE.md`. No row, no claim.
+3. Add provenance rows in `docs/history/launch/PROVENANCE.md`. No row, no claim.
 
 ## Per result
 
@@ -28,7 +28,7 @@ All launch visuals are generated from one status switchboard and the committed l
 - `TWEET.md`: main post (268.6 s), post 5, post 6 caveat (4). Update `square()` footer in `make_media.py` ("one token: 268.6 s").
 
 ### Tier changes in general
-- Tier table rows live in `tier_rows()` in `make_media.py` and in the README tier table; keep the two in sync. The mermaid block in the README must be re-pasted from `docs/assets/flow_tiers.mmd` after re-running.
+- Tier table rows live in `tier_rows()` in `make_media.py` and in the README tier table; keep the two in sync. The mermaid block in the README must be re-pasted from `docs/history/assets/flow_tiers.mmd` after re-running.
 
 ### Circuit-route tier measured (Qwenputer-style CPU in a real Qwen3.5)
 Source of truth: `docs/TIERS.md`; a row flips only from a committed `experiments/circuit/integrate/results/*.json` with `measured: true`.

@@ -66,4 +66,4 @@ Free-running generation vs HF greedy; HostGuard audit of the real driver; any sp
 
 ## 5. Reproduce
 
-`python docs/make_figures.py` (static PNG, needs rsvg-convert) and `python docs/launch/make_media.py` (PNG, GIF, MP4; Pillow, numpy, matplotlib, ffmpeg). The rendering host was a Mac; no GPU is needed.
+`python docs/make_figures.py` (static PNG, needs rsvg-convert) and `python docs/history/launch/make_media.py` (PNG, GIF, MP4; Pillow, numpy, matplotlib, ffmpeg). The rendering host was a Mac; no GPU is needed.

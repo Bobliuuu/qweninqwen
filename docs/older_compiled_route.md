@@ -10,7 +10,7 @@
 
 **A real Qwen3-0.6B token, computed by the weights and recurrent state of another, stock Qwen.**
 
-![Qwen inside Qwen](assets/hero.gif)
+![Qwen inside Qwen](history/assets/hero.gif)
 
 | outer argmax == Hugging Face | max relative logit error | per token |
 |:---:|:---:|:---:|
@@ -28,7 +28,7 @@ A homage to [Qwenputer](https://github.com/divagr18/qwenputer), in which a CPU l
 
 ## Status board
 
-Single source of truth for what is done and what is not. Pending rows are flipped by the maintainers when results land (see [`docs/launch/UPDATING.md`](launch/UPDATING.md)).
+Single source of truth for what is done and what is not. Pending rows are flipped by the maintainers when results land (see [`docs/history/launch/UPDATING.md`](launch/UPDATING.md)).
 
 <!-- STATUS:BEGIN -->
 | Item | Status | Evidence |
@@ -49,13 +49,13 @@ Single source of truth for what is done and what is not. Pending rows are flippe
 
 The mechanism animations are **illustrations** and say so on screen; every number shown comes from the committed logs. The demo is a time-lapse replay of the recorded run, not a live one.
 
-![idea](assets/idea.gif)
+![idea](history/assets/idea.gif)
 
 ## The tier ladder
 
 The project is organised as tiers: each tier is a harder claim than the one below it and needs the previous one. The staircase shows where the evidence stands today.
 
-![tier climb](assets/tiers_climb.gif)
+![tier climb](history/assets/tiers_climb.gif)
 
 | Tier | What it means | What is needed to reach it | Status and evidence |
 |---|---|---|---|
@@ -66,7 +66,7 @@ The project is organised as tiers: each tier is a harder claim than the one belo
 | T3 real | Real Qwen3-0.6B produces tokens entirely inside the outer weights | T3-toy at real size (1006 outer layers), layer-major executor | **One token achieved; 6 teacher-forced positions match HF.** Pending: free-running generation (**in progress**), HostGuard audit of the real driver (**in progress**) |
 | T4 | Measured cost model for the full model | timings of the real run, tuned kernels | **Measured for one token:** 268.6 s untuned. Speedup work: **in progress** |
 
-![tier ladder](assets/tiers_ladder.png)
+![tier ladder](history/assets/tiers_ladder.png)
 
 ```mermaid
 flowchart LR
@@ -89,7 +89,7 @@ flowchart LR
   SP -->|improves| T4
 ```
 
-(The same graph as a picture, for viewers without mermaid: [`flow_tiers.png`](assets/flow_tiers.png).)
+(The same graph as a picture, for viewers without mermaid: [`flow_tiers.png`](history/assets/flow_tiers.png).)
 
 ## How it works at a glance
 
@@ -109,7 +109,7 @@ flowchart LR
   X -->|next token| H
 ```
 
-![who does what](assets/flow_architecture.png)
+![who does what](history/assets/flow_architecture.png)
 
 ```mermaid
 flowchart LR
@@ -130,19 +130,19 @@ flowchart LR
   R --> T
 ```
 
-![one token](assets/flow_token.png)
+![one token](history/assets/flow_token.png)
 
 ### Results
 
-![six positions](assets/results_table.png)
+![six positions](history/assets/results_table.png)
 
-![cost](assets/cost_chart.png)
+![cost](history/assets/cost_chart.png)
 
 The 3.4e7 s circuit-route figure in the cost chart is an extrapolation (estimate), not a run; see [Cost model](#cost-model).
 
 ### The argmax tournament
 
-![tournament](assets/tournament.gif)
+![tournament](history/assets/tournament.gif)
 
 (Bar heights are an illustration; the winning block and the 18-bit code are derived from the real token id 15846.)
 
@@ -170,15 +170,15 @@ The outer layers are strictly feed-forward: layer `l` at step `t` sees only the 
 
 ### DeltaNet state as weight memory
 
-![state as memory](assets/state_memory.gif)
+![state as memory](history/assets/state_memory.gif)
 
-Illustration with a toy 4x5 matrix; static version: [`state_memory.png`](assets/state_memory.png) (hand-drawn figure) and [`state_memory_toy.png`](assets/state_memory_toy.png).
+Illustration with a toy 4x5 matrix; static version: [`state_memory.png`](history/assets/state_memory.png) (hand-drawn figure) and [`state_memory_toy.png`](history/assets/state_memory_toy.png).
 
 ### How a token is computed
 
-![unrolled pipeline](assets/pipeline.gif)
+![unrolled pipeline](history/assets/pipeline.gif)
 
-![unrolled pipeline, static](assets/unrolled_pipeline.png)
+![unrolled pipeline, static](history/assets/unrolled_pipeline.png)
 
 1. **Embed.** The host places the embedding row of the current token in the stream (a lookup, no arithmetic) together with position id (the inner token clock) and flags.
 2. **Per inner layer, in depth order.** RMSNorm (a GDN gated-RMSNorm head, or a norm layer); the `W_qkv` bank (WRITE frames load weight rows into DeltaNet state, the READ frame contracts the activation against them); a register layer; for Qwen3, q/k norm plus a gain product in MLP gadgets; RoPE and softmax attention in an outer full-attention layer that appends to and reads the KV cache; `W_o` and the residual add; the second RMSNorm; `W_gate, W_up`; SwiGLU in an MLP layer; `W_down` and the residual add.
@@ -189,7 +189,7 @@ Steps 1 to 4 have been executed for the real Qwen3-0.6B at one position, and for
 
 ### How the full-vocabulary LM head works in-model
 
-![LM head](assets/lm_head.png)
+![LM head](history/assets/lm_head.png)
 
 The LM head is a 151,936 x 1024 matrix, so its logits are produced in 594 blocks of 256 by the same state-bank matvec as every other projection. Each block then reduces itself in the model: a per-block max/argmax tournament yields the block's best logit and the local index (8 bits). A hard-max attention over the 594 block winners (key = block best logit, value = a dual-rail code of the local index plus the block index, 8 + 10 = 18 bits, 36 rails) selects the global winner across blocks. The outer `lm_head` has only 36 non-zero columns and decodes the rails into the outer token id, and the host takes the outer argmax and appends it. In the full-token run the winning rails were clean: top code score 18.0007 against an ideal 18.
 
@@ -234,13 +234,13 @@ Known open items, from the agents' notes and the audit ([`audit/AUDIT.md`](../au
 
 ## Cost model
 
-![cost model](assets/cost_model.png)
+![cost model](history/assets/cost_model.png)
 
 Measured, full token of the real Qwen3-0.6B, single position: **268.6 s** on a shared A100 (fp32, torch-reference GDN, layer-major executor, untuned): 13.9 s building layers plus about 242 s running 293,068 outer frames (about 1.2 k frames/s) through 1006 outer layers at D=40775. The frame, layer and weight counts come from the planner and are reproducible without a GPU (`experiments/vslice/cost_model.py`). Measured, weight streaming alone (an `nL=4` bank on an A10G, 12.4 k frames/s, harness-fed activations): 41.95 s; this is a different, much shallower stack, so the two numbers do not add up or compare directly. Estimates, labelled as such in the figure: the 7 to 19 s smaller-bank figures come from the runner's `plan()` function, not from a run, and the 110 s paging bound is an untested design estimate. Not yet measured: a KV-using position, tuned kernels (the flash-linear-attention path was slower or inexact in the agents' tests), and the in-model argmax on its own (18 to 44 s on a Mac CPU in the op test). Frame cost scales with depth and `D`, and the path is fp32 compute-bound.
 
 ### Circuit route versus state-as-memory route
 
-![comparison](assets/comparison.png)
+![comparison](history/assets/comparison.png)
 
 The circuit route in [`reference/`](../reference/nested-qwen-lab) emulates arithmetic bit by bit in GDN state. Extrapolating its measured rates to 494 M projection MACs gives between about 12 days (488 MAC/s, small synthetic tiles) and about a year (14.7 to 15 MAC/s, real-weight rows) per token, before any non-matvec operation. The state-as-memory route moves the same contraction into the delta-rule read, which is why even the full chained token (268.6 s) is more than five orders of magnitude faster than the slower circuit number (3.4e7 s, matvecs only). That comparison is matvec against matvec; the full chained token for the state route (268.6 s) is a single-position measurement.
 
@@ -316,7 +316,7 @@ python -c "import vs2, cost_model as c; print(c.counts(vs2.Cfg(1024,16,8,128,307
 cd experiments/run && NOFLA=1 python run_token.py q3 4
 
 # regenerate figures and launch media (Pillow, numpy, matplotlib fonts, ffmpeg)
-python docs/make_figures.py && python docs/launch/make_media.py
+python docs/history/make_figures.py && python docs/history/launch/make_media.py
 ```
 
 ## Credits

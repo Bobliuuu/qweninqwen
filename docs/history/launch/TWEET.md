@@ -46,8 +46,8 @@ Alt text: "A staircase of six tiers T0, T1, T2, T3-toy, T3 real, T4. T0, T1 and 
 
 | File | Use |
 |---|---|
-| `docs/assets/hero.gif` | post 1 (GIF alternative to video) |
-| `docs/launch/video/explainer_square.mp4` (1080x1080) / `explainer_16x9.mp4` (1280x720) | post 1 |
-| `docs/launch/video/demo_square.mp4` / `demo_16x9.mp4` | post 5 |
-| `docs/assets/idea.gif`, `pipeline.gif`, `tournament.gif`, `tiers_climb.gif`, `state_memory.gif` | posts 2, 3, 4, 6 |
-| `docs/assets/results_table.png`, `tiers_ladder.png`, `cost_chart.png`, `flow_*.png` | static fallbacks |
+| `docs/history/assets/hero.gif` | post 1 (GIF alternative to video) |
+| `docs/history/launch/video/explainer_square.mp4` (1080x1080) / `explainer_16x9.mp4` (1280x720) | post 1 |
+| `docs/history/launch/video/demo_square.mp4` / `demo_16x9.mp4` | post 5 |
+| `docs/history/assets/idea.gif`, `pipeline.gif`, `tournament.gif`, `tiers_climb.gif`, `state_memory.gif` | posts 2, 3, 4, 6 |
+| `docs/history/assets/results_table.png`, `tiers_ladder.png`, `cost_chart.png`, `flow_*.png` | static fallbacks |
