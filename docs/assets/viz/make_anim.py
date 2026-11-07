@@ -97,7 +97,6 @@ def hero(t):
         rr(d, hx, 380, hx + 120, 436, 14, ACC, None, 2, ha); text(d, hx + 60, 408, 'HALT', 28, WHITE, 'Bold', 'mm', alpha=ha)
     oa = smooth(P(t, 8.0, 8.9))
     if oa > 0:
-        text(d, 1560, 560, '15846', 112, ACC, 'Bold', 'ls', alpha=oa) if False else None
         text(d, 1640, 470, '15846', 100, ACC, 'Bold', 'ma', alpha=oa); text(d, 1640, 596, "' Question'", 40, INK, 'Semibold', 'ma', alpha=smooth(P(t, 8.4, 9.2)))
         text(d, 1640, 656, "= Hugging Face's Qwen3-0.6B token", 22, G1, 'Regular', 'ma', alpha=smooth(P(t, 8.7, 9.4)))
     text(d, W / 2, 1052, FOOT, 20, G2, 'Regular', 'mm', alpha=smooth(P(t, 8.8, 9.6)))
@@ -230,19 +229,18 @@ def precision(t):
         xa, xb = x0 + l * bw + 3, x0 + (l + 1) * bw - 3; base = mix(ACCM, a)
         rr(d, xa, y0 + (1 - a) * 20, xb, y0 + h + (1 - a) * 20, 8, ACCM if not big else (int(lerp(ACCM[0], ACCD[0], hl)), int(lerp(ACCM[1], ACCD[1], hl)), int(lerp(ACCM[2], ACCD[2], hl))), None, alpha=a)
         text(d, (xa + xb) / 2, y0 + h + 30 + (1 - a) * 20, str(l), 16, ACC if big else G2, 'Semibold' if big else 'Regular', 'mm', alpha=a)
-    text(d, x0, y0 + h + 76, 'int4 weights, int8 activations', 22, G1, alpha=smooth(P(t, 1.8, 2.4)))
+    text(d, 960, y0 + h + 62, 'all other layers: int4 weights, int8 activations', 22, G1, 'Regular', 'ma', alpha=smooth(P(t, 1.8, 2.4)))
     ca = smooth(P(t, 3.2, 4.0))
     for l in BIG:
-        cx = x0 + (l + .5) * bw; line(d, cx, y0 + h + 52, cx, y0 + h + 130, ACC, 3, ca)
-    rr(d, 560, y0 + h + 130, 1420, y0 + h + 214, 18, ACC, None, 2, ca)
-    text(d, 990, y0 + h + 172, 'layers 2 · 26 · 27: 8-bit weights + 16-bit activations', 32, WHITE, 'Semibold', 'mm', alpha=ca)
+        cx = x0 + (l + .5) * bw; line(d, cx, y0 + h + 52 if l != 2 else y0 + h + 52, cx, y0 + h + 120, ACC, 3, ca)
+    rr(d, 200, y0 + h + 120, 1800, y0 + h + 196, 18, ACC, None, 2, ca)
+    text(d, 1000, y0 + h + 158, 'layers 2 · 26 · 27:  8-bit weights + 16-bit activations', 32, WHITE, 'Semibold', 'mm', alpha=ca)
     na = smooth(P(t, 5.0, 5.8))
     for i, (big_, lab) in enumerate([(commas(INSTR_TOK), 'instructions per token (ctx 1)'), (commas(WROM_WORDS), 'weight words (8 int4 cells each)')]):
-        x = 130 + i * 560; y = 700
+        x = 130 + i * 560; y = 730
         rr(d, x, y, x + 520, y + 150, 20, WHITE, G3, 2, na); text(d, x + 30, y + 44, big_, 52, INK, 'Bold', alpha=na); text(d, x + 30, y + 106, lab, 24, G1, alpha=na)
-    fa = smooth(P(t, 7.6, 8.6)); rr(d, 1260, 700, 1790, 850, 20, ACCL, ACCM, 2, fa)
-    text(d, 1290, 748, '15846', 56, ACC, 'Bold', alpha=fa); text(d, 1290, 818, "matches Hugging Face's Qwen3-0.6B", 24, INK, 'Semibold', alpha=fa)
-    ga = smooth(P(t, 8.2, 9.0)); text(d, 1700 if False else 1760, 748, '✓', 56, ACC, 'Bold', 'ra', alpha=ga) if False else None
+    fa = smooth(P(t, 7.6, 8.6)); rr(d, 1260, 730, 1790, 880, 20, ACCL, ACCM, 2, fa)
+    text(d, 1290, 774, '15846', 56, ACC, 'Bold', alpha=fa); text(d, 1290, 840, "✓ matches Hugging Face's Qwen3-0.6B", 24, INK, 'Semibold', alpha=fa)
     text(d, W / 2, 1030, 'Emulator figures for the final firmware (one prompt token). Sources: quantfix/results/b8_apl2.json, diag_quant.json', 20, G2, 'Regular', 'mm')
     return img
 

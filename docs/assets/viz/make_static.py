@@ -7,7 +7,7 @@
 usage: python3 make_static.py   (writes ../*.svg and ../*.png via rsvg-convert)"""
 import json, os, re, subprocess, datetime, collections, statistics
 HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.abspath(os.path.join(HERE, '..')); REPO = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
-FR = os.path.join(REPO, 'experiments', 'circuit', 'fullrun'); DEMO = os.path.join(REPO, 'docs', 'demo', 'data')
+FR = os.path.join(REPO, 'experiments', 'circuit', 'fullrun'); DEMO = os.path.join(FR, 'logs', 'cfram_q_vast')
 FONT = "-apple-system, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif"; MONO = "SFMono-Regular, Menlo, Consolas, monospace"
 INK, G1, G2, G3, G4, ACC, ACCD, ACCL, ACCM = '#111827', '#6B7280', '#9CA3AF', '#E5E7EB', '#F3F4F6', '#4F46E5', '#4338CA', '#EEF2FF', '#C7D2FE'
 def J(p): return json.load(open(p))
@@ -92,25 +92,23 @@ def metrics():
 # ---------------- tier ladder ----------------
 def tiers():
     import math
-    W, H = 1280, 520
-    # (label, sublabel, instr/token, measured?)  values from docs/TIERS.md (T0..T3m rows) and the final run (summary.json instructions_machine)
-    T = [('T0', 'fp32 soft-float firmware', 1.10e11, True), ('T1', '+ fused executor', 4.0e9, False), ('T2', '+ SMAQA int8 (matvec only)', 5.4e8, False), ('T3', '+ VDOT int4 (matvec only)', 1.05e8, False),
-         ('T3m', 'built: VDOT + fixed-point nonlinears', 1.346e8, True), ('Final', 'CF + RAM, 8-bit layers 2/26/27', 1.78066316e8, True)]
-    s = head(W, H, 'Tier ladder', 'Instructions per token for the tiers of the circuit route, on a log scale; measured tiers solid, projected tiers hatched')
-    s += txt(48, 54, 'The tier ladder', 26, INK, 700) + txt(48, 78, 'instructions per generated token (log scale), Qwen3-0.6B as a program on the circuit, ctx 1', 14, G1)
-    x0, x1 = 380, 1220; lo, hi = 7.5, 11.5
+    W, H = 1280, 470
+    # roadmap tiers (docs/TIERS.md: derived/projected instruction counts) + the one measured result (summary.json instructions_machine)
+    T = [('T0', 'literal fp32 soft-float baseline', 1.10e11, False), ('T1', '+ fused executor', 4.0e9, False), ('T2', '+ SMAQA int8 (matvec only)', 5.4e8, False),
+         ('T3', '+ VDOT int4 (matvec only)', 1.05e8, False), ('Measured', 'this run: CF + RAM, 189,109,345 per token', 1.78066316e8, True)]
+    s = head(W, H, 'Tier ladder', 'Roadmap tiers (hatched, projected) and the one measured result, as instructions per token on a log scale')
+    s += txt(48, 54, 'The tier ladder', 26, INK, 700) + txt(48, 78, 'instructions per generated token (log scale): roadmap tiers hatched, the measured result solid', 14, G1)
+    x0, x1 = 470, 1220; lo, hi = 7.5, 11.5
     def X(v): return x0 + (math.log10(v) - lo) / (hi - lo) * (x1 - x0)
     for e in (8, 9, 10, 11):
-        s += f'<line x1="{X(10 ** e):.1f}" y1="100" x2="{X(10 ** e):.1f}" y2="430" stroke="{G4}"/>' + txt(X(10 ** e), 452, f'1e{e}', 12, G2, 400, 'middle')
+        s += f'<line x1="{X(10 ** e):.1f}" y1="100" x2="{X(10 ** e):.1f}" y2="378" stroke="{G4}"/>' + txt(X(10 ** e), 400, f'1e{e}', 12, G2, 400, 'middle')
     for i, (n, sub, v, meas) in enumerate(T):
-        y = 112 + i * 52; bw = X(v) - x0
-        s += txt(48, y + 24, n, 18, INK, 700) + txt(104, y + 24, sub, 13.5, G1)
-        if meas and n == 'Final': s += f'<rect x="{x0}" y="{y + 4}" width="{bw:.1f}" height="30" rx="8" fill="url(#acc)"/>'
-        elif meas: s += f'<rect x="{x0}" y="{y + 4}" width="{bw:.1f}" height="30" rx="8" fill="{ACCM}"/>'
+        y = 108 + i * 54; bw = X(v) - x0
+        s += txt(48, y + 24, n, 18, INK, 700) + txt(168, y + 24, sub, 13.5, G1)
+        if meas: s += f'<rect x="{x0}" y="{y + 4}" width="{bw:.1f}" height="30" rx="8" fill="url(#acc)"/>'
         else: s += f'<rect x="{x0}" y="{y + 4}" width="{bw:.1f}" height="30" rx="8" fill="url(#hat)" stroke="{ACCM}"/>'
-        s += txt(x0 + bw + 10, y + 25, f'{v:.3g}'.replace('e+', 'e').replace('e0', 'e') + ('  measured' if meas else '  projected'), 13, ACC if n == 'Final' else G1, 600 if n == 'Final' else 400)
-    s += txt(48, 488, 'T0 to T3m rows: docs/TIERS.md (T3m = built firmware, emulator count at ctx 1). Final row: this run, 178,066,316 instructions (summary.json). T1 to T3 are projections; T2 and T3 count the matvec only.', 12, G2)
-    s += txt(48, 506, 'The Final row includes the constants-fetch and 16-bit-activation changes (+17% instructions vs the int4 firmware, quantfix results). Instruction counts differ by firmware; see TIERS.md for the derivations.', 12, G2)
+        s += txt(x0 + bw + 10, y + 25, f'{v:.3g}'.replace('e+', 'e').replace('e0', 'e') + ('  measured' if meas else '  roadmap'), 13, ACC if meas else G1, 600 if meas else 400)
+    s += txt(48, 440, 'Roadmap rows: docs/TIERS.md (derived or projected; T2 and T3 count the matvec only). Measured row: this run, 178,066,316 machine instructions over the whole trace (summary.json), one prompt token at ctx 1.', 12, G2)
     save('circuit_tiers', s)
 
 # ---------------- fleet timeline ----------------
@@ -121,9 +119,6 @@ def fleetplot():
         if m: st.append((datetime.datetime.fromisoformat(m.group(1)), int(m.group(2)), int(m.group(3)), int(m.group(5))))
     assert len(st) > 20
     events = []
-    for ln in open(os.path.join(FR, 'logs', 'cfram_q_vast', 'status.txt'), errors='ignore'):
-        m = re.match(r'(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d) (fleet restarted|\d+ instances vanished)', ln)
-        if m: events.append((datetime.datetime.fromisoformat(m.group(1)), 'restart' if m.group(2).startswith('fleet') else 'vanish'))
     t0, t1 = st[0][0], st[-1][0]; W, H = 1280, 470; x0, x1, y0, y1 = 80, 1230, 110, 360
     def X(t): return x0 + (t - t0).total_seconds() / (t1 - t0).total_seconds() * (x1 - x0)
     mxc = max(d for *_, d in st) or 1
@@ -142,7 +137,7 @@ def fleetplot():
     for t, k in events:
         s += f'<line x1="{X(t):.1f}" y1="{y0 - 6}" x2="{X(t):.1f}" y2="{y1}" stroke="{ACCM}" stroke-dasharray="2 4"/>' + txt(X(t), y0 - 12, 'restart' if k == 'restart' else 'boxes vanished', 11.5, G1, 400, 'middle')
     s += txt(x0, 412, 'solid: chunks done (of 96, Vast fleet only: chunks 32 to 70 were imported from Modal at the end)   ·   dashed: boxes up (scale 0 to 14)', 12.5, G2)
-    s += txt(x0, 432, 'Source: logs/cfram_q_vast/status.txt (fleet manager status lines). Vertical ticks: fleet manager restarts after two bugs and three instances that vanished (cause unknown).', 12.5, G2)
+    s += txt(x0, 432, 'Source: logs/cfram_q_vast/status.txt (fleet manager status lines).', 12.5, G2)
     save('circuit_fleet', s)
 
 if __name__ == '__main__':
