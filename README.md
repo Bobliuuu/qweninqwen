@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧠 qweninqwen
+# 🧠 QIQ: qweninqwen
 
 **A real Qwen3-0.6B token, computed by a CPU that lives inside the weights of another Qwen.**
 
