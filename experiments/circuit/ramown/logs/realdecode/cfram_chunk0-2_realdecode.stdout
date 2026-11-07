@@ -1,0 +1,30 @@
+[realdecode] in_drom widening removed; real in_ram + in_drom decode active
+ROW table slice materialised for this run: rows 0..8253 of 156396
+injections per row [0, 0, 0]... (RAM-type [0, 0, 0]), inj file inj, ramimg True, unaddressable-WROM VDOTs forced [0, 0, 0]...
+rows 3, steps/row 2,097,152, forced kinds [], forced fraction [0.0, 0.0, 0.0]
+step 100,000/2,097,152 31s 9,772 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 200,000/2,097,152 61s 9,794 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 300,000/2,097,152 92s 9,801 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 400,000/2,097,152 122s 9,805 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 500,000/2,097,152 153s 9,807 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 600,000/2,097,152 184s 9,809 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 700,000/2,097,152 214s 9,810 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 800,000/2,097,152 245s 9,811 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 900,000/2,097,152 275s 9,811 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,000,000/2,097,152 306s 9,811 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,100,000/2,097,152 336s 9,812 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,200,000/2,097,152 367s 9,812 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,300,000/2,097,152 397s 9,812 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,400,000/2,097,152 428s 9,813 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,500,000/2,097,152 459s 9,813 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,600,000/2,097,152 489s 9,813 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,700,000/2,097,152 520s 9,813 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,800,000/2,097,152 550s 9,813 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 1,900,000/2,097,152 581s 9,813 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 2,000,000/2,097,152 611s 9,813 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+step 2,097,152/2,097,152 641s 9,813 agg tok/s; free-token mismatches 0 (rows with any: 0), forced-token raw disagreements 0 of 0
+{"wf_mode": true, "inj_file": "inj", "ramimg": true, "injections": [0, 0, 0], "ram_injections": [0, 0, 0], "chunks": [0, 1, 2], "rows": 3, "steps_per_row": [2097151, 2097152, 2097152], "steps_run": 2097152, "seconds": 641.1057043075562, "agg_tok_per_s": 9813.445640353317, "forced_kinds": [], "free_tokens": [2097151, 2097152, 2097152], "forced_tokens": [0, 0, 0], "free_mismatches": [0, 0, 0], "first_free_mismatch": [null, null, null], "forced_raw_disagreements": [0, 0, 0], "gpu": "NVIDIA A100-SXM4-40GB"}
+
+--STDERR--
+/usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
+  warn_once(FP_FUSION_DEFAULT_WARNING)
