@@ -1,0 +1,47 @@
+{
+ "chunk": 74,
+ "circuit": {
+  "word": 13,
+  "bytes": [
+   13,
+   0,
+   0,
+   0
+  ],
+  "byte_positions": [
+   1887145,
+   1887151,
+   1887157,
+   1887163
+  ],
+  "halt_index": 1887187,
+  "n_tokens": 1887188,
+  "complete": true
+ },
+ "reference": {
+  "word": 13,
+  "bytes": [
+   13,
+   0,
+   0,
+   0
+  ],
+  "byte_positions": [
+   1887145,
+   1887151,
+   1887157,
+   1887163
+  ],
+  "halt_index": 1887187,
+  "n_tokens": 1887188,
+  "complete": true
+ },
+ "free_mismatches": [
+  0
+ ],
+ "host_writes": 0,
+ "token_overrides": 0,
+ "injections_applied": 0,
+ "steps_run": 1887188,
+ "gpu": "NVIDIA A100-SXM4-40GB"
+}
