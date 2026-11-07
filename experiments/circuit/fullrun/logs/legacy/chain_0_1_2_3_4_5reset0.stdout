@@ -1,0 +1,9 @@
+ROW table slice materialised for this run: rows 0..10687 of 155205
+Traceback (most recent call last):
+  File "/data/circuit_wf/fullrun/circuit_run.py", line 163, in <module>
+    core.snapshot(c, machine(states[0], chunks[0]))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/circuit_wf/fullrun/circuit_run.py", line 155, in machine
+    assert list(stt['x']) == list(m.x) and stt['anchor'] == m.anchor and stt['n'] == m.n == 0 and stt['wb'] == 0, 'reference state_0000 != program reset state'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: reference state_0000 != program reset state

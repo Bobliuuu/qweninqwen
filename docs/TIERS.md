@@ -1,8 +1,24 @@
 # Tier leaderboard: Qwen3-0.6B as a program on the RV32IM CPU inside a real Qwen3.5
 
-Maintained by the integration lead. Rule: a number in a **measured** column comes from a committed log/JSON of a run of that exact build; everything else is **projected** and says how it was derived. Nothing on the circuit route has been run end to end yet, so every full-model row below is PROJECTED. Definition of the goal and the arithmetic: [`CIRCUIT_ROUTE_PLAN.md`](CIRCUIT_ROUTE_PLAN.md).
+Maintained by the integration lead. Rule: a number in a **measured** column comes from a committed log/JSON of a run of that exact build; everything else is **projected** and says how it was derived. The final-contract CF+RAM build was run end to end on 2026-11-07 (section below); the tier rows further down are the earlier projections and are kept as written, so treat them as superseded where they disagree with that section. Definition of the goal and the arithmetic: [`CIRCUIT_ROUTE_PLAN.md`](CIRCUIT_ROUTE_PLAN.md).
 
-Not this: the README's 268.6 s/token result is the earlier compiled route (custom giant outer, 1006 layers, D=40775). It is a stepping stone, not a circuit-route tier.
+Not this: the 268.6 s/token result is the earlier compiled route (custom giant outer, 1006 layers, D=40775), kept in [`older_compiled_route.md`](older_compiled_route.md). It is a stepping stone, not a circuit-route tier.
+
+## Measured end to end (2026-11-07): final-contract CF+RAM build
+
+One Qwen3-0.6B token (prompt `[785]`, position 0, ctx 1) on the circuit, **measured** in `experiments/circuit/fullrun/logs/cfram_q_vast/` ([`FINAL_VERDICT.json`](../experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json)):
+
+| Item | Value |
+|---|---|
+| Build | WF table via ROW tokens + constants fetch (CF) + circuit-owned remapped RAM, real `in_ram`/`in_drom` decode; layers 2/26/27 at 8-bit weights + 16-bit activations, int4 elsewhere |
+| Instructions / trace tokens | 178,066,316 / 199,287,158 (about 1.12 tok per instr), 96 chunks of 2,097,152 steps |
+| Result | circuit's own HALT at step 57,705 of chunk 95; word **15846** = Hugging Face Qwen3-0.6B's token |
+| Checks | 96/96 jobs clean (0 free mismatches, 0 forced, 0 injections); 95/95 seams exact |
+| Time | 6.0 min per chunk on an RTX 4090, 4.9 to 9.7 min on an A100 PCIE, about 9.2 min on a Modal A100-40GB; chunks ran in parallel, so wall time is one chunk when enough GPUs are available |
+| Cost | about $10 of rented Vast.ai GPUs (fleet-log estimate) plus Modal A100 time for chunks 32 to 70 |
+| Previous build (int4 everywhere) | reproduced its emulator exactly but answered 13, not 15846 |
+
+The projected rows below assumed about 5,000 trace tok/s on one GPU, so a serial run would take about 11 to 13 hours; the parallel run replaces that with wall time of about one chunk.
 
 ## Headline (2026-11-06)
 

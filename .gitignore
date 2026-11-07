@@ -2,3 +2,11 @@
 __pycache__/
 *.safetensors
 ckpt/
+
+# local / large artifacts
+*.pkl
+*.npy
+*.pem
+.env
+.DS_Store
+nohup.out
