@@ -175,7 +175,9 @@ if WF:
             meta = json.load(open(cp + '.meta.json')); arr = np.load(cp, mmap_mode='r')
             if all(meta.get(k_) == v_ for k_, v_ in key.items()) and arr.shape[0] == hi - lo and arr.shape[1] == owner.ex.D:
                 print(f'ROW embedding loaded from cache {cp} {arr.shape}', flush=True); return arr
+            assert not os.environ.get('ROWEMB_STRICT'), f'ROW embedding cache {cp} does not match this table/circuit ({key}, D {owner.ex.D}); build it once with ROWEMB_WRITE=1 (spawn_cfram_parallel.py --build-cache) instead of recomputing in every job (19 min each)'
             print(f'ROW embedding cache {cp} does not match {key} / D {owner.ex.D}: recomputing', flush=True)
+        assert not (os.environ.get('ROWEMB_STRICT') and cp and not os.environ.get('ROWEMB_WRITE')), f'ROWEMB_STRICT: no ROW embedding cache at {cp}; build it once with --build-cache'
         t_ = time.time(); arr = owner.ex.embed(list(range(lo, hi))).cpu().numpy(); print(f'ROW embedding computed for {hi - lo} rows in {time.time() - t_:.0f}s', flush=True)
         if cp and os.environ.get('ROWEMB_WRITE'):
             np.save(cp + '.tmp.npy', arr); os.replace(cp + '.tmp.npy', cp); json.dump(dict(key, D=int(arr.shape[1])), open(cp + '.meta.json', 'w')); print(f'ROW embedding cache written {cp}', flush=True)

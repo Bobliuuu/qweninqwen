@@ -7,13 +7,13 @@ Compared but NOT part of the verdict (informational): bn (4x2x128 4-bit head sta
 HONEST CLAIM: if every job is clean and every seam is exact, then by induction the parallel runs equal one unbroken run (the circuit is deterministic: identical state in => identical tokens out), PROVIDED bn (and any other
 state not listed) does not influence later tokens - supported by bn equality when reported, and by 0 mismatches of every job that started without it. The reference is the comparator and the source of the seeds, not an input to any job's computation after its start.
 The final token is read from the circuit's own raw tokens of the last chunk (readout in the chunk result JSON), compared with the reference only afterwards.
-usage: python cf/collect_seams.py [--root cfram_par] [--chunks 0-74] [--refvol-dir cfram/refRC] [--out logs/cfram_par]   -> prints ONE verdict line, writes seams_<ts>.json + .md"""
+usage: python cf/collect_seams.py [--root cfram_par] [--n 75] [--refvol-dir cfram/refRC] [--expect-word 13] [--out logs/cfram_par]   (new firmware: --n <N> --root <R> --refvol-dir <fw>/<ref> --expect-word <emulator token>)   -> prints ONE verdict line, writes seams_<ts>.json + .md"""
 import argparse, json, os, pickle, re, subprocess, sys, time
 import numpy as np
-ap = argparse.ArgumentParser(); ap.add_argument('--root', default='cfram_par'); ap.add_argument('--chunks', default='0-74'); ap.add_argument('--refvol-dir', default='cfram/refRC')
+ap = argparse.ArgumentParser(); ap.add_argument('--root', default='cfram_par'); ap.add_argument('--n', type=int, default=75, help='number of chunks in the run (0..N-1); the LAST chunk has no next-seed and carries the final read-out'); ap.add_argument('--chunks', default='', help='subset a-b to collect (default 0..N-1)'); ap.add_argument('--refvol-dir', default='cfram/refRC', help='reference dir relative to volume qfr-data')
 ap.add_argument('--out', default=os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'logs', 'cfram_par')); ap.add_argument('--pull', default=os.path.expanduser('~/qweninqwen-work/cfram_par_pull')); ap.add_argument('--no-pull', action='store_true')
 ap.add_argument('--expect-word', type=int, default=13, help='reference final word (argmax) for the last chunk read-out comparison')
-a = ap.parse_args(); lo, hi = (int(x) for x in a.chunks.split('-')) if '-' in a.chunks else (int(a.chunks),) * 2
+a = ap.parse_args(); lo, hi = (int(x) for x in a.chunks.split('-')) if '-' in a.chunks else (0, a.n - 1); LAST = a.n - 1
 os.makedirs(a.pull, exist_ok=True); os.makedirs(a.out, exist_ok=True)
 def get(vol, remote, local):
     os.makedirs(os.path.dirname(local), exist_ok=True)
@@ -35,7 +35,7 @@ for k in range(lo, hi + 1):
     if res.get('forced_tokens') != 0: r['problems'].append(f"forced_tokens {res.get('forced_tokens')}")
     if res.get('diverged'): r['problems'].append('diverged')
     if r['injections'] != 0: r['problems'].append(f"injections {r['injections']}")
-    if k < 74 and res.get('halt_step') is not None: r['problems'].append('circuit HALT before the last chunk')
+    if k < LAST and res.get('halt_step') is not None: r['problems'].append('circuit HALT before the last chunk')
     sp = f'{d}/circuit_state_{k + 1:04d}.pkl'; rsp = f'{a.pull}/ref/state_{k + 1:04d}.pkl'; rip = f'{a.pull}/ref/ramimg_{k + 1:04d}.npy'
     if os.path.exists(sp) and os.path.exists(rsp) and os.path.exists(rip):
         cs = pickle.load(open(sp, 'rb')); stt = cs['stt']; rs = pickle.load(open(rsp, 'rb')); ri = np.load(rip); seam = {}
@@ -47,9 +47,9 @@ for k in range(lo, hi + 1):
         if 'bn' in rs and cs.get('bn'): seam['bn_bad_informational'] = int(sum(int(cs['bn'][i][j]) != int(rs['bn'][i][j]) for i in range(len(rs['bn'])) for j in range(len(rs['bn'][i]))))
         r['seam'] = seam
         if not seam['exact']: r['problems'].append('seam NOT exact')
-    elif k < 74:
+    elif k < LAST:
         r['problems'].append('seam files missing (circuit_state or reference seed)')
-    if k == 74 or res.get('halt_step') is not None:
+    if k == LAST or res.get('halt_step') is not None:
         ro = res.get('readout') or {}; r['readout'] = ro
         if ro.get('circuit_word') != a.expect_word: r['problems'].append(f"final word {ro.get('circuit_word')} != reference {a.expect_word}")
     r['clean'] = not r['problems']; ok_all &= r['clean']; rows.append(r)

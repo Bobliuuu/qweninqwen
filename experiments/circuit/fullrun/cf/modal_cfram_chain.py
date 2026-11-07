@@ -20,14 +20,14 @@ data = modal.Volume.from_name('qfr-data'); out = modal.Volume.from_name('qfr-out
 KW = dict(image=img, timeout=24 * 3600 - 60,   # Modal max 24 h: one unbroken 75-chunk chain is ~11-13 h at ~3.8k steps/s
            volumes={'/data': data, '/out': out, '/wf': wfhf}, retries=0)
 
-def _run(chunks, extra, outname='', resume=False, write_cache=False):
+def _run(chunks, extra, outname='', resume=False, write_cache=False, elf='/data/cfram/ramcf.elf', refdir='/data/cfram/refRC', ckpt='/wf/ckpt_cf', rowtab='/data/rowtab_cf.npy', rowemb='/data/cfram/rowemb_cf.npy'):
     """chunks: 'a,b,c' consecutive. outname: shared out dir name (all segments of one unbroken chain share it so circuit_state_NNNN.pkl accumulates). resume: start from the circuit's OWN saved state for chunks[0] (written by --save-state of the previous run), never the reference."""
     data.reload(); out.reload(); wfhf.reload(); first, last = chunks.split(',')[0], chunks.split(',')[-1]
     tag = outname or (f'chain_{int(first):04d}_{int(last):04d}' + ''.join(extra).replace('-', ''))
     os.makedirs('/out/cfram_chain', exist_ok=True); o = f'/out/cfram_chain/{tag}'; os.makedirs(o, exist_ok=True)
-    env = dict(os.environ, PYTHONPATH='.:/data/circuit_wf/engine', WF='1', REALMAP='1', REALDECODE='1', WF_ROW_CELLS='3840', ROWEMB_CACHE='/data/cfram/rowemb_cf.npy')   # FINAL PATH: real in_ram/in_drom decode (no bring-up patch), cached circuit embedding of the whole row table
+    env = dict(os.environ, PYTHONPATH='.:/data/circuit_wf/engine', WF='1', REALMAP='1', REALDECODE='1', WF_ROW_CELLS='3840', ROWEMB_CACHE=rowemb)   # FINAL PATH: real in_ram/in_drom decode (no bring-up patch), cached circuit embedding of the whole row table
     if write_cache: env['ROWEMB_WRITE'] = '1'
-    cmd = ['python', '-u', '/data/circuit_wfram/fullrun/circuit_run.py', '/data/cfram/ramcf.elf', '/data/cfram/refRC', o, '--chunks', chunks, '--ramimg', '--block', '100000', '--rowtab', '/data/rowtab_cf.npy', '--rowtab-ckpt', '/wf/ckpt_cf', '--chain', '--save-state', '--fulltable', '--stop-on-halt', '--no-host-writes'] + list(extra)
+    cmd = ['python', '-u', '/data/circuit_wfram/fullrun/circuit_run.py', elf, refdir, o, '--chunks', chunks, '--ramimg', '--block', '100000', '--rowtab', rowtab] + (['--rowtab-ckpt', ckpt] if ckpt else []) + [ '--chain', '--save-state', '--fulltable', '--stop-on-halt', '--no-host-writes'] + list(extra)
     if resume:
         st = f'{o}/circuit_state_{int(first):04d}.pkl'; assert os.path.exists(st), f'no circuit state {st}: cannot resume at chunk {first}'
         cmd += ['--resume-state', st]
@@ -42,12 +42,12 @@ def _run(chunks, extra, outname='', resume=False, write_cache=False):
     return dict(tag=tag, rc=p.returncode, tail=open(f'{o}/run_{int(first):04d}_{int(last):04d}.stdout').read()[-3000:])
 
 @app.function(gpu='A100-40GB', **KW)
-def a100(chunks, extra=(), outname='', resume=False, write_cache=False): return _run(chunks, list(extra), outname, resume, write_cache)
+def a100(chunks, extra=(), outname='', resume=False, write_cache=False, elf='/data/cfram/ramcf.elf', refdir='/data/cfram/refRC', ckpt='/wf/ckpt_cf', rowtab='/data/rowtab_cf.npy', rowemb='/data/cfram/rowemb_cf.npy'): return _run(chunks, list(extra), outname, resume, write_cache, elf, refdir, ckpt, rowtab, rowemb)
 
 @app.local_entrypoint()
-def main(chunks: str = '0-9', outname: str = 'unbroken', resume: bool = False, reset0: bool = False, steps: int = 0, write_cache: bool = False):
+def main(chunks: str = '0-9', outname: str = 'unbroken', resume: bool = False, reset0: bool = False, steps: int = 0, write_cache: bool = False, elf: str = '/data/cfram/ramcf.elf', refdir: str = '/data/cfram/refRC', ckpt: str = '/wf/ckpt_cf', rowtab: str = '/data/rowtab_cf.npy', rowemb: str = '/data/cfram/rowemb_cf.npy'):
     """--resume: chunks[0] starts from the circuit's own circuit_state_<chunks[0]>.pkl in the shared outname dir (written by --save-state of the previous run). Use cf/chain_resume.py to find the chunk to resume at."""
     a, b = chunks.split('-') if '-' in chunks else (chunks, chunks)
     cl = ','.join(str(c) for c in range(int(a), int(b) + 1))
     ex = (('--reset0',) if reset0 else ()) + (('--steps', str(steps)) if steps else ())
-    print(json.dumps(a100.remote(cl, ex, outname, resume, write_cache)), flush=True)
+    print(json.dumps(a100.remote(cl, ex, outname, resume, write_cache, elf, refdir, ckpt, rowtab, rowemb)), flush=True)
