@@ -58,19 +58,20 @@ Caveat shown in the data: these are emulator runs of the real integer firmware a
 | collector verdict line | `seams_0-95_...json` `verdict` (the trailing "0s to collect" is trimmed) |
 | 15846 = ' Question' = Qwen3-0.6B's own answer | `logs/final_token/REPORT.md`, `diag_quant/diag_quant.json` |
 
-## Scene 6: what the host still does (short checklist)
+## Scene 6: what the host does (only the remaining roles)
 | Shown | Source |
 |---|---|
-| subtitle "0 injections, 0 forced tokens, 0 mismatches in all 96 chunks"; ticks "Weight, RAM and blob injections: 0", "Forced tokens: 0" | `seams_0-95_...json` `rows[*].injections`, `forced_tokens`, `free_mismatches` (summed by `make_demo.py`, asserted 0) |
-| tick "Table-window look-ahead from the reference" removed | `docs/HOST_ROLE_AUDIT_CFRAM.md` row 6 (owner: `--fulltable`, commit `b5378f7`) |
-| tick "Bring-up patch (in_ram / in_drom)" removed | `docs/HOST_ROLE_AUDIT_CFRAM.md` row 8; `ramown/logs/realdecode/` (agent D) |
-| tick "Chunk 0 boots from the program alone" | `docs/HOST_ROLE_AUDIT_CFRAM.md` row 5; `logs/cfram_reset0/`; the collector row for chunk 0 (`seam` exact) |
-| allowed by the plan: boot the program, the GO token, the embed-and-append loop, ecall I/O; "the reference comparison is the test, not an input" | `docs/HOST_ROLE_AUDIT_CFRAM.md` rows 10-12, 17 |
-| one slim line: "One token at position 0 . parallel jobs seeded from the reference, verified at 95 exact seams" | `rows[*].seam.exact` count (95); ctx=1 firmware: `docs/HOST_ROLE_AUDIT_CFRAM.md` row 16 |
+| subline "Everything else runs in the circuit: 0 injections, 0 forced tokens, 0 mismatches in all 96 chunks" | `seams_0-95_...json` `rows[*].injections`, `forced_tokens`, `free_mismatches` (summed by `make_demo.py`, asserted 0) |
+| cards "Boot the program", "The GO token", "The embed-and-append loop", "ecall I/O" (allowed by the design) | `docs/HOST_ROLE_AUDIT_CFRAM.md` rows 11, 12, 17 (boot / GO token + embed loop / ecall services); plan: `docs/CIRCUIT_ROUTE_PLAN.md` ("Host is allowed to") |
+| card "Reference comparison: the test, not an input" | `docs/HOST_ROLE_AUDIT_CFRAM.md` row 10 |
+| card "Later chunks' start state: seeded from the reference, verified by exact end-state equality at 95 seams" | `rows[*].seam.exact` count = 95 (registers, anchor, n, wb15, latch, 8,192 RAM words); `docs/HOST_ROLE_AUDIT_CFRAM.md` row 5 |
+
+Items that were removed from the host are deliberately not listed in this scene.
 
 **Not shown in the video, but true (kept out to stay short; they are in the README and the audit):**
 the executor is a fused Triton kernel, not the stock HF forward (audit row 9; HF-module checks cover chunk 0 only: `quantfix/results/hfcheck_cfq_pos_130k.json`, 130,000 steps, 0 mismatches, 2,320 ROW tokens, and the table+1 control `hfcheck_cfq_neg.json` diverges at step 41);
 the table lives in a bigger checkpoint (hidden 7680, 168,684 rows; decoded copy bit-identical, `docs/demo/data/verify_ckpt_vs_npy.log`);
+the firmware is single-position (ctx=1; audit row 16; the footer on every frame says "one token at position 0");
 a full HF check of the 199,287,253 steps is infeasible (about 155 steps/s per the sampled-check agent's report, not a data file).
 
 ## Scene 7: end card

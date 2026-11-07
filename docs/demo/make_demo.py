@@ -274,34 +274,25 @@ def scene_final():
             para(d, 56, 600, seams['verdict'].replace('; 0s to collect', ''), font(15), FG, W - 112, 22)
         footer(d); save(im, 0.16 if step < len(names) else 8.0)
 
-# ---------- scene 6: host roles (short, visual) ----------
-def tick(d, x, y, col=ACC):
-    d.line((x, y + 9, x + 6, y + 15), fill=col, width=3); d.line((x + 6, y + 15, x + 18, y + 2), fill=col, width=3)
+# ---------- scene 6: what the host does (only its remaining roles) ----------
 def scene_limits():
     begin()
-    removed = [f'Weight, RAM and blob injections: {sum_inj}', f'Forced tokens: {sum_forced}', 'Table-window look-ahead from the reference',
-               'Bring-up patch (in_ram / in_drom)', 'Chunk 0 boots from the program alone']
-    allowed = ['Boot the program', 'The GO token', 'The embed-and-append loop', 'ecall I/O']
-    N = 40
+    cards = [('Boot the program', 'allowed by the design', False), ('The GO token', 'allowed by the design', False),
+             ('The embed-and-append loop', 'allowed by the design', False), ('ecall I/O', 'allowed by the design', False),
+             ('Reference comparison', 'the test, not an input', False),
+             ("Later chunks' start state", f'seeded from the reference, verified by exact end-state equality at {n_seam} seams', True)]
+    N = 48; cw, chh = 560, 118; gx, gy = 56, 168
     for step in range(N + 1):
-        im, d = new(); title(im, d, 'What the host still does', '📋', 'Checked against the run: 0 injections, 0 forced tokens, 0 mismatches in all 96 chunks')
-        colw = (W - 112 - 40) // 2; x1 = 56; x2 = 56 + colw + 40
-        card(im, (x1, 150, x1 + colw, 560), 18); card(im, (x2, 150, x2 + colw, 560), 18)
-        text(d, (x1 + 30, 176), 'Removed from the host', font(24, 'Semibold'), FG); d.line((x1 + 30, 214, x1 + 70, 214), fill=ACC, width=3)
-        text(d, (x2 + 30, 176), 'Allowed by the plan', font(24, 'Semibold'), FG); d.line((x2 + 30, 214, x2 + 70, 214), fill=MUTE, width=3)
-        for i, tx in enumerate(removed):
-            t = ease_out((step - i * 4) / 12)
+        im, d = new(); title(im, d, 'What the host does', '📋', f'Everything else runs in the circuit: {sum_inj} injections, {sum_forced} forced tokens, {sum_mism} mismatches in all 96 chunks')
+        for i, (head, sub, key) in enumerate(cards):
+            t = ease_out((step - i * 6) / 14)
             if t <= 0: continue
-            y = 246 + i * 56 + (1 - t) * 14; col = mix(BG, FG, t)
-            tick(d, x1 + 32, int(y) + 2, mix(BG, ACC, t)); text(d, (x1 + 66, y), tx, font(21), col)
-        for i, tx in enumerate(allowed):
-            t = ease_out((step - 8 - i * 4) / 12)
-            if t <= 0: continue
-            y = 246 + i * 56 + (1 - t) * 14
-            d.ellipse((x2 + 36, int(y) + 9, x2 + 44, int(y) + 17), fill=mix(BG, MUTE, t)); text(d, (x2 + 66, y), tx, font(21), mix(BG, DARK, t))
-        t = ease_out((step - 22) / 12)
-        text(d, (x2 + 30, 508), 'The reference comparison is the test, not an input.', font(16), mix(BG, DIM, t))
-        text(d, (W // 2, 608), 'One token at position 0   ·   parallel jobs seeded from the reference, verified at 95 exact seams', font(19, 'Medium'), DIM, 'ma')
+            x = gx + (i % 2) * (cw + 48); y = int(gy + (i // 2) * (chh + 28) + (1 - t) * 16)
+            card(im, (x, y, x + cw, y + chh), 16, BG, ACC if key else LINE, 2 if key else 1)
+            d = ImageDraw.Draw(im)
+            d.rounded_rectangle((x + 24, y + 26, x + 30, y + 58), 3, fill=mix(BG, ACC if key else MUTE, t))
+            text(d, (x + 46, y + 22), head, font(25, 'Semibold'), mix(BG, FG, t))
+            para(d, x + 46, y + 64, sub, font(17), mix(BG, DIM, t), cw - 72, 23)
         footer(d); save(im, 1 / FPS if step < N else 9.0)
 
 # ---------- scene 7: end ----------
