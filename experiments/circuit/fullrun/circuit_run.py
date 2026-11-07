@@ -24,8 +24,10 @@ from chipformer.rv import core as _core0, elf, ref, fusedexec
 _src = open(_core0.__file__).read(); _old = 'in_ram = c.and_([1 - b for b in EA[15:32]], "in_ram")'
 REALMAP = bool(os.environ.get('REALMAP'))   # REALMAP=1: firmware linked for the real 32 KB RAM map (ramown/fw_rom.ld). in_ram stays REAL (no aliasing, no fault-masking); only in_drom is widened so that
 # DROM-class loads (real 128 KB DROM, plus the 0x10000000 weight/table blob) are answered by the circuit's DROM table, whose slot (EA[16:2]) the host fills for blob words (constants, not RAM).
+REALDECODE = bool(os.environ.get('REALDECODE'))   # REALDECODE=1 (with REALMAP=1): NO bring-up patch at all, real in_ram (EA[15:32]==0, 32 KB) and real in_drom (0x20000..0x3FFFF, 128 KB). Valid on the CF firmware (no blob loads, ramown/realdecode).
 if REALMAP:
-    _old2 = 'in_drom = c.and_([1 - b for b in EA[18:32]] + [EA[17]], "in_drom")'; assert _old2 in _src; _src = _src.replace(_old2, 'in_drom = 1 - in_ram')
+    _old2 = 'in_drom = c.and_([1 - b for b in EA[18:32]] + [EA[17]], "in_drom")'; assert _old2 in _src
+    if not REALDECODE: _src = _src.replace(_old2, 'in_drom = 1 - in_ram')
 else:
     assert _old in _src; _src = _src.replace(_old, 'in_ram = one')
 # >>> WB27 (ramown/wb27/wb27.py, WB27=1): the circuit holds the 27-bit weight pointer itself (7-nibble WB adder + wbase_hi latch head); WB token, WROM path unchanged;
@@ -151,8 +153,22 @@ if WF:
     S.ROW_TABLE = SliceTab(_tab, _lo, _hi); print(f'ROW table slice materialised for this run: rows {_lo}..{_hi} of {len(_tab)}', flush=True)
     _fs = open(_fe.__file__).read(); _o = "            if size <= 4096:\n"
     assert _o in _fs
-    _fs = _fs.replace(_o, "            if nm == 'ROW':\n                small[f], row0[f] = True, len(table) - ROWLO\n                table += list(self.ex.embed(list(range(t0 + ROWLO, t0 + ROWHI + 1))).cpu().numpy())\n            elif size <= 4096:\n")
-    _m = types.ModuleType('chipformer.rv.fastexec_wf'); _m.__file__ = _fe.__file__; _m.__dict__.update(ROWLO=_lo, ROWHI=_hi); exec(compile(_fs, 'fastexec_wf.py', 'exec'), _m.__dict__); _fe.FreeRun = _m.FreeRun
+    _fs = _fs.replace(_o, "            if nm == 'ROW':\n                small[f], row0[f] = True, len(table) - ROWLO\n                table += list(_rowemb(self, t0 + ROWLO, t0 + ROWHI + 1))\n            elif size <= 4096:\n")
+    def _rowemb(owner, lo, hi):
+        """The circuit's embedding of every ROW token in [lo, hi). Computing it is python-bound (~17 min for the whole 156,396-row table: feature_value per row x feature). ROWEMB_CACHE=path.npy loads it
+        (validated against rows/D/table md5 in path.meta.json); ROWEMB_WRITE=1 writes it after computing. The embedding is a pure function of the table + circuit, so the cache changes nothing about the run."""
+        import hashlib
+        cp = os.environ.get('ROWEMB_CACHE'); key = dict(lo=lo, hi=hi, tab=hashlib.md5(np.ascontiguousarray(_tab[:: max(1, len(_tab) // 4096)]).tobytes()).hexdigest(), tab_rows=len(_tab), neg=bool(os.environ.get('WF_NEG')))
+        if cp and os.path.exists(cp) and os.path.exists(cp + '.meta.json'):
+            meta = json.load(open(cp + '.meta.json')); arr = np.load(cp, mmap_mode='r')
+            if all(meta.get(k_) == v_ for k_, v_ in key.items()) and arr.shape[0] == hi - lo and arr.shape[1] == owner.ex.D:
+                print(f'ROW embedding loaded from cache {cp} {arr.shape}', flush=True); return arr
+            print(f'ROW embedding cache {cp} does not match {key} / D {owner.ex.D}: recomputing', flush=True)
+        t_ = time.time(); arr = owner.ex.embed(list(range(lo, hi))).cpu().numpy(); print(f'ROW embedding computed for {hi - lo} rows in {time.time() - t_:.0f}s', flush=True)
+        if cp and os.environ.get('ROWEMB_WRITE'):
+            np.save(cp + '.tmp.npy', arr); os.replace(cp + '.tmp.npy', cp); json.dump(dict(key, D=int(arr.shape[1])), open(cp + '.meta.json', 'w')); print(f'ROW embedding cache written {cp}', flush=True)
+        return arr
+    _m = types.ModuleType('chipformer.rv.fastexec_wf'); _m.__file__ = _fe.__file__; _m.__dict__.update(ROWLO=_lo, ROWHI=_hi, _rowemb=_rowemb); exec(compile(_fs, 'fastexec_wf.py', 'exec'), _m.__dict__); _fe.FreeRun = _m.FreeRun
 c = core.build(wrow=8) if WF else core.build()
 entry, segs = elf.segments(a.elf)
 text = [s for s in segs if s[0] == S.ROM_BASE][0][1]
@@ -370,8 +386,14 @@ if CHAIN:
         if a.handoff and bi + 1 < len(bounds):   # re-snapshot the circuit FROM ITS OWN READ-BACK STATE (rd copy of the regfile) and restart the chunk
             mm = machine(dict(x=o['x_rd'], anchor=o['anchor'], n=o['n'] or 0, wb=o['wb'], wb27=o.get('wb27', o['wb']))); mm.ram = [int(v) for v in o['ram']]; mm.bn = [list(r) for r in o['bn']]
             core.snapshot(c, mm); fr.load(0, S.tok('GO')); CTR.fill_(bnd); ICTR.fill_(bnd); done = bnd; torch.cuda.synchronize()
+    # ---- END-TO-END READ-OUT: the circuit's OWN raw tokens up to its own HALT (or the end of the run), decoded to the final putchar word; the reference is used only afterwards as a comparator ----
+    end_ = (halt_step + 1) if halt_step is not None else min(done, TT); lo_ = max(0, end_ - 64); tail_ = RAW[0, lo_:end_].cpu().numpy().astype(np.int64); np.save(a.out + '/circuit_tail.npy', tail_)
+    tail_ref_ = TREF[0, lo_:end_].cpu().numpy().astype(np.int64); fams_ = [S.family(int(x_)) for x_ in tail_]; by_ = [int(f_[1]) for f_ in fams_ if f_[0] == 'BYTE']
+    readout = dict(from_step=lo_, to_step=end_, halt_in_tail=any(f_[0] == 'HALT' for f_ in fams_), circuit_halt_step=halt_step, tail_tokens_circuit=tail_.tolist()[-24:], tail_names_circuit=[S.name(int(x_)) for x_ in tail_[-24:]],
+                   circuit_bytes=by_, circuit_word=(sum(b_ << (8 * k_) for k_, b_ in enumerate(by_[:4])) if len(by_) >= 4 else None), tail_equals_reference=bool((tail_ == tail_ref_).all()))
+    print('READOUT', json.dumps(readout, default=str), flush=True)
     res = dict(mode='handoff' if a.handoff else 'chain', chunks=chunk_list, steps=TT, steps_run=done, seconds=time.time() - t0, tok_per_s=done / (time.time() - t0), free_tokens=n_free0, free_mismatches=nbad_free0,
-               first_free_mismatch=first_bad0, halt_step=halt_step, fulltable=a.fulltable, forced_tokens=n_forced0, forced_raw_disagreements=nbad_forced0, diverged=diverged, boundaries=bl, gpu=torch.cuda.get_device_name())
+               first_free_mismatch=first_bad0, halt_step=halt_step, readout=readout, fulltable=a.fulltable, forced_tokens=n_forced0, forced_raw_disagreements=nbad_forced0, diverged=diverged, boundaries=bl, gpu=torch.cuda.get_device_name())
     json.dump(res, open(a.out + f'/{res["mode"]}_{chunk_list[0]}_to_{chunk_list[-1]}.json', 'w'), indent=1, default=str); print(json.dumps(res, default=str), flush=True); sys.exit(0)
 while done < N:
     k = min(a.block, N - done)
