@@ -30,4 +30,4 @@ Rebuild: `python3 docs/assets/viz/make_static.py` (SVG/PNG) and `python3 docs/as
 | `circuit_fleet.svg/.png` | `FR/logs/cfram_q_vast/status.txt`: chunks done and boxes up over time; restart and vanish events from the same file | counts only the Vast fleet manager's own bookkeeping; chunks 32 to 70 (Modal) were imported at the end and are not in the curve; the cause of the vanished instances is unknown |
 
 ## Limits shown in the visuals
-One prompt token at position 0 (ctx 1 firmware). The 96 jobs were seeded from the reference start state and checked for exact end-state equality at all 95 seams. The executor is the fused Triton kernel; the stock-module check covers chunk 0 (130,000 steps, with a table+1 negative control). The outer checkpoint carries the 2.59 GB table.
+One prompt token at position 0 (ctx 1 firmware). The 96 jobs were seeded from the reference start state and checked for exact end-state equality at all 95 seams. The executor is the fused Triton kernel; the HF `Qwen3_5` module-class check covers chunk 0 (130,000 steps, with a table+1 negative control). The outer checkpoint carries the 2.59 GB table.

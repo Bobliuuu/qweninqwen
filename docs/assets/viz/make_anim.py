@@ -52,10 +52,10 @@ RICH = D['rich0']['names']
 def hero(t):
     img, d = new()
     a = smooth(P(t, 0, .9)); text(d, 120, 96, 'A real Qwen3-0.6B token,', 62, INK, 'Bold', alpha=a); text(d, 120, 172, 'computed inside another Qwen.', 62, ACC, 'Bold', alpha=a)
-    text(d, 122, 262, "a RISC-V circuit in the weights of a Qwen3.5-4B-geometry model  ·  weights fetched from the model's own embedding table", 26, G1, alpha=smooth(P(t, .8, 1.6)))
+    text(d, 122, 262, "a RISC-V circuit in the weights of a Qwen3.5-style outer model  ·  weights fetched from the model's own embedding table", 26, G1, alpha=smooth(P(t, .8, 1.6)))
     bx0, by0, bx1, by1 = 480, 320, 1440, 800; ba = smooth(P(t, .5, 1.3))
     rr(d, bx0, by0, bx1, by1, 30, '#FAFAFF' if False else (250, 250, 255), ACCM, 3, ba)
-    text(d, bx0 + 36, by0 + 30, 'OUTER MODEL', 20, ACC, 'Semibold', alpha=ba); text(d, bx0 + 36, by0 + 60, 'Qwen3.5-4B geometry · stock Qwen3_5ForCausalLM', 26, INK, 'Semibold', alpha=ba)
+    text(d, bx0 + 36, by0 + 30, 'OUTER MODEL', 20, ACC, 'Semibold', alpha=ba); text(d, bx0 + 36, by0 + 60, 'Qwen3_5 architecture · HF Qwen3_5ForCausalLM classes', 26, INK, 'Semibold', alpha=ba)
     ca = smooth(P(t, 1.2, 2.2))
     for i in range(44):                       # 12 chip layers + Qwen's 32
         y = by0 + 120 + i * 6.6; line(d, bx0 + 40, y, bx0 + 150, y, ACC if i < 12 else G2, 3, ca)
