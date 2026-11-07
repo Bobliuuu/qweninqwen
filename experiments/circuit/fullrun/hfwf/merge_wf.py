@@ -4,7 +4,7 @@ Same recipe as chipformer.rv.merge.build_merged (chip layers first, Qwen's 32 la
   * the ROW family has exactly NROWS=155,205 tokens; the embedding row of ROW(r) = its code/payload features (as before) PLUS table row r:
     3840 4-bit entries (wf_table.build_table of wrom.bin) written as bf16 integers into the 3840 'row.c{j}' feature columns. The table is a PARAMETER (embed_tokens.weight).
   * hidden size picked by pick_hidden for the real slot count (the 3840 cells + the ~1.4 K other dims cannot share a 4096 residual: see the printed slots).
-usage: python merge_wf.py QWEN35_4B_DIR WROM_BIN OUT_DIR"""
+usage: python merge_wf.py QWEN35_4B_DIR WROM_BIN_or_TABLE_NPY OUT_DIR   (CF+RAM: env WF_NROWS=156396 REALMAP=1, table /data/rowtab_cf.npy)"""
 import sys, json, re, time
 from pathlib import Path
 import numpy as np, torch
@@ -62,7 +62,8 @@ def main(src, wrom_path, dst, hidden=None, mm=None):
     emb[v0:v0 + S.VOCAB] = chip[:S.VOCAB].to(torch.bfloat16); del chip
     print(f'embedding rows built {time.time()-t00:.0f}s', flush=True)
     # ---- the weight table: rows of the ROW family ----
-    wrom = open(wrom_path, 'rb').read(); tab = build_table(wrom); assert tab.shape == (NROWS, S.ROW_CELLS), tab.shape
+    tab = np.load(wrom_path) if str(wrom_path).endswith('.npy') else build_table(open(wrom_path, 'rb').read())   # .npy = prebuilt table (CF: rowtab_cf.npy)
+    assert tab.shape == (NROWS, S.ROW_CELLS), (tab.shape, NROWS)
     cell_dims = [next(iter(e.terms)) for e in c.rowcell]; cols = torch.tensor([lay.dim(d) for d in cell_dims])
     assert len(set(cols.tolist())) == S.ROW_CELLS and cols.min() >= d0
     r0 = v0 + ROW_BASE; assert (emb[r0:r0 + NROWS][:, cols] == 0).all()
@@ -89,7 +90,7 @@ def main(src, wrom_path, dst, hidden=None, mm=None):
             'ballast_dims': mm, 'circuit': c.stats(), 'slots': alloc.n_slots, 'muted': True, 'code_dims': [lay.dim(d) for d in code], 'tau_dim': lay.dim(tau),
             'mu_dim': lay.dim(next(iter(c.mu.terms))), 'nfam': core.NFAM, 'npay': core.NPAY, 'tool_call': [T.TCO, T.TCC], 'printable': T.printable,
             'wrow': 8, 'row_cells': S.ROW_CELLS, 'row_ent_bits': S.ROW_ENT_BITS, 'row_family_base': ROW_BASE, 'row_rows': NROWS, 'cell_columns': cols.tolist(),
-            'table_param_bytes_bf16': NROWS * hidden * 2, 'table_payload_bits': NROWS * S.ROW_CELLS * 4, 'bringup_core': 'in_ram := one'}
+            'table_param_bytes_bf16': NROWS * hidden * 2, 'table_payload_bits': NROWS * S.ROW_CELLS * 4, 'bringup_core': ('REALMAP: real in_ram, in_drom := 1 - in_ram' if REALMAP else 'in_ram := one'), 'realmap': REALMAP}
     (dst / 'chipformer.json').write_text(json.dumps(meta, indent=1))
     print(json.dumps({k: meta[k] for k in ('hidden', 'chip_layers', 'slots', 'circuit', 'chip_vocab', 'table_param_bytes_bf16')}), f'total {time.time()-t00:.0f}s', flush=True)
 if __name__ == '__main__': main(*sys.argv[1:4])

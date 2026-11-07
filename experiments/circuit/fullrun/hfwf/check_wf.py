@@ -1,7 +1,7 @@
 """Teacher-forced check of the WF firmware trace through the REAL merged checkpoint (stock Qwen3_5 HF modules: 12 chip layers + Qwen's 32), the weight table being
 rows of embed_tokens.weight. Per step: next-token argmax over the FULL tied vocabulary (lm_head(norm(h)), all ~666 K rows incl. the 155,205 table rows) must equal the
 reference trace's next token. Pattern of e2e/hfcheck.py. Host-assisted (labelled): type-1 RAM/blob word injections into the RAM heads' recurrent state (same records as
-circuit_run.py), chunk-0 start state from the program (as --reset0), bring-up core (in_ram := one).
+circuit_run.py), chunk-0 start state from the program (as --reset0), bring-up core (in_ram := one; with REALMAP=1: CF+RAM firmware, real RAM, 0 injections, program-only start state).
 usage: python check_wf.py MODEL_DIR ELF REFDIR OUT.json [--steps N] [--neg] [--nohead]"""
 import argparse, json, time, sys, pickle
 from common import *
@@ -24,12 +24,20 @@ if a.neg:
     print('NEGATIVE CONTROL: all table entries +1 mod 16', flush=True)
 # --- reference trace, state, injections (chunk 0) ---
 tok_all = remap_trace(np.load(f'{a.refdir}/tok_0000.npy')); stt = pickle.load(open(f'{a.refdir}/state_0000.pkl', 'rb'))
-inj = np.load(f'{a.refdir}/inj_0000.npy'); assert (inj[:, 1] == 1).all(), 'only type-1 (RAM/blob word) injections expected'
+inj = np.load(f'{a.refdir}/inj_0000.npy')
+if REALMAP: assert len(inj) == 0, f'CF+RAM reference must have 0 host injections, found {len(inj)}'
+else: assert (inj[:, 1] == 1).all(), 'only type-1 (RAM/blob word) injections expected'
 N = min(a.steps, len(tok_all) - 1); inj = inj[inj[:, 0] - 1 < N]
-entry, segs = elf.segments(a.elf); text = [s for s in segs if s[0] == S.ROM_BASE][0][1]
-prog = Program([int.from_bytes(text[i:i + 4], 'little') for i in range(0, len(text), 4)], b'', {'_start': entry}, data_base=S.RAM_BASE, rodata=b'', wrom=b'')
+if not REALMAP: entry, segs = elf.segments(a.elf); text = [s for s in segs if s[0] == S.ROM_BASE][0][1]
+prog = elf.program(a.elf) if REALMAP else Program([int.from_bytes(text[i:i + 4], 'little') for i in range(0, len(text), 4)], b'', {'_start': entry}, data_base=S.RAM_BASE, rodata=b'', wrom=b'')
 m = ref.Machine.from_program(prog); assert stt['n'] == 0 and stt['wb'] == 0 and not stt.get('latch')
-m.wrow_w = 8; m.latch = []; m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF   # chunk-0 start state (registers, pc anchor) from the reference, as circuit_run.py
+if REALMAP:   # --reset0: chunk 0 starts from the PROGRAM ONLY (reset registers/pc/n/wb + initial .data RAM image); asserted equal to the reference state_0000 and ramimg_0000
+    assert list(stt['x']) == list(m.x) and stt['anchor'] == m.anchor and m.n == 0, 'reference state_0000 != program reset state'
+    import os
+    if os.path.exists(f'{a.refdir}/ramimg_0000.npy'): assert all(int(v) == int(w) for v, w in zip(np.load(f'{a.refdir}/ramimg_0000.npy'), m.ram)), 'ramimg_0000 != program initial RAM'
+    m.wrow_w = 8; m.latch = []
+else:
+    m.wrow_w = 8; m.latch = []; m.x = list(stt['x']); m.anchor = stt['anchor']; m.n = stt['n']; m.wb = stt['wb'] & 0x7FFF   # chunk-0 start state (registers, pc anchor) from the reference, as circuit_run.py
 # --- chip layers: prompt prefill, snapshot, inject (hfcheck pattern) ---
 ids = chat.prompt_ids([{"role": "user", "content": "Hi"}]); ccache = chat._chip_cache()
 h = chat.cm.embed_tokens(torch.tensor([ids], device=dev))

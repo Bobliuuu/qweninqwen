@@ -10,8 +10,9 @@ img = (modal.Image.debian_slim(python_version='3.12').pip_install('torch', 'nump
 data = modal.Volume.from_name('qfr-data'); wf = modal.Volume.from_name('qfr-wfhf', create_if_missing=True)
 KW = dict(image=img, timeout=24 * 3600, volumes={'/data': data, '/wf': wf}, gpu=['H100', 'A100-80GB', 'L40S', 'A100-40GB'], memory=131072, ephemeral_disk=600 * 1024)
 ENV = dict(os.environ, PYTHONPATH='/hfwf:/data/qpriscv_wf', PYTHONUNBUFFERED='1')
-def sh(cmd, log):
-    with open(log, 'a') as f: r = subprocess.run(cmd, cwd='/hfwf', env=ENV, stdout=f, stderr=subprocess.STDOUT, text=True)
+CFENV = dict(ENV, WF_NROWS='156396', REALMAP='1')   # CF table (156,396 rows) + CF+RAM firmware (real RAM map)
+def sh(cmd, log, env=None):
+    with open(log, 'a') as f: r = subprocess.run(cmd, cwd='/hfwf', env=env or ENV, stdout=f, stderr=subprocess.STDOUT, text=True)
     wf.commit(); return r.returncode
 @app.function(**KW)
 def merge():
@@ -24,6 +25,19 @@ def check(steps: int = 130000, neg: bool = False, tag: str = ''):
     data.reload(); wf.reload(); os.makedirs('/wf/logs', exist_ok=True); log = f'/wf/logs/check{tag}.log'
     cmd = ['python', '-u', 'check_wf.py', '/wf/ckpt', '/data/w785wf/ref.elf', '/data/ref785wf', f'/wf/logs/check{tag}.json', '--steps', str(steps)] + (['--neg'] if neg else [])
     rc = sh(cmd, log); return rc, open(log).read()[-3000:]
+@app.function(**KW)
+def mergecf():
+    from huggingface_hub import snapshot_download
+    data.reload(); os.makedirs('/wf/logs', exist_ok=True)
+    src = snapshot_download('Qwen/Qwen3.5-4B'); log = '/wf/logs/merge_cf.log'
+    rc = sh(['python', '-u', 'merge_wf.py', src, '/data/rowtab_cf.npy', '/wf/ckpt_cf'], log, CFENV); return rc, open(log).read()[-3000:]
+@app.function(**KW)
+def checkcf(steps: int = 130000, neg: bool = False, tag: str = ''):
+    data.reload(); wf.reload(); os.makedirs('/wf/logs', exist_ok=True); log = f'/wf/logs/check_cf{tag}.log'
+    cmd = ['python', '-u', 'check_wf.py', '/wf/ckpt_cf', '/data/cfram/ramcf.elf', '/data/cfram/refRC', f'/wf/logs/check_cf{tag}.json', '--steps', str(steps)] + (['--neg'] if neg else [])
+    rc = sh(cmd, log, CFENV); return rc, open(log).read()[-3000:]
 @app.local_entrypoint()
 def main(what: str = 'merge', steps: int = 130000, neg: bool = False):
-    print(*(merge.remote() if what == 'merge' else check.remote(steps, neg, '_neg' if neg else '')))
+    if what == 'mergecf': print(*mergecf.remote())
+    elif what == 'checkcf': print(*checkcf.remote(steps, neg, '_neg' if neg else ''))
+    else: print(*(merge.remote() if what == 'merge' else check.remote(steps, neg, '_neg' if neg else '')))
