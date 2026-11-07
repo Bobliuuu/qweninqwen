@@ -68,21 +68,15 @@ Both knobs are needed. The fix costs about +19% instructions per token and +7.9%
 
 The merged checkpoint passes the stock-module check: 130,000 teacher-forced steps of chunk 0 through the stock `Qwen3_5` modules, the argmax taken over the full 680,128-token vocabulary, **0 mismatches** over 2,320 ROW tokens. A copy of the same check with every table entry +1 diverges at step 41 ([`hfcheck_cfq_pos_130k.json`](experiments/circuit/fullrun/quantfix/results/hfcheck_cfq_pos_130k.json), [`hfcheck_cfq_neg.json`](experiments/circuit/fullrun/quantfix/results/hfcheck_cfq_neg.json)).
 
-## 🧑‍💻 What the host still does
+## 🧑‍💻 What the host does
 
-| Role | Status |
+| Role | Why |
 |---|---|
-| Weight words, RAM words, blob constants | ✅ removed: 0 injections in all 96 chunks; the injection hook is not in the graph (`--no-host-writes`) |
-| Forced tokens | ✅ removed: 0 |
-| `in_ram` / `in_drom` bring-up patch | ✅ removed: real decode |
-| Row-table window, run length, stop point from the reference | ✅ removed: whole table, the circuit's own `HALT` |
-| Table location | ✅ the outer checkpoint's own `embed_tokens.weight` (the chunks run on Vast read `rowtab_cf.npy`, checked bit-identical to that table) |
-| Chunk 0 start state | ✅ the firmware ELF alone |
 | Boot, the `GO` token, the embed-and-append loop, `ecall` I/O | 🟦 allowed by the design |
 | Comparison against the reference trace | 🟦 the test, not an input |
 | Later chunks' start state | 🟨 seeded from the reference, verified by exact end-state equality at all 95 seams |
 
-Full audit with file and line references: [`docs/HOST_ROLE_AUDIT_CFRAM.md`](docs/HOST_ROLE_AUDIT_CFRAM.md).
+Everything else runs in the circuit. Full audit with file and line references: [`docs/HOST_ROLE_AUDIT_CFRAM.md`](docs/HOST_ROLE_AUDIT_CFRAM.md).
 
 ## ⏱️ Speed and cost
 
@@ -100,7 +94,7 @@ The whole run cost about **$10 of rented Vast.ai GPUs** (chunks 0 to 31 and 71 t
 - One prompt token at position 0: the firmware is built for context length 1.
 - The 96 chunks ran in parallel. Each was seeded from the reference start state and checked for exact end-state equality with the next job's seed at all 95 seams.
 - The executor is the fused Triton kernel. The stock `Qwen3_5` modules were checked on chunk 0 (130,000 steps, with the negative control above).
-- The outer checkpoint carries the 2.59 GB table, so it is larger than stock Qwen3.5-4B.
+- The outer checkpoint carries the 2.59 GB table, so it is larger than stock Qwen3.5-4B. The chunks run on Vast read the same table from `rowtab_cf.npy`, checked bit-identical to the checkpoint's `embed_tokens.weight`.
 
 ## 🔁 Reproduce
 
