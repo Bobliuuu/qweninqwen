@@ -3,7 +3,7 @@
 The first chunk on each box is its own verification (clean = rc 0, 0 free mismatches, 0 forced, not diverged); a box that fails is destroyed, slower-than-2x-per-dollar boxes are destroyed after >=1 chunk.
 Status line every 2 min -> ~/qweninqwen-work/cfram_q_vast_out/status.txt. When the queue is empty each idle box is destroyed; at the end every qiq- instance is destroyed and verified.
 usage: python fleet.py [--chunks 0-91] [--hub 59513405]. The Vast key is read by vast_api.py only (never sent to boxes)."""
-import argparse, collections, json, os, subprocess, sys, threading, time
+import argparse, collections, json, os, re, subprocess, sys, threading, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import vast_api as v
 ap = argparse.ArgumentParser(); ap.add_argument('--chunks', default='0-91'); ap.add_argument('--hub', type=int, default=59513405); ap.add_argument('--relay-par', type=int, default=5); a = ap.parse_args()
 lo, hi = (int(x) for x in a.chunks.split('-')); HOME = os.path.expanduser('~'); W = f'{HOME}/qweninqwen-work'; PULL = f'{W}/cfram_q_vast_pull/cfram_q_par_full'; OUT = f'{W}/cfram_q_vast_out'; os.makedirs(PULL, exist_ok=True)
@@ -15,7 +15,7 @@ def log(m):
     with open(f'{OUT}/fleet.log', 'a') as f: f.write(f'{time.strftime("%F %T")} {m}\n')
 def ssh(b, cmd, timeout=120):
     try:
-        r = subprocess.run(['ssh', *SSHO, '-p', str(b['port']), f'root@{b["host"]}', cmd], capture_output=True, text=True, timeout=timeout); return r.returncode, r.stdout + r.stderr
+        r = subprocess.run(['ssh', *SSHO, '-p', str(b['port']), f'root@{b["host"]}', cmd], capture_output=True, text=True, timeout=timeout); return r.returncode, r.stdout + (r.stderr if r.returncode else '')
     except subprocess.TimeoutExpired: return 124, 'timeout'
 def scp(b, files, dest):
     return subprocess.run(['scp', '-q', *SSHO[:6], '-P', str(b['port']), *files, f'root@{b["host"]}:{dest}'], capture_output=True, text=True, timeout=120).returncode
@@ -57,14 +57,19 @@ def run_chunk(b, k, launch=True):
     if launch: ssh(b, f'rm -rf {d}; nohup /root/run_chunks.sh {k} > /root/run_{k}.log 2>&1 < /dev/null &')
     while time.time() - t0 < 4200 and not stop.is_set():
         time.sleep(20); rc, o = ssh(b, f'cat {d}/job_done.json 2>/dev/null', 60)
-        if rc == 0 and '"rc"' in o:
-            jd = json.loads(o); loc = f'{PULL}/chunk_{k:04d}'; os.makedirs(loc, exist_ok=True)
+        if rc == 0 and re.search(r'\{[^{}]*"rc"[^{}]*\}', o):
+            mm = re.search(r'\{[^{}]*"rc"[^{}]*\}', o); jd = json.loads(mm.group(0)); loc = f'{PULL}/chunk_{k:04d}'; os.makedirs(loc, exist_ok=True)
             subprocess.run(['rsync', '-a', '-e', 'ssh ' + ' '.join(SSHO) + f' -p {b["port"]}', f'root@{b["host"]}:{d}/', loc + '/'], capture_output=True, timeout=600)
             try: res = json.load(open(f'{loc}/chain_{k}_to_{k}.json'))
             except Exception: res = {}
             return jd, res
     return None, None
 def worker(b):
+    try: worker_inner(b)
+    except Exception as e:
+        import traceback; log(f'WORKER EXC {b["id"]}: {traceback.format_exc()[-400:]}'); b['state'] = 'exc'
+        if not stop.is_set(): time.sleep(5); threading.Thread(target=worker, args=(b,), daemon=True).start()
+def worker_inner(b):
     b['state'] = 'prep'
     if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
     b['state'] = 'ready'; log(f'READY {b["id"]} {b["label"]} {b.get("env","")}'); n = 0; adopt = None
