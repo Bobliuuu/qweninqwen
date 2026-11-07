@@ -43,3 +43,7 @@
 | 2026-11-06 | Modal A100 (ap-fBThed1pYehleksI46QqqO) | `--job lmshort` SVD shortlist head | done: no saving |
 | 2026-11-06 | Modal A100 (ap-tHRNr6w2lbtiE9EimUFLVs) | `--job quant` grid 2 (weight-only, per-group acts, mixed) | queued behind workspace GPU limit at handback |
 | 2026-11-06 | Modal A100 (ap-AEelnKmdTf68dXJIaUNjmc) | `--job quant` repeated compiler prompt, 130 tokens, W4 per-row/g128 + A8 per-token | launched (queued) |
+
+## 2026-11-06 hfwf sampled HF check (fix F)
+- hfcheck_sampled.py windows over CF+RAM trace through merged ckpt_cf (qfr-wfhf). Modal app qwen-in-qwen-hfsampled: worker1 ap-NPLQ8ktPjjzCOzBpnhfrd0 (14 windows x 100k), worker0 (last chunk 74 to its end, 1,887,187 steps + chunks). Outputs qfr-wfhf:/logs/sampled_w{0,1}of2.{json,log}. Launch logs ~/qweninqwen-work/box-logs/hfsampled/.
+- FINDING: refRC on qfr-data/cfram has chunks 0..74 but chunks 64 and 72 are MISSING (73 present); spawn script TOTAL and chain would hit the gap.
