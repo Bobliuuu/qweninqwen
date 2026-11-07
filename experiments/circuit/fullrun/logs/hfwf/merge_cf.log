@@ -1,0 +1,7 @@
+circuit {'layers': 12, 'dims': 7381, 'heads': 106, 'ffn_units': 52807, 'max_units': 9216, 'max_heads': 16}, token features 4440, slots 5076, hidden 7680 (m=30), 12 chip layers, S.VOCAB 419488
+Loading weights:   0%|          | 0/723 [00:00<?, ?it/s]Loading weights: 100%|██████████| 723/723 [00:00<00:00, 8674.92it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+chip layers emitted 78s
+embedding rows built 179s
+{"hidden": 7680, "chip_layers": 12, "slots": 5076, "circuit": {"layers": 12, "dims": 7381, "heads": 106, "ffn_units": 52807, "max_units": 9216, "max_heads": 16}, "chip_vocab": 419488, "table_param_bytes_bf16": 2402242560} total 254s

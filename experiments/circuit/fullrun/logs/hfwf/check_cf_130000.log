@@ -1,0 +1,33 @@
+Loading weights:   0%|          | 0/594 [00:00<?, ?it/s]Loading weights:   9%|▉         | 56/594 [00:00<00:01, 536.41it/s]Loading weights:  19%|█▊        | 110/594 [00:04<00:21, 22.03it/s]Loading weights:  22%|██▏       | 133/594 [00:05<00:20, 22.62it/s]Loading weights:  25%|██▌       | 150/594 [00:05<00:16, 27.65it/s]Loading weights:  28%|██▊       | 166/594 [00:05<00:12, 33.97it/s]Loading weights:  34%|███▍      | 201/594 [00:05<00:07, 54.01it/s]Loading weights:  38%|███▊      | 223/594 [00:05<00:05, 63.88it/s]Loading weights:  41%|████      | 242/594 [00:05<00:04, 74.78it/s]Loading weights:  45%|████▌     | 270/594 [00:05<00:03, 100.01it/s]Loading weights:  51%|█████     | 302/594 [00:06<00:02, 125.99it/s]Loading weights:  55%|█████▍    | 324/594 [00:06<00:01, 137.18it/s]Loading weights:  60%|█████▉    | 356/594 [00:06<00:01, 170.62it/s]Loading weights:  64%|██████▍   | 380/594 [00:06<00:01, 185.06it/s]Loading weights:  68%|██████▊   | 404/594 [00:06<00:01, 164.69it/s]Loading weights:  72%|███████▏  | 430/594 [00:06<00:00, 182.27it/s]Loading weights:  78%|███████▊  | 462/594 [00:06<00:00, 199.43it/s]Loading weights:  82%|████████▏ | 485/594 [00:06<00:00, 201.52it/s]Loading weights:  85%|████████▌ | 507/594 [00:07<00:00, 186.61it/s]Loading weights:  93%|█████████▎| 552/594 [00:07<00:00, 250.19it/s]Loading weights:  98%|█████████▊| 580/594 [00:07<00:00, 238.32it/s]Loading weights: 100%|██████████| 594/594 [00:07<00:00, 81.16it/s] 
+[transformers] The tokenizer you are loading from '/wf/ckpt_cf' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+step 5000/130000 mismatches 0 ROW so far 60 34s (148 step/s)
+step 10000/130000 mismatches 0 ROW so far 119 67s (149 step/s)
+step 15000/130000 mismatches 0 ROW so far 128 101s (149 step/s)
+step 20000/130000 mismatches 0 ROW so far 128 134s (149 step/s)
+step 25000/130000 mismatches 0 ROW so far 128 168s (149 step/s)
+step 30000/130000 mismatches 0 ROW so far 160 202s (149 step/s)
+step 35000/130000 mismatches 0 ROW so far 160 235s (149 step/s)
+step 40000/130000 mismatches 0 ROW so far 173 269s (149 step/s)
+step 45000/130000 mismatches 0 ROW so far 192 302s (149 step/s)
+step 50000/130000 mismatches 0 ROW so far 192 336s (149 step/s)
+step 55000/130000 mismatches 0 ROW so far 224 370s (149 step/s)
+step 60000/130000 mismatches 0 ROW so far 224 403s (149 step/s)
+step 65000/130000 mismatches 0 ROW so far 246 437s (149 step/s)
+step 70000/130000 mismatches 0 ROW so far 256 471s (149 step/s)
+step 75000/130000 mismatches 0 ROW so far 256 504s (149 step/s)
+step 80000/130000 mismatches 0 ROW so far 256 538s (149 step/s)
+step 85000/130000 mismatches 0 ROW so far 256 571s (149 step/s)
+step 90000/130000 mismatches 0 ROW so far 256 605s (149 step/s)
+step 95000/130000 mismatches 0 ROW so far 256 638s (149 step/s)
+step 100000/130000 mismatches 0 ROW so far 401 672s (149 step/s)
+step 105000/130000 mismatches 0 ROW so far 779 706s (149 step/s)
+step 110000/130000 mismatches 0 ROW so far 1163 739s (149 step/s)
+step 115000/130000 mismatches 0 ROW so far 1540 773s (149 step/s)
+step 120000/130000 mismatches 0 ROW so far 1924 806s (149 step/s)
+step 125000/130000 mismatches 0 ROW so far 2304 840s (149 step/s)
+step 130000/130000 mismatches 0 ROW so far 2685 874s (149 step/s)
+RESULT {"model": "/wf/ckpt_cf", "neg": false, "steps_requested": 130000, "steps_checked": 130000, "n_mismatch": 0, "first_mismatch": null, "full_vocab": 667840, "table_rows": 156396, "hidden": 7680, "family_counts_checked": {"F0": 74832, "J": 6847, "V": 22315, "F1": 11317, "ST1": 2809, "WB": 864, "ROW": 2685, "R": 267, "ST0": 2893, "NT": 84, "F2": 3963, "QS": 29, "QD": 71, "SS0": 512, "SS1": 512}, "n_row_tokens_checked": 2685, "n_vdot_tokens_checked": 22315, "min_top1_top2_logit_margin": 22528.0, "steps_where_code_decode_ne_fullvocab_argmax": 0, "injections_applied": 0, "seconds": 873.7599799633026}
