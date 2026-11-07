@@ -14,6 +14,9 @@ VARIANTS = {
  'b12_apl2':       dict(boost={'2': 12, '26': 12, '27': 12}, apl={'2': 2, '26': 2, '27': 2}),
  'w4_apl2only':    dict(apl={'2': 2, '26': 2, '27': 2}),
  'b8_apl1':        dict(boost={'2': 8, '26': 8, '27': 8}),
+ # EXT OFF = the final CF+RAM circuit firmware (cfg.h without #define EXT: plain RV32IM nonlinears, as ramcf.elf / refRC were built); the first gate ran EXT=1
+ 'ctrl_w4_noext':  dict(wbits=4, ext=0),
+ 'b8_apl2_noext':  dict(boost={'2': 8, '26': 8, '27': 8}, apl={'2': 2, '26': 2, '27': 2}, ext=0),
 }
 @app.function(image=img, cpu=8, memory=28672, timeout=7200, volumes={'/out': out})
 def go(name, spec):
