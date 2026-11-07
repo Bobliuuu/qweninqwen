@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 750" width="1280" height="750" font-family="-apple-system, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <title>Architecture: a Qwen3-0.6B firmware running on a CPU compiled into a Qwen3.5-4B-geometry model</title>
+  <desc>The host boots the run and loops tokens. Inside the outer model, a RISC-V circuit executes the firmware one instruction per trace token, fetching weights as ROW tokens from the outer model's own embedding table.</desc>
+  <defs>
+    <filter id="sh" x="-5%" y="-5%" width="110%" height="115%"><feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="#1b1b3a" flood-opacity="0.07"/></filter>
+    <linearGradient id="acc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366F1"/><stop offset="1" stop-color="#4338CA"/></linearGradient>
+    <marker id="ar" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4F46E5"/></marker>
+    <marker id="arg" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9CA3AF"/></marker>
+  </defs>
+  <rect width="1280" height="750" fill="#FFFFFF"/>
+
+  <text x="48" y="54" font-size="26" font-weight="700" fill="#111827">A Qwen inside a Qwen</text>
+  <text x="48" y="80" font-size="15" fill="#6B7280">One Qwen3-0.6B token, computed as a program on a CPU that lives in the weights of a Qwen3.5-4B-geometry model</text>
+
+  <!-- HOST -->
+  <g filter="url(#sh)">
+    <rect x="48" y="150" width="210" height="300" rx="18" fill="#FFFFFF" stroke="#E5E7EB"/>
+  </g>
+  <text x="72" y="188" font-size="13" font-weight="600" letter-spacing="1.2" fill="#9CA3AF">HOST</text>
+  <text x="72" y="214" font-size="17" font-weight="600" fill="#111827">almost nothing</text>
+  <g font-size="14" fill="#4B5563">
+    <text x="72" y="256">boot the firmware</text>
+    <text x="72" y="284">send the GO token</text>
+    <text x="72" y="312">embed + append loop</text>
+    <text x="72" y="340">ecall I/O</text>
+  </g>
+  <line x1="72" y1="368" x2="234" y2="368" stroke="#F3F4F6"/>
+  <text x="72" y="394" font-size="12.5" fill="#9CA3AF">no weights, no RAM words,</text>
+  <text x="72" y="412" font-size="12.5" fill="#9CA3AF">no forced tokens</text>
+  <text x="72" y="430" font-size="12.5" fill="#9CA3AF">(0 / 0 / 0 in all 96 chunks)</text>
+
+  <path d="M258 300 H318" stroke="#4F46E5" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+  <text x="262" y="288" font-size="12" fill="#4F46E5">GO</text>
+
+  <!-- OUTER MODEL -->
+  <g filter="url(#sh)">
+    <rect x="318" y="118" width="640" height="470" rx="26" fill="#FAFAFF" stroke="#C7D2FE" stroke-width="1.5"/>
+  </g>
+  <text x="346" y="154" font-size="13" font-weight="600" letter-spacing="1.2" fill="#6366F1">OUTER MODEL</text>
+  <text x="346" y="180" font-size="19" font-weight="700" fill="#111827">Qwen3.5-4B geometry, stock <tspan font-family="SFMono-Regular, Menlo, monospace" font-size="16">Qwen3_5ForCausalLM</tspan></text>
+  <text x="346" y="203" font-size="13.5" fill="#6B7280">merged checkpoint: hidden 7680 · 12 chip layers + Qwen's 32 · vocab 680,128</text>
+
+  <!-- circuit -->
+  <rect x="346" y="228" width="364" height="330" rx="16" fill="#FFFFFF" stroke="#E0E7FF"/>
+  <text x="366" y="256" font-size="12.5" font-weight="600" letter-spacing="1.1" fill="#6366F1">CIRCUIT  ·  RV32IM CPU + VDOT</text>
+  <g font-size="13.5" fill="#374151">
+    <rect x="366" y="272" width="150" height="40" rx="9" fill="#EEF2FF"/><text x="381" y="297">registers · pc</text>
+    <rect x="530" y="272" width="164" height="40" rx="9" fill="#EEF2FF"/><text x="545" y="297">ALU · MUL · DIV</text>
+    <rect x="366" y="324" width="150" height="40" rx="9" fill="#EEF2FF"/><text x="381" y="349">RAM · 32 KB</text>
+    <rect x="530" y="324" width="164" height="40" rx="9" fill="#EEF2FF"/><text x="545" y="349">VDOT · 8 int4 / step</text>
+    <rect x="366" y="376" width="328" height="40" rx="9" fill="#EEF2FF"/><text x="381" y="401">real address decode (no patch)</text>
+    <rect x="366" y="428" width="328" height="40" rx="9" fill="url(#acc)"/><text x="381" y="453" fill="#FFFFFF" font-weight="600">argmax → HALT (the circuit's own)</text>
+  </g>
+  <text x="366" y="498" font-size="12.5" fill="#6B7280">state lives in DeltaNet heads; each generated</text>
+  <text x="366" y="516" font-size="12.5" fill="#6B7280">trace token is one CPU step</text>
+  <text x="366" y="542" font-size="12.5" fill="#9CA3AF">199,287,158 trace tokens · 178,066,316 instructions</text>
+
+  <!-- embedding table -->
+  <rect x="738" y="228" width="196" height="330" rx="16" fill="#FFFFFF" stroke="#E0E7FF"/>
+  <text x="756" y="256" font-size="12.5" font-weight="600" letter-spacing="1.1" fill="#6366F1">EMBEDDING TABLE</text>
+  <text x="756" y="280" font-size="13.5" fill="#374151">embed_tokens.weight</text>
+  <g>
+    <rect x="756" y="296" width="160" height="14" rx="3" fill="#EEF2FF"/>
+    <rect x="756" y="316" width="160" height="14" rx="3" fill="#EEF2FF"/>
+    <rect x="756" y="336" width="160" height="14" rx="3" fill="#C7D2FE"/>
+    <rect x="756" y="356" width="160" height="14" rx="3" fill="#EEF2FF"/>
+    <rect x="756" y="376" width="160" height="14" rx="3" fill="#EEF2FF"/>
+    <rect x="756" y="396" width="160" height="14" rx="3" fill="#EEF2FF"/>
+  </g>
+  <text x="756" y="436" font-size="13" fill="#374151">168,684 rows</text>
+  <text x="756" y="456" font-size="13" fill="#374151">× 3,840 int4 cells</text>
+  <text x="756" y="476" font-size="13" fill="#374151">2.59 GB (bf16)</text>
+  <text x="756" y="504" font-size="12.5" fill="#6B7280">the weights of the</text>
+  <text x="756" y="522" font-size="12.5" fill="#6B7280">inner model, and its</text>
+  <text x="756" y="540" font-size="12.5" fill="#6B7280">constants</text>
+  <!-- ROW fetch arrows -->
+  <path d="M694 344 C 716 344, 716 330, 738 330" stroke="#4F46E5" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+  <text x="702" y="322" font-size="11.5" fill="#4F46E5">ROW(r)</text>
+  <path d="M738 372 C 716 372, 716 358, 694 358" stroke="#9CA3AF" stroke-width="2" fill="none" marker-end="url(#arg)"/>
+  <text x="696" y="394" font-size="11.5" fill="#9CA3AF">cells</text>
+
+  <!-- loop -->
+  <path d="M780 588 C 780 646, 500 646, 500 588" stroke="#4F46E5" stroke-width="2" stroke-dasharray="5 5" fill="none" marker-end="url(#ar)"/>
+  <text x="640" y="668" text-anchor="middle" font-size="13" fill="#4F46E5">trace token in  →  next trace token out</text>
+
+  <!-- FIRMWARE -->
+  <path d="M958 300 H1010" stroke="#9CA3AF" stroke-width="2" fill="none" marker-end="url(#arg)"/>
+  <g filter="url(#sh)">
+    <rect x="1010" y="150" width="226" height="300" rx="18" fill="#FFFFFF" stroke="#E5E7EB"/>
+  </g>
+  <text x="1034" y="188" font-size="13" font-weight="600" letter-spacing="1.2" fill="#9CA3AF">PROGRAM</text>
+  <text x="1034" y="214" font-size="17" font-weight="600" fill="#111827">Qwen3-0.6B</text>
+  <text x="1034" y="236" font-size="13.5" fill="#6B7280">C firmware · prompt 785 "The"</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="1034" y="272">28 layers, int4 weights</text>
+    <text x="1034" y="296" fill="#4F46E5" font-weight="600">layers 2 · 26 · 27:</text>
+    <text x="1034" y="316" fill="#4F46E5">8-bit weights, 16-bit acts</text>
+    <text x="1034" y="344">RMSNorm · attention</text>
+    <text x="1034" y="364">MLP · LM head</text>
+    <text x="1034" y="384">argmax in the firmware</text>
+  </g>
+  <text x="1034" y="424" font-size="12.5" fill="#9CA3AF">one instruction per token</text>
+
+  <!-- OUTPUT -->
+  <path d="M1123 450 V 520" stroke="#4F46E5" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+  <g filter="url(#sh)"><rect x="1010" y="520" width="226" height="92" rx="16" fill="url(#acc)"/></g>
+  <text x="1034" y="556" font-size="24" font-weight="700" fill="#FFFFFF">15846</text>
+  <text x="1034" y="578" font-size="14" fill="#E0E7FF">' Question'</text>
+  <text x="1034" y="597" font-size="12.5" fill="#C7D2FE">Qwen3-0.6B's own token</text>
+
+  <!-- legend / footer -->
+  <line x1="48" y1="686" x2="1232" y2="686" stroke="#F3F4F6"/>
+  <text x="48" y="714" font-size="13" fill="#6B7280">Diagram is schematic (box sizes are not to scale). Numbers are from the run: 96 chunks · 95/95 exact seams · 0 mismatches · 0 forced tokens · 0 host injections.</text>
+  <text x="48" y="734" font-size="13" fill="#9CA3AF">One prompt token at position 0 (ctx = 1 firmware). Source: docs/assets/PROVENANCE.md</text>
+</svg>

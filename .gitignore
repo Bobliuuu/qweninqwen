@@ -10,3 +10,8 @@ ckpt/
 .env
 .DS_Store
 nohup.out
+
+# visual build temp files
+docs/assets/viz/_frames_*/
+docs/assets/viz/_still_*.png
+docs/assets/viz/__pycache__/

@@ -11,6 +11,10 @@
 </div>
 
 <!-- VISUAL:hero-gif -->
+<p align="center">
+  <img src="docs/assets/circuit_hero.gif" alt="A real Qwen3-0.6B token, computed inside another Qwen: the prompt token enters a Qwen3.5-4B-geometry model, the circuit inside runs the firmware while the weights are fetched from the model's own embedding table, then halts with 15846" width="900">
+  <br><sub>🎞️ <a href="docs/assets/circuit_hero.mp4">mp4</a> · a visualization of the real run (layer widths, counts and the answer are real data)</sub>
+</p>
 
 <!-- VISUAL:demo-video -->
 <p align="center">
@@ -53,6 +57,10 @@ The verdict is in [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_
 ## 🧱 Architecture
 
 <!-- VISUAL:architecture-svg -->
+<p align="center">
+  <img src="docs/assets/circuit_architecture.svg" alt="Architecture: the host boots the run and loops tokens; inside the Qwen3.5-4B-geometry outer model a RISC-V circuit executes a Qwen3-0.6B firmware, fetching weights as ROW tokens from the outer model's embedding table" width="100%">
+  <br><sub>Schematic (box sizes are not to scale); numbers are from the run.</sub>
+</p>
 
 ### Two models
 
@@ -140,6 +148,10 @@ flowchart LR
 ```
 
 <!-- VISUAL:one-token-animation -->
+<p align="center">
+  <img src="docs/assets/circuit_one_token.gif" alt="How one token is generated: the whole 199,287,158-token trace, a zoom into chunk 0, 18 real trace tokens around a weight-row fetch, the 28 layers and the LM head, then the HALT in chunk 95 and the answer 15846" width="900">
+  <br><sub>🎞️ <a href="docs/assets/circuit_one_token.mp4">mp4 (24 s)</a> · every frame is drawn from the real reference trace; see <a href="docs/assets/PROVENANCE.md">PROVENANCE.md</a></sub>
+</p>
 
 The host loop only boots the machine, embeds each emitted token and appends it, and handles the `ecall` I/O. Everything between `GO` and `HALT` is decided by the circuit.
 
@@ -148,8 +160,16 @@ The host loop only boots the machine, embeds each emitted token and appends it, 
 A **chunk** is 2,097,152 steps (the jobs report 2,097,153 including the boundary step). The 199.3M-step trace is 96 chunks; the last one ends at its `HALT` after 57,705 steps. Each job runs one chunk on one GPU and saves **the circuit's own end state**. Job k+1 starts from the reference's start state for chunk k+1, and the collector checks that job k's end state equals that start state exactly: registers, pc, anchor, `n`, `wb`, the 8-word latch window, all 8,192 RAM words, and `bn`. 95 seams, 95 exact matches.
 
 <!-- VISUAL:seam-grid -->
+<p align="center">
+  <img src="docs/assets/circuit_seam_grid.gif" alt="96 chunk jobs fill in parallel and 95 seam links turn exact, with counters 0 mismatches, 0 forced tokens, 0 host injections" width="900">
+  <br><sub>🎞️ <a href="docs/assets/circuit_seam_grid.mp4">mp4</a> · replay of the real per-job durations as if all 96 jobs started together (the real run was staggered)</sub>
+</p>
 
 ## 🪜 The tier ladder
+
+<p align="center">
+  <img src="docs/assets/circuit_tiers.svg" alt="Instructions per token on a log scale for tiers T0 to T3m and the final run; measured tiers solid, projected tiers hatched" width="100%">
+</p>
 
 The project is organised as tiers: each is a harder claim or a faster build than the one before. The first tiers came from the planning documents ([`docs/TIERS.md`](docs/TIERS.md), [`docs/CIRCUIT_ROUTE_PLAN.md`](docs/CIRCUIT_ROUTE_PLAN.md)); instruction counts below are from the compiler emulator, and seconds are computed, not run, unless the row says measured.
 
@@ -187,6 +207,10 @@ The second axis is how much the host still supplies. Each step below moved a rol
 
 ## 📊 Metrics
 
+<p align="center">
+  <img src="docs/assets/circuit_metrics.svg" alt="The run in numbers: final word 15846, 96 of 96 jobs clean, 95 of 95 seams exact, 0 mismatches, 0 forced tokens, 0 host injections, 199,287,158 trace tokens, 178,066,316 instructions" width="100%">
+</p>
+
 All numbers below come from committed files. Sources are linked in each table.
 
 ### Run totals
@@ -213,6 +237,10 @@ All numbers below come from committed files. Sources are linked in each table.
 | Chunk 0 | boots from the firmware ELF alone |
 
 <!-- VISUAL:quant-chart -->
+<p align="center">
+  <img src="docs/assets/circuit_quantfix.gif" alt="Quantising only layer 2, 26 or 27 flips the answer; with 8-bit weights and 16-bit activations at those layers the answer is 15846" width="900">
+  <br><sub>🎞️ <a href="docs/assets/circuit_quantfix.mp4">mp4</a> · data: <code>diag_quant2.json</code>, <code>quantfix/results/*.json</code></sub>
+</p>
 
 ### Quantisation study
 
@@ -276,6 +304,13 @@ All times are EST, 2026-11-06 to 2026-11-07.
 | 00:48 | collector verdict **PASS**; all rented instances destroyed; Modal app stopped |
 
 <!-- VISUAL:fleet-timeline -->
+<p align="center">
+  <img src="docs/assets/circuit_fleet.svg" alt="Chunks completed by the Vast.ai fleet manager over time, with boxes up and the points where the manager restarted" width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/assets/circuit_heatstrip.svg" alt="Job time in minutes for each of the 96 chunks, coloured by minutes, with the machine that ran each chunk" width="100%">
+</p>
 
 ### History
 
