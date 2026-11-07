@@ -51,3 +51,5 @@
 ## 2026-11-06 BUILD fork (parallel final-path tooling)
 - ap-wSUMIF7igXdVsdxZIgAPFz  qwen-in-qwen-cfram-chain (detached, 1 A100): `modal run --detach cf/modal_cfram_chain.py --chunks 0-0 --reset0 --steps 2000 --write-cache --outname rowemb_build` -> builds /data/cfram/rowemb_cf.npy (circuit embedding of the 156,396-row table, ~17 min python-bound). log ~/qweninqwen-work/cfram_chain_out/rowemb_build.log
 - ap-dcd4heMDVQCAfLlurtvBqu  qwen-in-qwen-ckpt-table (CPU): checkpoint-decoded row table vs rowtab_cf.npy: bit-identical, 12 s load. logs/cfram_par/ckpt_table_verify.json
+
+- 2026-11-06 21:10 EST diag_quant (CPU, Modal apps qwen-in-qwen-diagquant, 3 detached runs, no GPU): why firmware token 13 vs HF 15846. Verdict quantisation at layers 2/26/27 (massive activation); report fullrun/diag_quant/REPORT.md

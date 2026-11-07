@@ -1,0 +1,171 @@
+{
+ "W4+act; down_proj fp @ layers 2,27": {
+  "argmax": 25,
+  "top5": [
+   25,
+   11,
+   220,
+   12,
+   15
+  ],
+  "rank13": 6,
+  "rank15846": 1399,
+  "cos_final": 0.7763075828552246
+ },
+ "W4+act; ALL mats fp @ layer 2 only": {
+  "argmax": 25,
+  "top5": [
+   25,
+   11,
+   291,
+   12,
+   13
+  ],
+  "rank13": 4,
+  "rank15846": 6850,
+  "cos_final": 0.7603195905685425
+ },
+ "W4+act; ALL mats fp @ layer 27 only": {
+  "argmax": 6712,
+  "top5": [
+   6712,
+   2010,
+   57995,
+   16231,
+   43561
+  ],
+  "rank13": 1348,
+  "rank15846": 52844,
+  "cos_final": 0.7949604392051697
+ },
+ "W4+act; ALL mats fp @ 2,26,27 (act still int8 there)": {
+  "argmax": 7662,
+  "top5": [
+   7662,
+   13213,
+   17980,
+   3988,
+   9
+  ],
+  "rank13": 17694,
+  "rank15846": 15,
+  "cos_final": 0.9560636281967163
+ },
+ "W4+act; ALL mats fp @ 2,3,26,27 (act still int8 there)": {
+  "argmax": 7662,
+  "top5": [
+   7662,
+   13213,
+   17980,
+   3988,
+   9
+  ],
+  "rank13": 17819,
+  "rank15846": 14,
+  "cos_final": 0.9559997320175171
+ },
+ "W4+act; W8 @ 2,3,26,27 (act int8 there)": {
+  "argmax": 25715,
+  "top5": [
+   25715,
+   7662,
+   9,
+   17380,
+   1479
+  ],
+  "rank13": 12733,
+  "rank15846": 11,
+  "cos_final": 0.9496824741363525
+ },
+ "W4+act; W8 @ 2,3,26,27, act OFF there": {
+  "argmax": 15846,
+  "top5": [
+   15846,
+   83291,
+   21806,
+   7662,
+   14582
+  ],
+  "rank13": 17822,
+  "rank15846": 0,
+  "cos_final": 0.9484131336212158
+ },
+ "W4+act; fp weights @ 2,3,26,27, act OFF there (= EXCEPT)": {
+  "argmax": 15846,
+  "top5": [
+   15846,
+   3405,
+   7662,
+   38297,
+   3988
+  ],
+  "rank13": 29671,
+  "rank15846": 0,
+  "cos_final": 0.9939145445823669
+ },
+ "W4+act; W8 @ 2,26,27, act OFF there": {
+  "argmax": 15846,
+  "top5": [
+   15846,
+   83291,
+   14582,
+   21806,
+   7662
+  ],
+  "rank13": 17466,
+  "rank15846": 0,
+  "cos_final": 0.9484564065933228
+ },
+ "W4+act; down_proj W8 @ 2,27 and act OFF on all of layers 2,27": {
+  "argmax": 25,
+  "top5": [
+   25,
+   11,
+   311,
+   374,
+   13
+  ],
+  "rank13": 4,
+  "rank15846": 634,
+  "cos_final": 0.7695884108543396
+ },
+ "W4+act; fp down_proj @ 2,27 and act OFF on layers 2,27": {
+  "argmax": 25,
+  "top5": [
+   25,
+   11,
+   13,
+   311,
+   220
+  ],
+  "rank13": 2,
+  "rank15846": 429,
+  "cos_final": 0.7717444896697998
+ },
+ "W8+act everywhere except fp @ 27 (weights+act off)": {
+  "argmax": 38297,
+  "top5": [
+   38297,
+   3405,
+   15846,
+   3988,
+   21806
+  ],
+  "rank13": 29161,
+  "rank15846": 2,
+  "cos_final": 0.9865334033966064
+ },
+ "W8+act everywhere except fp @ 2,27 (weights+act off)": {
+  "argmax": 38297,
+  "top5": [
+   38297,
+   15846,
+   3405,
+   14582,
+   21806
+  ],
+  "rank13": 21089,
+  "rank15846": 1,
+  "cos_final": 0.9981801509857178
+ }
+}
