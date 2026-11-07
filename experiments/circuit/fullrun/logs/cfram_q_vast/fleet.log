@@ -1,0 +1,1240 @@
+2026-11-06 23:25:27 manage 59513405 qiq-hub-a100pcie A100 PCIE $0.703/h
+2026-11-06 23:25:27 manage 59513407 qiq-smoke-l40s L40S $0.614/h
+2026-11-06 23:25:27 manage 59514410 qiq-smoke-4090b RTX 4090 $0.481/h
+2026-11-06 23:25:27 manage 59516199 qiq-4090-59150175 RTX 4090 $0.474/h
+2026-11-06 23:25:27 manage 59516200 qiq-4090-58548022 RTX 4090 $0.468/h
+2026-11-06 23:25:27 manage 59516202 qiq-4090-59504223 RTX 4090 $0.468/h
+2026-11-06 23:25:27 manage 59516210 qiq-4090-52308525 RTX 4090 $0.500/h
+2026-11-06 23:25:27 manage 59516212 qiq-4090-53581241 RTX 4090 $0.500/h
+2026-11-06 23:25:27 manage 59516214 qiq-4090-37248633 RTX 4090 $0.481/h
+2026-11-06 23:25:27 manage 59516215 qiq-4090-58947676 RTX 4090 $0.494/h
+2026-11-06 23:30:17 READY 59513405 qiq-hub-a100pcie torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA A100-PCIE-40GB
+2026-11-06 23:40:09 chunk 0 on 59513405 A100 PCIE: OK 582s
+2026-11-06 23:40:50 READY 59516214 qiq-4090-37248633 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:41:25 READY 59516199 qiq-4090-59150175 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:41:37 READY 59516210 qiq-4090-52308525 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:41:59 READY 59516215 qiq-4090-58947676 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-06 23:42:01 READY 59516212 qiq-4090-53581241 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:42:49 manage 59519508 qiq-extra-58548031 RTX 4090 $0.468/h
+2026-11-06 23:43:35 manage 59519509 qiq-extra-59515892 RTX 4090 $0.468/h
+2026-11-06 23:44:51 startup: 1 chunks already done on disk, queue=[95, 1, 2, 3, 4, 5]...
+2026-11-06 23:44:52 manage 59513405 qiq-hub-a100pcie A100 PCIE $0.703/h
+2026-11-06 23:44:52 manage 59513407 qiq-smoke-l40s L40S $0.614/h
+2026-11-06 23:44:52 manage 59514410 qiq-smoke-4090b RTX 4090 $0.481/h
+2026-11-06 23:44:52 manage 59516199 qiq-4090-59150175 RTX 4090 $0.474/h
+2026-11-06 23:44:52 manage 59516200 qiq-4090-58548022 RTX 4090 $0.468/h
+2026-11-06 23:44:52 manage 59516202 qiq-4090-59504223 RTX 4090 $0.468/h
+2026-11-06 23:44:52 manage 59516210 qiq-4090-52308525 RTX 4090 $0.500/h
+2026-11-06 23:44:52 manage 59516212 qiq-4090-53581241 RTX 4090 $0.500/h
+2026-11-06 23:44:52 manage 59516214 qiq-4090-37248633 RTX 4090 $0.481/h
+2026-11-06 23:44:52 manage 59516215 qiq-4090-58947676 RTX 4090 $0.494/h
+2026-11-06 23:44:52 manage 59519508 qiq-extra-58548031 RTX 4090 $0.468/h
+2026-11-06 23:44:52 manage 59519509 qiq-extra-59515892 RTX 4090 $0.468/h
+2026-11-06 23:45:03 READY 59513405 qiq-hub-a100pcie torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA A100-PCIE-40GB
+2026-11-06 23:45:05 ADOPT chunk 1 running on 59513405
+2026-11-06 23:45:19 READY 59516199 qiq-4090-59150175 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:45:20 READY 59516214 qiq-4090-37248633 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:45:20 ADOPT chunk 3 running on 59516199
+2026-11-06 23:45:21 READY 59516210 qiq-4090-52308525 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:45:21 ADOPT chunk 2 running on 59516214
+2026-11-06 23:45:23 ADOPT chunk 4 running on 59516210
+2026-11-06 23:45:37 READY 59516212 qiq-4090-53581241 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:45:39 ADOPT chunk 6 running on 59516212
+2026-11-06 23:45:40 READY 59516215 qiq-4090-58947676 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-06 23:45:42 ADOPT chunk 5 running on 59516215
+2026-11-06 23:48:19 chunk 5 on 59516215 RTX 4090: OK 357s
+2026-11-06 23:49:51 chunk 1 on 59513405 A100 PCIE: OK 562s
+2026-11-06 23:50:00 READY 59519508 qiq-extra-58548031 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:50:40 chunk 95 on 59513405 A100 PCIE: OK 29s
+2026-11-06 23:51:15 manage 59520869 qiq-4090x-57669401 RTX 4090 $0.468/h
+2026-11-06 23:51:44 READY 59516200 qiq-4090-58548022 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:52:46 READY 59514410 qiq-smoke-4090b Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:54:15 chunk 7 on 59516215 RTX 4090: OK 345s
+2026-11-06 23:54:15 DESTROY 59516215 qiq-4090-58947676: $/chunk 0.047 > 2x best 0.006
+2026-11-06 23:59:30 startup: 5 chunks already done on disk, queue=[2, 3, 4, 6, 8, 9]...
+2026-11-06 23:59:31 manage 59513405 qiq-hub-a100pcie A100 PCIE $0.703/h
+2026-11-06 23:59:31 manage 59513407 qiq-smoke-l40s L40S $0.614/h
+2026-11-06 23:59:31 manage 59514410 qiq-smoke-4090b RTX 4090 $0.481/h
+2026-11-06 23:59:31 manage 59516199 qiq-4090-59150175 RTX 4090 $0.474/h
+2026-11-06 23:59:31 manage 59516200 qiq-4090-58548022 RTX 4090 $0.468/h
+2026-11-06 23:59:31 manage 59516202 qiq-4090-59504223 RTX 4090 $0.468/h
+2026-11-06 23:59:31 manage 59516210 qiq-4090-52308525 RTX 4090 $0.500/h
+2026-11-06 23:59:31 manage 59516212 qiq-4090-53581241 RTX 4090 $0.500/h
+2026-11-06 23:59:31 manage 59516214 qiq-4090-37248633 RTX 4090 $0.481/h
+2026-11-06 23:59:31 manage 59519508 qiq-extra-58548031 RTX 4090 $0.468/h
+2026-11-06 23:59:31 manage 59519509 qiq-extra-59515892 RTX 4090 $0.468/h
+2026-11-06 23:59:31 manage 59520869 qiq-4090x-57669401 RTX 4090 $0.468/h
+2026-11-06 23:59:42 READY 59513405 qiq-hub-a100pcie torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA A100-PCIE-40GB
+2026-11-06 23:59:44 ADOPT chunk 9 running on 59513405
+2026-11-06 23:59:54 READY 59516200 qiq-4090-58548022 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:59:54 READY 59519508 qiq-extra-58548031 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:59:57 READY 59516199 qiq-4090-59150175 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-06 23:59:58 READY 59516214 qiq-4090-37248633 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:00:09 chunk 9 on 59513405 A100 PCIE: OK 564s
+2026-11-07 00:00:12 READY 59516210 qiq-4090-52308525 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:00:13 READY 59516212 qiq-4090-53581241 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:00:22 READY 59514410 qiq-smoke-4090b Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:01:11 harvested chunk_0010 from 59516200
+2026-11-07 00:01:11 harvested chunk_0008 from 59519508
+2026-11-07 00:01:19 startup: 8 chunks already done on disk, queue=[2, 3, 4, 6, 11, 12]...
+2026-11-07 00:01:20 manage 59513405 qiq-hub-a100pcie A100 PCIE $0.703/h
+2026-11-07 00:01:20 manage 59513407 qiq-smoke-l40s L40S $0.614/h
+2026-11-07 00:01:20 manage 59514410 qiq-smoke-4090b RTX 4090 $0.481/h
+2026-11-07 00:01:20 manage 59516199 qiq-4090-59150175 RTX 4090 $0.474/h
+2026-11-07 00:01:20 manage 59516200 qiq-4090-58548022 RTX 4090 $0.468/h
+2026-11-07 00:01:20 manage 59516202 qiq-4090-59504223 RTX 4090 $0.468/h
+2026-11-07 00:01:20 manage 59516210 qiq-4090-52308525 RTX 4090 $0.500/h
+2026-11-07 00:01:20 manage 59516212 qiq-4090-53581241 RTX 4090 $0.500/h
+2026-11-07 00:01:20 manage 59516214 qiq-4090-37248633 RTX 4090 $0.481/h
+2026-11-07 00:01:20 manage 59519508 qiq-extra-58548031 RTX 4090 $0.468/h
+2026-11-07 00:01:20 manage 59519509 qiq-extra-59515892 RTX 4090 $0.468/h
+2026-11-07 00:01:20 manage 59520869 qiq-4090x-57669401 RTX 4090 $0.468/h
+2026-11-07 00:01:31 READY 59513405 qiq-hub-a100pcie torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA A100-PCIE-40GB
+2026-11-07 00:01:33 ADOPT chunk 8 running on 59513405
+2026-11-07 00:01:43 READY 59516200 qiq-4090-58548022 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:01:44 READY 59519508 qiq-extra-58548031 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:01:44 ADOPT chunk 2 running on 59516200
+2026-11-07 00:01:45 ADOPT chunk 3 running on 59519508
+2026-11-07 00:01:47 READY 59516199 qiq-4090-59150175 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:01:47 READY 59516214 qiq-4090-37248633 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:01:48 READY 59520869 qiq-4090x-57669401 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:01:49 ADOPT chunk 4 running on 59516199
+2026-11-07 00:01:49 ADOPT chunk 6 running on 59516214
+2026-11-07 00:02:01 READY 59516210 qiq-4090-52308525 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:02:02 READY 59516212 qiq-4090-53581241 Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:02:03 ADOPT chunk 10 running on 59516210
+2026-11-07 00:02:04 ADOPT chunk 11 running on 59516212
+2026-11-07 00:02:10 READY 59514410 qiq-smoke-4090b Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:02:13 ADOPT chunk 12 running on 59514410
+2026-11-07 00:09:41 READY 59513407 qiq-smoke-l40s Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+2026-11-07 00:09:59 chunk 8 on 59513405 A100 PCIE: OK 563s
+2026-11-07 00:11:15 harvested chunk_0002 from 59516200
+2026-11-07 00:11:15 harvested chunk_0003 from 59519508
+2026-11-07 00:11:15 harvested chunk_0011 from 59520869
+2026-11-07 00:11:15 harvested chunk_0003 from 59516199
+2026-11-07 00:11:15 harvested chunk_0002 from 59516214
+2026-11-07 00:11:16 harvested chunk_0004 from 59516210
+2026-11-07 00:11:16 harvested chunk_0006 from 59516212
+2026-11-07 00:11:17 harvested chunk_0011 from 59514410
+2026-11-07 00:11:18 harvested chunk_0004 from 59516199
+2026-11-07 00:11:18 harvested chunk_0006 from 59516214
+2026-11-07 00:11:22 harvested chunk_0012 from 59514410
+2026-11-07 00:11:22 startup: 14 chunks already done on disk, queue=[13, 14, 15, 16, 17, 18]...
+2026-11-07 00:11:22 manage 59513405 qiq-hub-a100pcie A100 PCIE $0.703/h
+2026-11-07 00:11:22 manage 59513407 qiq-smoke-l40s L40S $0.614/h
+2026-11-07 00:11:22 manage 59514410 qiq-smoke-4090b RTX 4090 $0.481/h
+2026-11-07 00:11:22 manage 59516199 qiq-4090-59150175 RTX 4090 $0.474/h
+2026-11-07 00:11:22 manage 59516200 qiq-4090-58548022 RTX 4090 $0.468/h
+2026-11-07 00:11:22 manage 59516202 qiq-4090-59504223 RTX 4090 $0.468/h
+2026-11-07 00:11:22 manage 59516210 qiq-4090-52308525 RTX 4090 $0.500/h
+2026-11-07 00:11:22 manage 59516212 qiq-4090-53581241 RTX 4090 $0.500/h
+2026-11-07 00:11:22 manage 59516214 qiq-4090-37248633 RTX 4090 $0.481/h
+2026-11-07 00:11:22 manage 59519508 qiq-extra-58548031 RTX 4090 $0.468/h
+2026-11-07 00:11:22 manage 59519509 qiq-extra-59515892 RTX 4090 $0.468/h
+2026-11-07 00:11:22 manage 59520869 qiq-4090x-57669401 RTX 4090 $0.468/h
+2026-11-07 00:11:33 READY 59513405 qiq-hub-a100pcie torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA A100-PCIE-40GB
+2026-11-07 00:11:35 ADOPT chunk 14 running on 59513405
+2026-11-07 00:11:47 READY 59520869 qiq-4090x-57669401 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:11:49 READY 59516199 qiq-4090-59150175 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:11:50 READY 59516214 qiq-4090-37248633 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:11:51 READY 59516210 qiq-4090-52308525 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:11:52 READY 59516212 qiq-4090-53581241 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:12:07 READY 59519508 qiq-extra-58548031                                                                                                                         
+2026-11-07 00:12:09 READY 59516200 qiq-4090-58548022 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:12:10 READY 59513407 qiq-smoke-l40s torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA L40S
+2026-11-07 00:12:12 ADOPT chunk 13 running on 59513407
+2026-11-07 00:12:15 READY 59514410 qiq-smoke-4090b torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:15:59 READY 59519509 qiq-extra-59515892 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:17:37 chunk 13 on 59520869 RTX 4090: OK 329s
+2026-11-07 00:17:41 chunk 15 on 59516199 RTX 4090: OK 339s
+2026-11-07 00:17:47 chunk 17 on 59516210 RTX 4090: OK 342s
+2026-11-07 00:17:48 chunk 18 on 59516212 RTX 4090: OK 346s
+2026-11-07 00:18:16 chunk 19 on 59519508 RTX 4090: OK 343s
+2026-11-07 00:18:17 chunk 20 on 59516200 RTX 4090: OK 343s
+2026-11-07 00:18:26 chunk 16 on 59516214 RTX 4090: OK 369s
+2026-11-07 00:18:50 chunk 21 on 59514410 RTX 4090: OK 369s
+2026-11-07 00:18:59 chunk 13 on 59513407 L40S: OK 529s
+2026-11-07 00:18:59 DESTROY 59513407 qiq-smoke-l40s: $/chunk 0.090 > 2x best 0.043
+2026-11-07 00:19:38 chunk 14 on 59513405 A100 PCIE: OK 562s
+2026-11-07 00:19:38 DESTROY 59513405 qiq-hub-a100pcie: $/chunk 0.110 > 2x best 0.043
+2026-11-07 00:20:04 relay 59516202 attempt 0 failed: Connection to <vast-ssh-host> closed by remote host.
+
+2026-11-07 00:20:24 relay 59516202 attempt 1 failed: ssh: connect to host <vast-ssh-host> port 12410: Operation timed out
+
+2026-11-07 00:20:24 prep failed 59516202
+2026-11-07 00:20:24 DESTROY 59516202 qiq-4090-59504223: prep failed
+2026-11-07 00:22:01 chunk 22 on 59519509 RTX 4090: OK 343s
+2026-11-07 00:22:25 startup: 24 chunks already done on disk, queue=[23, 24, 25, 26, 27, 28]...
+2026-11-07 00:22:25 manage 59514410 qiq-smoke-4090b RTX 4090 $0.481/h
+2026-11-07 00:22:25 manage 59516199 qiq-4090-59150175 RTX 4090 $0.474/h
+2026-11-07 00:22:25 manage 59516200 qiq-4090-58548022 RTX 4090 $0.468/h
+2026-11-07 00:22:25 manage 59516210 qiq-4090-52308525 RTX 4090 $0.500/h
+2026-11-07 00:22:25 manage 59516212 qiq-4090-53581241 RTX 4090 $0.500/h
+2026-11-07 00:22:25 manage 59516214 qiq-4090-37248633 RTX 4090 $0.481/h
+2026-11-07 00:22:25 manage 59519508 qiq-extra-58548031 RTX 4090 $0.468/h
+2026-11-07 00:22:25 manage 59519509 qiq-extra-59515892 RTX 4090 $0.468/h
+2026-11-07 00:22:25 manage 59520869 qiq-4090x-57669401 RTX 4090 $0.468/h
+2026-11-07 00:22:32 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:33 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:33 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:34 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:34 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:35 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:35 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:39 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:43 WORKER EXC 59519509: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:45 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:45 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:47 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:49 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:49 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:51 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:51 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:57 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:58 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:22:58 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:01 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:03 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:03 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:05 WORKER EXC 59519509: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:06 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:06 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:10 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:11 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:14 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:17 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:17 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:17 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:20 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:20 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:26 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:27 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:27 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:28 WORKER EXC 59519509: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:31 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:31 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:36 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:36 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:36 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:39 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:40 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:40 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:45 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:45 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:50 WORKER EXC 59519509: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:51 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:51 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:51 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:53 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:53 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:54 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:59 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:23:59 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:04 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:06 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:06 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:06 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:07 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:12 WORKER EXC 59519509: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:12 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:13 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:13 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:17 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:19 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:20 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:20 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:20 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:26 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:27 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:29 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:31 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:31 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:33 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:34 WORKER EXC 59519509: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:35 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:35 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:40 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:41 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:42 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:44 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:47 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:50 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:50 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:50 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:54 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:54 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:56 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:56 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:57 WORKER EXC 59519509: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:24:59 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:05 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:05 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:06 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:07 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:08 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:08 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:09 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:12 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:18 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:19 WORKER EXC 59519509: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:19 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:20 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:20 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:20 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:23 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:25 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:26 WORKER EXC 59514410: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:30 WORKER EXC 59516200: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:33 WORKER EXC 59519508: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:34 WORKER EXC 59516199: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:34 WORKER EXC 59516210: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:34 WORKER EXC 59516212: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:36 WORKER EXC 59516214: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:25:38 WORKER EXC 59520869: eet.py", line 76, in worker_inner
+    if not prep(b): log(f'prep failed {b["id"]}'); destroy(b, 'prep failed'); return
+           ^^^^^^^
+  File "/Users/jhome/qweninqwen-work/repo/experiments/circuit/fullrun/cf/vast/fleet.py", line 41, in prep
+    hub = boxes[a.hub]; rc, o = ssh(hub, f'/root/relay.sh {b["host"]} {b["port"]} rowemb 2>&1 | tail -n 3', 3000)
+          ~~~~~^^^^^^^
+KeyError: 59513405
+
+2026-11-07 00:26:01 harvested chunk_0028 from 59516200
+2026-11-07 00:26:01 harvested chunk_0027 from 59519508
+2026-11-07 00:26:02 harvested chunk_0023 from 59520869
+2026-11-07 00:26:02 harvested chunk_0024 from 59516199
+2026-11-07 00:26:02 harvested chunk_0029 from 59516214
+2026-11-07 00:26:02 harvested chunk_0025 from 59516210
+2026-11-07 00:26:02 harvested chunk_0026 from 59516212
+2026-11-07 00:26:04 harvested chunk_0030 from 59514410
+2026-11-07 00:26:04 startup: 32 chunks already done on disk, queue=[31, 32, 33, 34, 35, 36]...
+2026-11-07 00:26:05 manage 59514410 qiq-smoke-4090b RTX 4090 $0.481/h
+2026-11-07 00:26:05 manage 59516199 qiq-4090-59150175 RTX 4090 $0.474/h
+2026-11-07 00:26:05 manage 59516200 qiq-4090-58548022 RTX 4090 $0.468/h
+2026-11-07 00:26:05 manage 59516210 qiq-4090-52308525 RTX 4090 $0.500/h
+2026-11-07 00:26:05 manage 59516212 qiq-4090-53581241 RTX 4090 $0.500/h
+2026-11-07 00:26:05 manage 59516214 qiq-4090-37248633 RTX 4090 $0.481/h
+2026-11-07 00:26:05 manage 59519508 qiq-extra-58548031 RTX 4090 $0.468/h
+2026-11-07 00:26:05 manage 59519509 qiq-extra-59515892 RTX 4090 $0.468/h
+2026-11-07 00:26:05 manage 59520869 qiq-4090x-57669401 RTX 4090 $0.468/h
+2026-11-07 00:26:14 READY 59516200 qiq-4090-58548022 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:26:14 READY 59519508 qiq-extra-58548031                                                                                                                         
+2026-11-07 00:26:15 READY 59520869 qiq-4090x-57669401 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:26:16 READY 59516199 qiq-4090-59150175 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:26:17 READY 59516214 qiq-4090-37248633 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:26:18 READY 59516210 qiq-4090-52308525 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:26:18 READY 59516212 qiq-4090-53581241 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:26:23 READY 59514410 qiq-smoke-4090b torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:26:29 READY 59519509 qiq-extra-59515892 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:26:32 ADOPT chunk 31 running on 59519509
+2026-11-07 00:27:48 chunk 31 on 59519509 RTX 4090: OK 331s
+2026-11-07 00:30:11 startup: 72 chunks already done on disk, queue=[71, 72, 73, 74, 75, 76]...
+2026-11-07 00:30:11 manage 59514410 qiq-smoke-4090b RTX 4090 $0.481/h
+2026-11-07 00:30:11 manage 59516199 qiq-4090-59150175 RTX 4090 $0.474/h
+2026-11-07 00:30:11 manage 59516200 qiq-4090-58548022 RTX 4090 $0.468/h
+2026-11-07 00:30:11 manage 59516210 qiq-4090-52308525 RTX 4090 $0.500/h
+2026-11-07 00:30:11 manage 59516212 qiq-4090-53581241 RTX 4090 $0.500/h
+2026-11-07 00:30:11 manage 59516214 qiq-4090-37248633 RTX 4090 $0.481/h
+2026-11-07 00:30:11 manage 59519508 qiq-extra-58548031 RTX 4090 $0.468/h
+2026-11-07 00:30:11 manage 59519509 qiq-extra-59515892 RTX 4090 $0.468/h
+2026-11-07 00:30:11 manage 59520869 qiq-4090x-57669401 RTX 4090 $0.468/h
+2026-11-07 00:30:21 READY 59516200 qiq-4090-58548022 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:30:21 READY 59519508 qiq-extra-58548031                                                                                                                         
+2026-11-07 00:30:22 READY 59520869 qiq-4090x-57669401 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:30:22 ADOPT chunk 32 running on 59516200
+2026-11-07 00:30:22 ADOPT chunk 31 running on 59519508
+2026-11-07 00:30:23 READY 59516199 qiq-4090-59150175 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:30:23 READY 59516214 qiq-4090-37248633 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:30:23 KILLED duplicate chunk 32 on 59516200 (already done)
+2026-11-07 00:30:24 ADOPT chunk 33 running on 59520869
+2026-11-07 00:30:24 KILLED duplicate chunk 31 on 59519508 (already done)
+2026-11-07 00:30:25 ADOPT chunk 34 running on 59516199
+2026-11-07 00:30:25 READY 59516212 qiq-4090-53581241 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:30:25 READY 59516210 qiq-4090-52308525 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:30:25 ADOPT chunk 35 running on 59516214
+2026-11-07 00:30:25 KILLED duplicate chunk 33 on 59520869 (already done)
+2026-11-07 00:30:26 KILLED duplicate chunk 34 on 59516199 (already done)
+2026-11-07 00:30:27 ADOPT chunk 37 running on 59516212
+2026-11-07 00:30:27 ADOPT chunk 36 running on 59516210
+2026-11-07 00:30:27 KILLED duplicate chunk 35 on 59516214 (already done)
+2026-11-07 00:30:29 KILLED duplicate chunk 37 on 59516212 (already done)
+2026-11-07 00:30:29 KILLED duplicate chunk 36 on 59516210 (already done)
+2026-11-07 00:30:30 READY 59514410 qiq-smoke-4090b torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:30:32 ADOPT chunk 38 running on 59514410
+2026-11-07 00:30:35 KILLED duplicate chunk 38 on 59514410 (already done)
+2026-11-07 00:30:36 READY 59519509 qiq-extra-59515892 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:30:39 ADOPT chunk 39 running on 59519509
+2026-11-07 00:30:43 KILLED duplicate chunk 39 on 59519509 (already done)
+2026-11-07 00:31:30 startup: 72 chunks already done on disk, queue=[94, 93, 92, 91, 90, 89]...
+2026-11-07 00:31:31 manage 59514410 qiq-smoke-4090b RTX 4090 $0.481/h
+2026-11-07 00:31:31 manage 59516199 qiq-4090-59150175 RTX 4090 $0.474/h
+2026-11-07 00:31:31 manage 59516200 qiq-4090-58548022 RTX 4090 $0.468/h
+2026-11-07 00:31:31 manage 59516210 qiq-4090-52308525 RTX 4090 $0.500/h
+2026-11-07 00:31:31 manage 59516212 qiq-4090-53581241 RTX 4090 $0.500/h
+2026-11-07 00:31:31 manage 59516214 qiq-4090-37248633 RTX 4090 $0.481/h
+2026-11-07 00:31:31 manage 59519508 qiq-extra-58548031 RTX 4090 $0.468/h
+2026-11-07 00:31:31 manage 59519509 qiq-extra-59515892 RTX 4090 $0.468/h
+2026-11-07 00:31:31 manage 59520869 qiq-4090x-57669401 RTX 4090 $0.468/h
+2026-11-07 00:31:40 READY 59516200 qiq-4090-58548022 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:31:41 READY 59519508 qiq-extra-58548031                                                                                                                         
+2026-11-07 00:31:42 READY 59520869 qiq-4090x-57669401 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:31:42 ADOPT chunk 71 running on 59516200
+2026-11-07 00:31:42 ADOPT chunk 72 running on 59519508
+2026-11-07 00:31:43 READY 59516199 qiq-4090-59150175 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:31:43 READY 59516214 qiq-4090-37248633 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:31:43 ADOPT chunk 73 running on 59520869
+2026-11-07 00:31:44 READY 59516210 qiq-4090-52308525 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:31:44 READY 59516212 qiq-4090-53581241 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:31:44 ADOPT chunk 74 running on 59516199
+2026-11-07 00:31:45 ADOPT chunk 75 running on 59516214
+2026-11-07 00:31:46 ADOPT chunk 77 running on 59516210
+2026-11-07 00:31:46 ADOPT chunk 76 running on 59516212
+2026-11-07 00:31:49 READY 59514410 qiq-smoke-4090b torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:31:52 ADOPT chunk 78 running on 59514410
+2026-11-07 00:31:55 READY 59519509 qiq-extra-59515892 torch 2.15.0+cu132 triton 3.9.0 cuda True NVIDIA GeForce RTX 4090
+2026-11-07 00:31:58 ADOPT chunk 79 running on 59519509
+2026-11-07 00:36:04 chunk 73 on 59520869 RTX 4090: OK 331s
+2026-11-07 00:36:21 chunk 71 on 59516200 RTX 4090: OK 346s
+2026-11-07 00:36:22 chunk 72 on 59519508 RTX 4090: OK 344s
+2026-11-07 00:36:28 chunk 74 on 59516199 RTX 4090: OK 338s
+2026-11-07 00:36:33 chunk 76 on 59516212 RTX 4090: OK 347s
+2026-11-07 00:36:33 chunk 77 on 59516210 RTX 4090: OK 342s
+2026-11-07 00:36:43 chunk 79 on 59519509 RTX 4090: OK 331s
+2026-11-07 00:36:49 chunk 78 on 59514410 RTX 4090: OK 355s
+2026-11-07 00:36:51 chunk 75 on 59516214 RTX 4090: OK 372s
+2026-11-07 00:41:54 chunk 94 on 59520869 RTX 4090: OK 331s
+2026-11-07 00:42:19 chunk 91 on 59516199 RTX 4090: OK 338s
+2026-11-07 00:42:28 chunk 90 on 59516212 RTX 4090: OK 346s
+2026-11-07 00:42:28 chunk 89 on 59516210 RTX 4090: OK 343s
+2026-11-07 00:42:28 chunk 93 on 59516200 RTX 4090: OK 342s
+2026-11-07 00:42:30 chunk 92 on 59519508 RTX 4090: OK 345s
+2026-11-07 00:42:41 chunk 88 on 59519509 RTX 4090: OK 331s
+2026-11-07 00:42:41 DESTROY 59519509 qiq-extra-59515892: queue empty
+2026-11-07 00:42:57 chunk 87 on 59514410 RTX 4090: OK 355s
+2026-11-07 00:42:57 DESTROY 59514410 qiq-smoke-4090b: queue empty
+2026-11-07 00:43:26 chunk 86 on 59516214 RTX 4090: OK 372s
+2026-11-07 00:43:26 DESTROY 59516214 qiq-4090-37248633: queue empty
+2026-11-07 00:47:44 chunk 85 on 59520869 RTX 4090: OK 330s
+2026-11-07 00:47:44 DESTROY 59520869 qiq-4090x-57669401: queue empty
+2026-11-07 00:48:10 chunk 84 on 59516199 RTX 4090: OK 338s
+2026-11-07 00:48:10 DESTROY 59516199 qiq-4090-59150175: queue empty
+2026-11-07 00:48:16 chunk 80 on 59519508 RTX 4090: OK 341s
+2026-11-07 00:48:16 DESTROY 59519508 qiq-extra-58548031: queue empty
+2026-11-07 00:48:23 chunk 83 on 59516212 RTX 4090: OK 346s
+2026-11-07 00:48:23 DESTROY 59516212 qiq-4090-53581241: queue empty
+2026-11-07 00:48:23 chunk 82 on 59516210 RTX 4090: OK 342s
+2026-11-07 00:48:23 DESTROY 59516210 qiq-4090-52308525: queue empty
+2026-11-07 00:48:35 chunk 81 on 59516200 RTX 4090: OK 343s
+2026-11-07 00:48:35 DESTROY 59516200 qiq-4090-58548022: queue empty
+2026-11-07 00:48:45 COLLECTOR: PASS: chunks 0-95: 96/96 jobs clean (0 mismatches, 0 forced, 0 injections); seams exact 95/95; final word from circuit tokens: 15846 (reference 15846); 0s to collect
