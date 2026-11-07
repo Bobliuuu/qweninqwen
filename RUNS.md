@@ -53,3 +53,6 @@
 - ap-dcd4heMDVQCAfLlurtvBqu  qwen-in-qwen-ckpt-table (CPU): checkpoint-decoded row table vs rowtab_cf.npy: bit-identical, 12 s load. logs/cfram_par/ckpt_table_verify.json
 
 - 2026-11-06 21:10 EST diag_quant (CPU, Modal apps qwen-in-qwen-diagquant, 3 detached runs, no GPU): why firmware token 13 vs HF 15846. Verdict quantisation at layers 2/26/27 (massive activation); report fullrun/diag_quant/REPORT.md
+- 2026-11-07T01:59:52Z quantfix gate: modal run --detach quantfix/modal_q.py (6 CPU variants; app qwen-in-qwen-quantfix); results qfr-out /quantfix/*.json; log ~/qweninqwen-work/box-logs/quantfix/launch1.log
+- result: quantfix gate passed (b8_apl2 -> 15846); commit b4d2b54; apps stopped
+- 2026-11-06 21:0x BUILD fork smoke tests: chained 0-2 (ap-PAOj2F8HUspvC8wdJQBQ4h, 6,291,455 free tokens, 0 mismatches, 3/3 boundaries ok); parallel 0-2 on deployed app qwen-in-qwen-cfram-par (3 jobs, seams exact 3/3); parametrized-signature test chunk 0 300k steps OK (0 mismatches); strict-cache test never got a GPU (queued ~20 min, A100/A100-80/L40S capacity short) and was cancelled when the app was stopped. All my Modal apps stopped.
