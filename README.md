@@ -2,7 +2,7 @@
 
 # 🧠 QIQ: qweninqwen
 
-**A real Qwen3-0.6B token, computed by a CPU that lives inside the weights of a modified Qwen3.5-0.8B.**
+**A real Qwen3-0.6B token, computed by a CPU that lives inside the weights of a modified Qwen3.5-4B.**
 
 `prompt token 785` → `circuit` → **`15846`** (the token Hugging Face's Qwen3-0.6B produces)
 
