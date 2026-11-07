@@ -1,0 +1,30 @@
+[endcheck] step 100,000/2,097,152 27s 29,860 agg tok/s free mismatches 0
+[endcheck] step 200,000/2,097,152 54s 29,893 agg tok/s free mismatches 0
+[endcheck] step 300,000/2,097,152 80s 29,904 agg tok/s free mismatches 0
+[endcheck] step 400,000/2,097,152 107s 29,909 agg tok/s free mismatches 0
+[endcheck] step 500,000/2,097,152 134s 29,909 agg tok/s free mismatches 0
+[endcheck] step 600,000/2,097,152 160s 29,909 agg tok/s free mismatches 0
+[endcheck] step 700,000/2,097,152 187s 29,910 agg tok/s free mismatches 0
+[endcheck] step 800,000/2,097,152 214s 29,910 agg tok/s free mismatches 0
+[endcheck] step 900,000/2,097,152 241s 29,911 agg tok/s free mismatches 0
+[endcheck] step 1,000,000/2,097,152 267s 29,911 agg tok/s free mismatches 0
+[endcheck] step 1,100,000/2,097,152 294s 29,911 agg tok/s free mismatches 0
+[endcheck] step 1,200,000/2,097,152 321s 29,911 agg tok/s free mismatches 0
+[endcheck] step 1,300,000/2,097,152 348s 29,910 agg tok/s free mismatches 0
+[endcheck] step 1,400,000/2,097,152 374s 29,910 agg tok/s free mismatches 0
+[endcheck] step 1,500,000/2,097,152 401s 29,906 agg tok/s free mismatches 0
+[endcheck] step 1,600,000/2,097,152 428s 29,903 agg tok/s free mismatches 0
+[endcheck] step 1,700,000/2,097,152 455s 29,898 agg tok/s free mismatches 0
+[endcheck] step 1,800,000/2,097,152 482s 29,895 agg tok/s free mismatches 0
+[endcheck] step 1,900,000/2,097,152 508s 29,892 agg tok/s free mismatches 0
+[endcheck] step 2,000,000/2,097,152 535s 29,889 agg tok/s free mismatches 0
+[endcheck] step 2,097,152/2,097,152 561s 29,886 agg tok/s free mismatches 0
+BOUNDARY 0->1: ok_full=True regs_bad rd/rs1/rs2 0/0/0 anchor/n (152, 152)/(6, 6) wb15_ok=True (ref wb27 134216450) bn_bad 0 latch_bad words/cells 0/0 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097151
+[endcheck] step 2,097,153/2,097,153 562s 29,879 agg tok/s free mismatches 0
+BOUNDARY 1->2: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1433, 1433)/(21, 21) wb15_ok=True (ref wb27 134216450) bn_bad 0 latch_bad words/cells 8/56 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 2->3: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (544, 544)/(7, 7) wb15_ok=True (ref wb27 134216386) bn_bad 0 latch_bad words/cells 8/59 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 3->4: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (882, 882)/(9, 9) wb15_ok=True (ref wb27 134216642) bn_bad 0 latch_bad words/cells 8/56 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 4->5: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1433, 1433)/(10, 10) wb15_ok=True (ref wb27 134216642) bn_bad 0 latch_bad words/cells 8/58 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 5->6: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1335, 1335)/(35, 35) wb15_ok=True (ref wb27 134216836) bn_bad 0 latch_bad words/cells 8/52 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 6->7: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1433, 1433)/(25, 25) wb15_ok=True (ref wb27 134216706) bn_bad 0 latch_bad words/cells 8/55 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 7->8: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1433, 1433)/(17, 17) wb15_ok=True (ref wb27 134216514) bn_bad 0 latch_bad words/cells 8/58 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152

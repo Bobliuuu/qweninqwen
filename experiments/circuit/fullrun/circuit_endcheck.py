@@ -358,6 +358,7 @@ if CHAIN or a.endcheck:
             for r in [r for r in range(B) if tg[r] == stop]:
                 ch = chunks[r]; o = extract(r); rs = full_next[ch]
                 if rs is None: rep_[ch] = dict(chunk=ch, boundary=f'{ch}->{ch + 1}', no_next_snapshot=True, anchor=o['anchor'], n=o['n']); print('chunk', ch, 'is last: no snapshot', ch + 1, flush=True); continue
+                if os.environ.get('ECDBG'): print('ECDBG circuit latch', o['latch'][:3], '| start-snapshot latch', states[r].get('latch', [])[:3], '| end-snapshot latch', rs.get('latch', [])[:3], flush=True)
                 d = compare(o, rs); exp = np.array(recon_ram(rs), np.int64); rb = np.nonzero(o['ram'] != exp)[0]; tmask = rs['touch_ea'] >= 0
                 d.update(chunk=ch, boundary=f'{ch}->{ch + 1}', step=tg[r] - 1, ram_slots_total=int(len(exp)), ram_full_bad=int(len(rb)), ram_full_bad_touched=int(tmask[rb].sum()), ram_full_bad_untouched=int((~tmask[rb]).sum()),
                          ram_full_first=[(int(i), hex(int(o['ram'][i])), hex(int(exp[i]))) for i in rb[:8]], regs_rd_bad_n=len(d['regs_rd_bad']), free_tokens=int(nff[r]), free_mismatches=int(nbf[r]), first_free_mismatch=first_bad[r])

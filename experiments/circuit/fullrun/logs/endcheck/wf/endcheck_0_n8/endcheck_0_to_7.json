@@ -1,0 +1,512 @@
+{
+ "mode": "endcheck",
+ "chunks": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7
+ ],
+ "steps_run": 2097153,
+ "seconds": 562.2984628677368,
+ "boundaries": [
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    152,
+    152
+   ],
+   "n": [
+    6,
+    6
+   ],
+   "wb15": [
+    31490,
+    31490
+   ],
+   "wb_ref_full27": 134216450,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "latch_bad_words": 0,
+   "latch_bad_cells": 0,
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 8103,
+    "sb_sh": 0,
+    "sw": 89
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": true,
+   "latch_bad": 0,
+   "row_reg_a4": [
+    4294964502,
+    4294964502
+   ],
+   "chunk": 0,
+   "boundary": "0->1",
+   "step": 2097151,
+   "ram_slots_total": 8192,
+   "ram_full_bad": 0,
+   "ram_full_bad_touched": 0,
+   "ram_full_bad_untouched": 0,
+   "ram_full_first": [],
+   "regs_rd_bad_n": 0,
+   "free_tokens": 2097151,
+   "free_mismatches": 0,
+   "first_free_mismatch": null,
+   "ok_full": true
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1433,
+    1433
+   ],
+   "n": [
+    21,
+    21
+   ],
+   "wb15": [
+    31490,
+    31490
+   ],
+   "wb_ref_full27": 134216450,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "latch_bad_words": 8,
+   "latch_bad_cells": 56,
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 6479,
+    "sb_sh": 656,
+    "sw": 1057
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "latch_bad": 56,
+   "row_reg_a4": [
+    3389,
+    3389
+   ],
+   "chunk": 1,
+   "boundary": "1->2",
+   "step": 2097152,
+   "ram_slots_total": 8192,
+   "ram_full_bad": 0,
+   "ram_full_bad_touched": 0,
+   "ram_full_bad_untouched": 0,
+   "ram_full_first": [],
+   "regs_rd_bad_n": 0,
+   "free_tokens": 2097152,
+   "free_mismatches": 0,
+   "first_free_mismatch": null,
+   "ok_full": false
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    544,
+    544
+   ],
+   "n": [
+    7,
+    7
+   ],
+   "wb15": [
+    31426,
+    31426
+   ],
+   "wb_ref_full27": 134216386,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "latch_bad_words": 8,
+   "latch_bad_cells": 59,
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 6157,
+    "sb_sh": 921,
+    "sw": 1114
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "latch_bad": 59,
+   "row_reg_a4": [
+    4294967295,
+    4294967295
+   ],
+   "chunk": 2,
+   "boundary": "2->3",
+   "step": 2097152,
+   "ram_slots_total": 8192,
+   "ram_full_bad": 0,
+   "ram_full_bad_touched": 0,
+   "ram_full_bad_untouched": 0,
+   "ram_full_first": [],
+   "regs_rd_bad_n": 0,
+   "free_tokens": 2097152,
+   "free_mismatches": 0,
+   "first_free_mismatch": null,
+   "ok_full": false
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    882,
+    882
+   ],
+   "n": [
+    9,
+    9
+   ],
+   "wb15": [
+    31682,
+    31682
+   ],
+   "wb_ref_full27": 134216642,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "latch_bad_words": 8,
+   "latch_bad_cells": 56,
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 3110,
+    "sb_sh": 0,
+    "sw": 5082
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "latch_bad": 56,
+   "row_reg_a4": [
+    0,
+    0
+   ],
+   "chunk": 3,
+   "boundary": "3->4",
+   "step": 2097152,
+   "ram_slots_total": 8192,
+   "ram_full_bad": 0,
+   "ram_full_bad_touched": 0,
+   "ram_full_bad_untouched": 0,
+   "ram_full_first": [],
+   "regs_rd_bad_n": 0,
+   "free_tokens": 2097152,
+   "free_mismatches": 0,
+   "first_free_mismatch": null,
+   "ok_full": false
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1433,
+    1433
+   ],
+   "n": [
+    10,
+    10
+   ],
+   "wb15": [
+    31682,
+    31682
+   ],
+   "wb_ref_full27": 134216642,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "latch_bad_words": 8,
+   "latch_bad_cells": 58,
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 4853,
+    "sb_sh": 0,
+    "sw": 3339
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "latch_bad": 58,
+   "row_reg_a4": [
+    9034,
+    9034
+   ],
+   "chunk": 4,
+   "boundary": "4->5",
+   "step": 2097152,
+   "ram_slots_total": 8192,
+   "ram_full_bad": 0,
+   "ram_full_bad_touched": 0,
+   "ram_full_bad_untouched": 0,
+   "ram_full_first": [],
+   "regs_rd_bad_n": 0,
+   "free_tokens": 2097152,
+   "free_mismatches": 0,
+   "first_free_mismatch": null,
+   "ok_full": false
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1335,
+    1335
+   ],
+   "n": [
+    35,
+    35
+   ],
+   "wb15": [
+    31876,
+    31876
+   ],
+   "wb_ref_full27": 134216836,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "latch_bad_words": 8,
+   "latch_bad_cells": 52,
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 3941,
+    "sb_sh": 0,
+    "sw": 4251
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "latch_bad": 52,
+   "row_reg_a4": [
+    10685,
+    10685
+   ],
+   "chunk": 5,
+   "boundary": "5->6",
+   "step": 2097152,
+   "ram_slots_total": 8192,
+   "ram_full_bad": 0,
+   "ram_full_bad_touched": 0,
+   "ram_full_bad_untouched": 0,
+   "ram_full_first": [],
+   "regs_rd_bad_n": 0,
+   "free_tokens": 2097152,
+   "free_mismatches": 0,
+   "first_free_mismatch": null,
+   "ok_full": false
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1433,
+    1433
+   ],
+   "n": [
+    25,
+    25
+   ],
+   "wb15": [
+    31746,
+    31746
+   ],
+   "wb_ref_full27": 134216706,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "latch_bad_words": 8,
+   "latch_bad_cells": 55,
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 5967,
+    "sb_sh": 144,
+    "sw": 2081
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "latch_bad": 55,
+   "row_reg_a4": [
+    12492,
+    12492
+   ],
+   "chunk": 6,
+   "boundary": "6->7",
+   "step": 2097152,
+   "ram_slots_total": 8192,
+   "ram_full_bad": 0,
+   "ram_full_bad_touched": 0,
+   "ram_full_bad_untouched": 0,
+   "ram_full_first": [],
+   "regs_rd_bad_n": 0,
+   "free_tokens": 2097152,
+   "free_mismatches": 0,
+   "first_free_mismatch": null,
+   "ok_full": false
+  },
+  {
+   "regs_rd_bad": [],
+   "regs_rs1_bad": 0,
+   "regs_rs2_bad": 0,
+   "anchor": [
+    1433,
+    1433
+   ],
+   "n": [
+    17,
+    17
+   ],
+   "wb15": [
+    31554,
+    31554
+   ],
+   "wb_ref_full27": 134216514,
+   "wb_high12_lost": true,
+   "pc_ok": true,
+   "wb15_ok": true,
+   "j_vcnt": [
+    128.0,
+    128.0
+   ],
+   "latch_bad_words": 8,
+   "latch_bad_cells": 58,
+   "bn_bad": 0,
+   "ram_slots_touched": 8192,
+   "ram_bad": 0,
+   "ram_bad_first": [],
+   "ram_touched_by_op": {
+    "load": 4946,
+    "sb_sh": 176,
+    "sw": 3070
+   },
+   "ram_bad_by_op": {
+    "load": 0,
+    "sb_sh": 0,
+    "sw": 0
+   },
+   "ram_untouched_nonzero": 0,
+   "ok": false,
+   "latch_bad": 58,
+   "row_reg_a4": [
+    14166,
+    14166
+   ],
+   "chunk": 7,
+   "boundary": "7->8",
+   "step": 2097152,
+   "ram_slots_total": 8192,
+   "ram_full_bad": 0,
+   "ram_full_bad_touched": 0,
+   "ram_full_bad_untouched": 0,
+   "ram_full_first": [],
+   "regs_rd_bad_n": 0,
+   "free_tokens": 2097152,
+   "free_mismatches": 0,
+   "first_free_mismatch": null,
+   "ok_full": false
+  }
+ ],
+ "gpu": "NVIDIA L40S",
+ "env": {
+  "WF": true,
+  "REALMAP": false,
+  "WB27": false
+ },
+ "inj_file": "inj"
+}

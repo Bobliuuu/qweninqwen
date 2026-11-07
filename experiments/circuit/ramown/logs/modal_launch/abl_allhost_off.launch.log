@@ -10,3 +10,7 @@ https://modal.com/apps/jerry-zhu/main/ap-abtggMAp3UbNis6b6fo8cj
 ├── ✓ Created Function h100.
 ├── ✓ Created Function a100.
 └── ✓ Created Function a10g.
+{"name": "abl_allhost_off", "rc": 0}
+[modal-client] 2026-11-06T13:12:31-0500 Timed out waiting for final app logs.
+✓ App completed. View run at 
+https://modal.com/apps/jerry-zhu/main/ap-abtggMAp3UbNis6b6fo8cj

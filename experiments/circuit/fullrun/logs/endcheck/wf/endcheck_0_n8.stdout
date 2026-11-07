@@ -1,0 +1,40 @@
+ROW table slice materialised for this run: rows 0..14168 of 155205
+reset0: step-0 sp from outside = 0x1400000 (tree S.SP_INIT 0x8000); every other register/pc/n/wb = program reset state
+injections per row [158279, 131698, 155727, 154017]... (RAM-type [158279, 131698, 155727, 154017]), inj file inj, ramimg False, unaddressable-WROM VDOTs forced [0, 0, 0, 0]...
+reset0: step-0 sp from outside = 0x1400000 (tree S.SP_INIT 0x8000); every other register/pc/n/wb = program reset state
+rows 8, steps/row 2,097,153, forced kinds [], forced fraction [0.0, 0.0, 0.0, 0.0]
+[endcheck] step 100,000/2,097,152 27s 29,860 agg tok/s free mismatches 0
+[endcheck] step 200,000/2,097,152 54s 29,893 agg tok/s free mismatches 0
+[endcheck] step 300,000/2,097,152 80s 29,904 agg tok/s free mismatches 0
+[endcheck] step 400,000/2,097,152 107s 29,909 agg tok/s free mismatches 0
+[endcheck] step 500,000/2,097,152 134s 29,909 agg tok/s free mismatches 0
+[endcheck] step 600,000/2,097,152 160s 29,909 agg tok/s free mismatches 0
+[endcheck] step 700,000/2,097,152 187s 29,910 agg tok/s free mismatches 0
+[endcheck] step 800,000/2,097,152 214s 29,910 agg tok/s free mismatches 0
+[endcheck] step 900,000/2,097,152 241s 29,911 agg tok/s free mismatches 0
+[endcheck] step 1,000,000/2,097,152 267s 29,911 agg tok/s free mismatches 0
+[endcheck] step 1,100,000/2,097,152 294s 29,911 agg tok/s free mismatches 0
+[endcheck] step 1,200,000/2,097,152 321s 29,911 agg tok/s free mismatches 0
+[endcheck] step 1,300,000/2,097,152 348s 29,910 agg tok/s free mismatches 0
+[endcheck] step 1,400,000/2,097,152 374s 29,910 agg tok/s free mismatches 0
+[endcheck] step 1,500,000/2,097,152 401s 29,906 agg tok/s free mismatches 0
+[endcheck] step 1,600,000/2,097,152 428s 29,903 agg tok/s free mismatches 0
+[endcheck] step 1,700,000/2,097,152 455s 29,898 agg tok/s free mismatches 0
+[endcheck] step 1,800,000/2,097,152 482s 29,895 agg tok/s free mismatches 0
+[endcheck] step 1,900,000/2,097,152 508s 29,892 agg tok/s free mismatches 0
+[endcheck] step 2,000,000/2,097,152 535s 29,889 agg tok/s free mismatches 0
+[endcheck] step 2,097,152/2,097,152 561s 29,886 agg tok/s free mismatches 0
+BOUNDARY 0->1: ok_full=True regs_bad rd/rs1/rs2 0/0/0 anchor/n (152, 152)/(6, 6) wb15_ok=True (ref wb27 134216450) bn_bad 0 latch_bad words/cells 0/0 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097151
+[endcheck] step 2,097,153/2,097,153 562s 29,879 agg tok/s free mismatches 0
+BOUNDARY 1->2: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1433, 1433)/(21, 21) wb15_ok=True (ref wb27 134216450) bn_bad 0 latch_bad words/cells 8/56 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 2->3: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (544, 544)/(7, 7) wb15_ok=True (ref wb27 134216386) bn_bad 0 latch_bad words/cells 8/59 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 3->4: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (882, 882)/(9, 9) wb15_ok=True (ref wb27 134216642) bn_bad 0 latch_bad words/cells 8/56 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 4->5: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1433, 1433)/(10, 10) wb15_ok=True (ref wb27 134216642) bn_bad 0 latch_bad words/cells 8/58 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 5->6: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1335, 1335)/(35, 35) wb15_ok=True (ref wb27 134216836) bn_bad 0 latch_bad words/cells 8/52 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 6->7: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1433, 1433)/(25, 25) wb15_ok=True (ref wb27 134216706) bn_bad 0 latch_bad words/cells 8/55 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+BOUNDARY 7->8: ok_full=False regs_bad rd/rs1/rs2 0/0/0 anchor/n (1433, 1433)/(17, 17) wb15_ok=True (ref wb27 134216514) bn_bad 0 latch_bad words/cells 8/58 RAM bad 0/8192 (touched 0, untouched 0) free mismatches 0/2097152
+{"mode": "endcheck", "chunks": [0, 1, 2, 3, 4, 5, 6, 7], "steps_run": 2097153, "seconds": 562.2984628677368, "boundaries": [{"regs_rd_bad": [], "regs_rs1_bad": 0, "regs_rs2_bad": 0, "anchor": [152, 152], "n": [6, 6], "wb15": [31490, 31490], "wb_ref_full27": 134216450, "wb_high12_lost": true, "pc_ok": true, "wb15_ok": true, "j_vcnt": [128.0, 128.0], "latch_bad_words": 0, "latch_bad_cells": 0, "bn_bad": 0, "ram_slots_touched": 8192, "ram_bad": 0, "ram_bad_first": [], "ram_touched_by_op": {"load": 8103, "sb_sh": 0, "sw": 89}, "ram_bad_by_op": {"load": 0, "sb_sh": 0, "sw": 0}, "ram_untouched_nonzero": 0, "ok": true, "latch_bad": 0, "row_reg_a4": [4294964502, 4294964502], "chunk": 0, "boundary": "0->1", "step": 2097151, "ram_slots_total": 8192, "ram_full_bad": 0, "ram_full_bad_touched": 0, "ram_full_bad_untouched": 0, "ram_full_first": [], "regs_rd_bad_n": 0, "free_tokens": 2097151, "free_mismatches": 0, "first_free_mismatch": null, "ok_full": true}, {"regs_rd_bad": [], "regs_rs1_bad": 0, "regs_rs2_bad": 0, "anchor": [1433, 1433], "n": [21, 21], "wb15": [31490, 31490], "wb_ref_full27": 134216450, "wb_high12_lost": true, "pc_ok": true, "wb15_ok": true, "j_vcnt": [128.0, 128.0], "latch_bad_words": 8, "latch_bad_cells": 56, "bn_bad": 0, "ram_slots_touched": 8192, "ram_bad": 0, "ram_bad_first": [], "ram_touched_by_op": {"load": 6479, "sb_sh": 656, "sw": 1057}, "ram_bad_by_op": {"load": 0, "sb_sh": 0, "sw": 0}, "ram_untouched_nonzero": 0, "ok": false, "latch_bad": 56, "row_reg_a4": [3389, 3389], "chunk": 1, "boundary": "1->2", "step": 2097152, "ram_slots_total": 8192, "ram_full_bad": 0, "ram_full_bad_touched": 0, "ram_full_bad_untouched": 0, "ram_full_first": [], "regs_rd_bad_n": 0, "free_tokens": 2097152, "free_mismatches": 0, "first_free_mismatch": null, "ok_full": false}, {"regs_rd_bad": [], "regs_rs1_bad": 0, "regs_rs2_bad": 0, "anchor": [544, 544], "n": [7, 7], "wb15": [31426, 31426], "wb_ref_full27": 134216386, "wb_high12_lost": true, "pc_ok": true, "wb15_ok": true, "j_vcnt": [128.0, 128.0], "latch_bad_words": 8, "latch_bad_cells": 59, "bn_bad": 0, "ram_slots_touched": 8192, "ram_bad": 0, "ram_bad_first": [], "ram_touched_by_op": {"load": 6157, "sb_sh": 921, "sw": 1114}, "ram_bad_by_op": {"load": 0, "sb_sh": 0, "sw": 0}, "ram_untouched_nonzero": 0, "ok": false, "latch_bad": 59, "row_reg_a4": [4294967295, 4294967295], "chunk": 2, "boundary": "2->3", "step": 2097152, "ram_slots_total": 8192, "ram_full_bad": 0, "ram_full_bad_touched": 0, "ram_full_bad_untouched": 0, "ram_full_first": [], "regs_rd_bad_n": 0, "free_tokens": 2097152, "free_mismatches": 0, "first_free_mismatch": null, "ok_full": false}, {"regs_rd_bad": [], "regs_rs1_bad": 0, "regs_rs2_bad": 0, "anchor": [882, 882], "n": [9, 9], "wb15": [31682, 31682], "wb_ref_full27": 134216642, "wb_high12_lost": true, "pc_ok": true, "wb15_ok": true, "j_vcnt": [128.0, 128.0], "latch_bad_words": 8, "latch_bad_cells": 56, "bn_bad": 0, "ram_slots_touched": 8192, "ram_bad": 0, "ram_bad_first": [], "ram_touched_
+
+--STDERR--
+/usr/local/lib/python3.11/site-packages/triton/knobs.py:504: UserWarning: TRITON_DEFAULT_FP_FUSION is unset: defaulting to FP fusion ENABLED for backward compatibility in Triton 3.9. The default will change to DISABLED in Triton 3.10; set TRITON_DEFAULT_FP_FUSION=1 to keep fusion enabled or =0 to adopt the new default early and silence this warning.
+  warn_once(FP_FUSION_DEFAULT_WARNING)

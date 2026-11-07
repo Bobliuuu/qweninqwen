@@ -1,0 +1,11 @@
+ROW table slice materialised for this run: rows 0..1816 of 155205
+
+--STDERR--
+Traceback (most recent call last):
+  File "/data/circuit_wf/fullrun/circuit_endcheck.py", line 172, in <module>
+    core.snapshot(c, machine(states[0], chunks[0]))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/circuit_wf/fullrun/circuit_endcheck.py", line 162, in machine
+    assert list(stt['x']) == list(m.x) and stt['anchor'] == m.anchor and stt['n'] == m.n == 0 and stt['wb'] == 0, 'reference state_0000 != program reset state'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: reference state_0000 != program reset state
