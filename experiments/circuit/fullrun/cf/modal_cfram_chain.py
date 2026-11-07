@@ -7,7 +7,7 @@ One unbroken 75-chunk chain is ~11-13 h on one GPU; function timeout is the Moda
   python cf/spawn_cfram_chain.py 8                                    (75 chunks as 8 segments, spaced launches; Modal rate-limits AppCreate)
   python cf/chain_resume.py launch 0-74                               (ONE unbroken chain, all 75 chunks, ~11-13 h, timeout 24 h; if it dies: python cf/chain_resume.py launch   -> resumes from the last circuit_state_NNNN.pkl)
 Outputs: qfr-out /cfram_chain/chain_<first>_<last>(.stdout|/). Pull with `modal volume get qfr-out cfram_chain/<name>.stdout`.
-NOT YET RUN. Open: confirm circuit_run.py --chain works with REALMAP + --ramimg (ramimg is applied to the first chunk only); if it asserts, run with --reset0 on chunk 0 only."""
+Validated 2026-11-06: chunks 0-1 then 2 resumed from the circuit's own state = unsplit 0-2 (all boundaries ok, 0 free mismatches). See logs/cfram_chain.
 import modal, subprocess, os, json
 app = modal.App('qwen-in-qwen-cfram-chain')
 img = modal.Image.debian_slim(python_version='3.11').pip_install('torch', 'numpy', 'triton', 'safetensors')
