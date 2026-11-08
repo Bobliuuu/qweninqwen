@@ -15,3 +15,13 @@ nohup.out
 docs/assets/viz/_frames_*/
 docs/assets/viz/_still_*.png
 docs/assets/viz/__pycache__/
+
+# --- secrets / infrastructure identifiers: never commit (see skill github-workflow) ---
+*.pem
+*.key
+known_hosts
+.env
+.env.*
+vast_api_key
+sw.sh
+*.local.sh
