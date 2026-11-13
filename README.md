@@ -1,41 +1,65 @@
 <div align="center">
 
+<img src="assets/hero.svg" alt="QIQ: qweninqwen" width="100%">
+
 # 🧠 QIQ: qweninqwen
 
-**A real Qwen3-0.6B token, computed by a CPU that lives inside the weights of a modified Qwen3.5-4B.**
+**A real Qwen3-0.6B token, computed by a CPU that lives inside the weights of a modified Qwen3.5-4B**
 
-`prompt token 785` → `circuit` → **`15846`** (the token Hugging Face's Qwen3-0.6B produces)
+![final word: 15,846](https://img.shields.io/badge/final%20word-15%2C846-3ddc97) ![chunks clean: 96 / 96](https://img.shields.io/badge/chunks%20clean-96%20%2F%2096-27c8e8) ![seams exact: 95 / 95](https://img.shields.io/badge/seams%20exact-95%20%2F%2095-27c8e8) ![host injections: 0](https://img.shields.io/badge/host%20injections-0-3ddc97) ![inner model: Qwen3-0.6B](https://img.shields.io/badge/inner%20model-Qwen3--0.6B-7e57c2) ![outer model: Qwen3.5-style, 4B design](https://img.shields.io/badge/outer%20model-Qwen3.5--style%2C%204B%20design-7e57c2) [![license: MIT](https://img.shields.io/badge/license-MIT-f2c14e)](LICENSE)
 
-[Verdict](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) · [Architecture](#-architecture) · [Tiers](#-the-tier-ladder) · [Metrics](#-metrics) · [Host roles](#-what-the-host-does) · [FAQ](#-faq) · [Reproduce](#-reproduce)
+[🎬 Video](#video) · [📊 At a glance](#results) · [🧱 Architecture](#architecture) · [🪜 Tiers](#the-tier-ladder) · [📈 Metrics](#metrics) · [👤 Host roles](#what-the-host-does) · [📌 Scope](#scope) · [❓ FAQ](#faq) · [🔁 Reproduce](#reproduce)
 
 </div>
 
-<!-- VISUAL:hero-gif -->
+---
+
 <p align="center">
   <img src="docs/assets/circuit_hero.gif" alt="A real Qwen3-0.6B token, computed inside another Qwen: the prompt token enters a Qwen3.5-style outer model, the circuit inside runs the firmware while the weights are fetched from the model's own embedding table, then halts with 15846" width="900">
   <br><sub>🎞️ <a href="docs/assets/circuit_hero.mp4">mp4</a> · a visualization of the real run (layer widths, counts and the answer are real data)</sub>
 </p>
 
-<!-- VISUAL:demo-video -->
-<p align="center">
-  <a href="docs/demo/demo.mp4"><img src="docs/demo/demo.gif" alt="Demo: one Qwen3-0.6B token computed by a circuit inside a Qwen3.5-style outer model (click for the full video)" width="720"></a>
-  <br><sub>🎬 <a href="docs/demo/demo.mp4">Watch the full demo (mp4, ~70 s)</a> · a visualization of the real run; every number is mapped to a log in <a href="docs/demo/PROVENANCE.md">PROVENANCE.md</a></sub>
-</p>
-
 A homage to [Qwenputer](https://github.com/divagr18/qwenputer), where a RISC-V CPU is compiled into Qwen's weights and runs as the model generates tokens. Here that CPU runs **another language model**: a C firmware of Qwen3-0.6B (int4 weights, three layers at higher precision) executes on the circuit, one instruction per generated trace token, fetches its weights from the outer model's own embedding rows, keeps its working memory in circuit-owned RAM, and finishes by emitting its answer word.
 
-## 📑 Contents
+<a id="results"></a>
 
-1. [Result](#-result)
-2. [Architecture](#-architecture): [two models](#two-models) · [outer geometry](#the-outer-model) · [the circuit](#the-circuit) · [trace tokens](#trace-tokens) · [weights as ROW fetches](#weights-as-row-fetches) · [firmware](#the-firmware) · [the loop](#the-loop) · [chunks and seams](#chunks-and-seams)
-3. [The tier ladder](#-the-tier-ladder)
-4. [Metrics](#-metrics): [run totals](#run-totals) · [correctness](#correctness) · [precision results](#precision-results) · [stock-module check](#stock-module-check) · [speed and cost](#speed-and-cost) · [timeline](#wall-clock-timeline) · [history](#history)
-5. [What the host does](#-what-the-host-does)
-6. [Scope](#-scope)
-7. [FAQ](#-faq)
-8. [Reproduce](#-reproduce)
-9. [Repository map](#-repository-map)
-10. [Credits and license](#-credits)
+## 📊 At a glance
+
+Measured results of the full run, read from the committed run files under `experiments/circuit/fullrun/` ([`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json)).
+
+| Final word | Chunks clean | Seams exact | Host injections | Trace tokens |
+|:---:|:---:|:---:|:---:|:---:|
+| **15,846** | **96** | **95** | **0** | **199.3 M** |
+
+**Where the 96 chunks ran (from fleet_result.json)**
+
+| Hardware | Chunks | Mean minutes per chunk |
+| :--- | ---: | ---: |
+| RTX 4090 (Vast) | 50 | 5.84 |
+| A100-40GB (Modal) | 39 | 9.63 |
+| A100-PCIE-40GB (Vast) | 6 | 7.95 |
+| L40S (Vast) | 1 | 8.82 |
+
+<sub>Source: `docs/derived/readme_data.json`</sub>
+
+**Stock Qwen3.5 module check on chunk 0 (merged checkpoint, full-vocabulary argmax)**
+
+| Check | Steps | Mismatches | ROW tokens | VDOT tokens | Injections |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| positive (real table) | 130,000 | 0 | 2,320 | 23,817 | 0 |
+| negative control (table +1) | 76 | 20 | 1 | 4 | 0 |
+
+<sub>Source: `docs/derived/readme_data.json`</sub>
+
+<p align="center"><img src="assets/chunk_line.svg" alt="Job time per chunk (minutes)" width="100%"></p>
+
+<p align="center"><img src="assets/hw_mean.svg" alt="Mean minutes per chunk by hardware" width="100%"></p>
+
+<p align="center"><img src="assets/flow.svg" alt="One Qwen3-0.6B token inside a modified Qwen3.5" width="100%"></p>
+
+<p align="center"><img src="video/preview.gif" alt="animated overview of the explainer video" width="70%"></p>
+
+<a id="result"></a>
 
 ## ✅ Result
 
@@ -51,6 +75,8 @@ A homage to [Qwenputer](https://github.com/divagr18/qwenputer), where a RISC-V C
 | Chunk 0 | boots from the **firmware ELF alone** (no reference state) |
 
 The verdict is in [`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json) and [`seams_0-95_20261107_004845.md`](experiments/circuit/fullrun/logs/cfram_q_vast/seams_0-95_20261107_004845.md); every command and run is logged in [`RUNS.md`](RUNS.md).
+
+<a id="architecture"></a>
 
 ## 🧱 Architecture
 
@@ -165,6 +191,8 @@ A **chunk** is 2,097,152 steps (the jobs report 2,097,153 including the boundary
   <br><sub>🎞️ <a href="docs/assets/circuit_seam_grid.mp4">mp4</a> · replay of the real per-job durations as if all 96 jobs started together (the real run was staggered)</sub>
 </p>
 
+<a id="the-tier-ladder"></a>
+
 ## 🪜 The tier ladder
 
 <p align="center">
@@ -203,6 +231,8 @@ The second axis is the host's share. Each step below moved a role into the circu
 | H5 look-ahead removed | whole row table, the circuit's own `HALT`, chunk 0 from the ELF alone | [`docs/HOST_ROLE_AUDIT_CFRAM.md`](docs/HOST_ROLE_AUDIT_CFRAM.md) |
 | H6 table inside the checkpoint | the table is `embed_tokens.weight` of the merged checkpoint | [stock-module check](#stock-module-check) |
 | H7 precision design | layers 2/26/27 at 8-bit weights and 16-bit activations: the token equals the real model's | [precision results](#precision-results) |
+
+<a id="metrics"></a>
 
 ## 📊 Metrics
 
@@ -304,6 +334,8 @@ All times are EST, 2026-11-06 to 2026-11-07.
   <img src="docs/assets/circuit_heatstrip.svg" alt="Job time in minutes for each of the 96 chunks, coloured by minutes, with the machine that ran each chunk" width="100%">
 </p>
 
+<a id="what-the-host-does"></a>
+
 ## 👤 What the host does
 
 | Role | Why |
@@ -314,12 +346,16 @@ All times are EST, 2026-11-06 to 2026-11-07.
 
 Everything else runs in the circuit. Full audit with file and line references: [`docs/HOST_ROLE_AUDIT_CFRAM.md`](docs/HOST_ROLE_AUDIT_CFRAM.md).
 
+<a id="scope"></a>
+
 ## 📌 Scope
 
 - One prompt token at position 0: the firmware is built for context length 1.
 - The 96 chunks ran in parallel. Each was seeded from the reference start state and checked for exact end-state equality with the next job's seed at all 95 seams.
 - The executor is the fused Triton kernel. The HF `Qwen3_5` module classes ran the check on chunk 0 (130,000 steps, with the negative control above).
 - The outer checkpoint carries the 2.59 GB table, so it is larger than the released Qwen3.5-4B. The chunks run on Vast read the same table from `rowtab_cf.npy`, checked bit-identical to the checkpoint's `embed_tokens.weight`.
+
+<a id="faq"></a>
 
 ## ❓ FAQ
 
@@ -344,6 +380,8 @@ No. It is a Qwen3_5-architecture model (HF `Qwen3_5ForCausalLM` classes, widened
 **Why layers 2, 26 and 27?**
 They carry the position-0 massive activations. Quantising any one of them alone flips the answer; quantising any one of the other 25 does not ([`diag_quant`](experiments/circuit/fullrun/diag_quant/REPORT.md)).
 
+<a id="reproduce"></a>
+
 ## 🔁 Reproduce
 
 Everything is logged in [`RUNS.md`](RUNS.md). Pipeline, in order (all under [`experiments/circuit/fullrun`](experiments/circuit/fullrun)):
@@ -365,6 +403,8 @@ modal app stop -y <app id>                                                      
 For this run: `--elf /data/cfram_q/ramcf_q.elf --refdir /data/cfram_q/refQ --ckpt /wf/ckpt_cf_q --rowtab /data/cfram_q/cf/rowtab_cf.npy --rowemb /data/cfram_q/rowemb_q.npy --root cfram_q_par_full`. The same job can be run on rented GPUs with the scripts in [`cf/vast`](experiments/circuit/fullrun/cf/vast).
 
 Requirements: Python 3.11, `torch`, `triton`, `transformers` 5.x, `safetensors`, [Modal](https://modal.com) (or any CUDA GPU with the same scripts), and the Qwen checkpoints in the Hugging Face cache.
+
+<a id="repository-map"></a>
 
 ## 🧭 Repository map
 
@@ -388,11 +428,15 @@ reference/ older/    vendored Qwenputer lab and background experiments
 RUNS.md              log of every launched run
 ```
 
+<a id="credits"></a>
+
 ## 🙏 Credits
 
 - **Qwenputer** ([divagr18/qwenputer](https://github.com/divagr18/qwenputer)): the idea this repository is a homage to, a computer whose circuits are Qwen's own weights. Its compiler is vendored under `reference/nested-qwen-lab/qwentpu` with its license.
 - **Qwen** models by the Qwen team at Alibaba: the Qwen3.5-4B layer design for the outer model, Qwen3-0.6B as the inner model (Apache-2.0).
 - Built on Hugging Face `transformers`, PyTorch and Triton; run on Modal and Vast.ai.
+
+<a id="license"></a>
 
 ## 📜 License
 
@@ -400,4 +444,6 @@ Code in this repository is MIT (see [`LICENSE`](LICENSE)); vendored reference co
 
 ---
 
-_What we tried:_ we also tried plain int4 everywhere and an earlier compiled route; notes are in [`docs/history/`](docs/history/).
+---
+
+<div align="center"><sub>Generated with video-readme-maker from README.spec.yml and the run files under experiments/circuit/fullrun.</sub></div>

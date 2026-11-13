@@ -1,0 +1,3 @@
+- **Qwenputer** ([divagr18/qwenputer](https://github.com/divagr18/qwenputer)): the idea this repository is a homage to, a computer whose circuits are Qwen's own weights. Its compiler is vendored under `reference/nested-qwen-lab/qwentpu` with its license.
+- **Qwen** models by the Qwen team at Alibaba: the Qwen3.5-4B layer design for the outer model, Qwen3-0.6B as the inner model (Apache-2.0).
+- Built on Hugging Face `transformers`, PyTorch and Triton; run on Modal and Vast.ai.

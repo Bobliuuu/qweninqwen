@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 324" width="980" height="324" role="img" aria-label="Mean minutes per chunk by hardware">
+<rect width="980" height="324" rx="16" fill="#0b0f17"/>
+<text x="32" y="44" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-weight="700" font-size="22" fill="#e6edf6">Mean minutes per chunk by hardware</text>
+<text x="207" y="118" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">RTX 4090 (Vast)</text>
+<rect x="221" y="96" width="369.3" height="30" rx="6" fill="#263044"/>
+<text x="600.3" y="117" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">5.8 min</text>
+<text x="207" y="164" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">A100-40GB (Modal)</text>
+<rect x="221" y="142" width="609.0" height="30" rx="6" fill="#263044"/>
+<text x="840.0" y="163" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">9.6 min</text>
+<text x="207" y="210" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">A100-PCIE-40GB (Vast)</text>
+<rect x="221" y="188" width="502.8" height="30" rx="6" fill="#263044"/>
+<text x="733.8" y="209" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">8.0 min</text>
+<text x="207" y="256" text-anchor="end" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8a98ad" font-weight="400">L40S (Vast)</text>
+<rect x="221" y="234" width="557.8" height="30" rx="6" fill="#263044"/>
+<text x="788.8" y="255" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15" font-weight="700" fill="#e6edf6">8.8 min</text>
+<text x="948" y="310" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" fill="#8a98ad">source: docs/derived/readme_data.json · lower is better</text>
+</svg>

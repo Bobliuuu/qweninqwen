@@ -1,0 +1,184 @@
+1
+00:00:00,400 --> 00:00:01,345
+QIQ, qweninqwen.
+
+2
+00:00:01,345 --> 00:00:06,600
+One real Qwen three zero point six B token, computed by a processor that lives inside the
+
+3
+00:00:06,600 --> 00:00:09,198
+weights of a modified Qwen three point five.
+
+4
+00:00:09,198 --> 00:00:12,918
+This is a short tour of what the repository's own results show.
+
+5
+00:00:13,920 --> 00:00:18,939
+Qwenputer showed that a RISC-V processor can be compiled into a model's weights and run as the
+
+6
+00:00:18,939 --> 00:00:20,167
+model generates tokens.
+
+7
+00:00:20,167 --> 00:00:25,186
+The question here: can that processor run another language model, a real one, with the weights
+
+8
+00:00:25,186 --> 00:00:30,152
+fetched from the outer model's own parameters, and the host doing nothing but looping tokens?
+
+9
+00:00:31,150 --> 00:00:36,497
+The inner model is real Qwen three zero point six B, as a C firmware with int four weights and
+
+10
+00:00:36,497 --> 00:00:38,374
+three layers at higher precision.
+
+11
+00:00:38,374 --> 00:00:42,128
+It runs on the circuit, one instruction per generated trace token.
+
+12
+00:00:42,128 --> 00:00:47,191
+Its weights arrive as ROW fetches from the outer model's embedding table, and its working
+
+13
+00:00:47,191 --> 00:00:48,784
+memory is circuit owned RAM.
+
+14
+00:00:48,784 --> 00:00:50,832
+It ends by emitting its answer word.
+
+15
+00:00:51,830 --> 00:00:59,140
+The outer model keeps the Qwen three point five layer design, widened to hidden size 7,680
+
+16
+00:00:59,140 --> 00:01:04,663
+with twelve added chip layers and an extended vocabulary of 680,128.
+
+17
+00:01:04,663 --> 00:01:10,511
+The checkpoint holds 168,684 table rows, and the host only loops tokens.
+
+18
+00:01:10,511 --> 00:01:15,465
+Across the whole run it injected 0 weight, RAM or blob words.
+
+19
+00:01:16,470 --> 00:01:17,259
+The result.
+
+20
+00:01:17,259 --> 00:01:23,713
+For the prompt token seven eighty five, the circuit halts on its own with the word 15,846.
+
+21
+00:01:23,713 --> 00:01:30,096
+That is exactly the token Hugging Face's Qwen three zero point six B produces, in both fp
+
+22
+00:01:30,096 --> 00:01:31,961
+thirty two and bf sixteen.
+
+23
+00:01:32,960 --> 00:01:40,966
+The run was split into 96 chunks, and all 96 came back clean: 0 free token mismatches, 0 forced
+
+24
+00:01:40,966 --> 00:01:43,494
+tokens, and 0 host injections.
+
+25
+00:01:43,494 --> 00:01:48,466
+About 199.3 million trace tokens, and 12.1 of GPU job time.
+
+26
+00:01:49,470 --> 00:01:52,430
+Each bar is one chunk, in minutes.
+
+27
+00:01:52,430 --> 00:01:58,090
+The last chunk is short because the circuit halts at step 57,705.
+
+28
+00:01:58,090 --> 00:02:05,317
+Chunks ran on rented RTX forty nineties, A100s and an L40S, plus 39 on Modal A100s.
+
+29
+00:02:06,320 --> 00:02:13,112
+An RTX 4090 took about 5.8 per chunk on average across 50 chunks, a Modal A100 about 9.6.
+
+30
+00:02:14,110 --> 00:02:15,948
+Chunks are stitched at seams.
+
+31
+00:02:15,948 --> 00:02:21,970
+All 95 of 95 seams are exact: registers, program counter, all eight thousand one hundred ninety
+
+32
+00:02:21,970 --> 00:02:23,744
+two RAM words and the latch.
+
+33
+00:02:23,744 --> 00:02:26,597
+Chunk zero boots from the firmware ELF alone.
+
+34
+00:02:27,600 --> 00:02:33,160
+As a separate check, the merged checkpoint was run through Hugging Face's stock Qwen three
+
+35
+00:02:33,160 --> 00:02:35,632
+point five module classes on chunk zero.
+
+36
+00:02:35,632 --> 00:02:41,315
+Over 130,000 steps, with the argmax taken over the full vocabulary, there were 0 mismatches.
+
+37
+00:02:41,315 --> 00:02:47,123
+As a negative control, we shifted every table entry by one, and it fails 20 times, so the pass
+
+38
+00:02:47,123 --> 00:02:50,644
+depends on the table held in the checkpoint's parameters.
+
+39
+00:02:51,640 --> 00:02:52,799
+Scope and honesty.
+
+40
+00:02:52,799 --> 00:02:58,659
+This is one prompt token and one output token, so it is a feasibility result, not a serving
+
+41
+00:02:58,659 --> 00:02:59,110
+system.
+
+42
+00:02:59,110 --> 00:03:05,163
+The firmware is quantized, its logits have a cosine of 0.917 with Hugging Face, though its top
+
+43
+00:03:05,163 --> 00:03:06,901
+one margin is wide at 0.97.
+
+44
+00:03:06,901 --> 00:03:10,894
+And the run took about 12.1 of GPU time for that single token.
+
+45
+00:03:10,894 --> 00:03:13,856
+The host's exact roles are listed in the repo.
+
+46
+00:03:14,860 --> 00:03:19,754
+The verdict file, the seam report, and the host role audit are all in the repository.
+

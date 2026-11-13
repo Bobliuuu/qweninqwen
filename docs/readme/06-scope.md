@@ -1,0 +1,4 @@
+- One prompt token at position 0: the firmware is built for context length 1.
+- The 96 chunks ran in parallel. Each was seeded from the reference start state and checked for exact end-state equality with the next job's seed at all 95 seams.
+- The executor is the fused Triton kernel. The HF `Qwen3_5` module classes ran the check on chunk 0 (130,000 steps, with the negative control above).
+- The outer checkpoint carries the 2.59 GB table, so it is larger than the released Qwen3.5-4B. The chunks run on Vast read the same table from `rowtab_cf.npy`, checked bit-identical to the checkpoint's `embed_tokens.weight`.

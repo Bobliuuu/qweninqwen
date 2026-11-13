@@ -1,0 +1,244 @@
+# Spec for ~/video-readme-maker:  python3 ~/video-readme-maker/vrm.py all README.spec.yml
+# Numbers come from docs/derived/readme_data.json, built by tools/readme_data.py from the committed run files in
+# experiments/circuit/fullrun (seams json, fleet_result.json, FINAL_VERDICT.json, quantfix results).
+# The long technical sections are verbatim markdown in docs/readme/*.md (body_file).
+project:
+  name: "QIQ: qweninqwen"
+  emoji: "🧠"
+  tagline: "A real Qwen3-0.6B token, computed by a CPU that lives inside the weights of a modified Qwen3.5-4B"
+  repo: Bobliuuu/qweninqwen
+hero:
+  title: "QIQ: qweninqwen"
+  subtitle: "prompt token 785 -> circuit -> 15846, the token Hugging Face Qwen3-0.6B produces"
+  chips: [RV32IM circuit, Qwen3-0.6B firmware, 96 chunks, 0 host injections]
+theme: {accent: "#27c8e8", accent2: "#ff6b6b", accent3: "#f2c14e", good: "#3ddc97"}
+readme_out: README.md
+assets_dir: assets
+badges:
+  - {label: "final word", message: "{{ n.final_word.text }}", color: 3ddc97}
+  - {label: "chunks clean", message: "{{ n.clean.text }} / {{ n.chunks.text }}", color: 27c8e8}
+  - {label: "seams exact", message: "{{ n.seams.text }} / {{ n.seams_total.text }}", color: 27c8e8}
+  - {label: "host injections", message: "{{ n.injections.text }}", color: 3ddc97}
+  - {label: inner model, message: "Qwen3-0.6B", color: 7e57c2}
+  - {label: outer model, message: "Qwen3.5-style, 4B design", color: 7e57c2}
+  - {label: license, message: MIT, color: f2c14e, link: LICENSE}
+nav:
+  - {emoji: "🎬", label: Video, anchor: video}
+  - {emoji: "📊", label: At a glance, anchor: results}
+  - {emoji: "🧱", label: Architecture, anchor: architecture}
+  - {emoji: "🪜", label: Tiers, anchor: the-tier-ladder}
+  - {emoji: "📈", label: Metrics, anchor: metrics}
+  - {emoji: "👤", label: Host roles, anchor: what-the-host-does}
+  - {emoji: "📌", label: Scope, anchor: scope}
+  - {emoji: "❓", label: FAQ, anchor: faq}
+  - {emoji: "🔁", label: Reproduce, anchor: reproduce}
+
+numbers:
+  final_word: {file: docs/derived/readme_data.json, path: totals.final_word}
+  chunks: {file: docs/derived/readme_data.json, path: totals.chunks}
+  clean: {file: docs/derived/readme_data.json, path: totals.clean}
+  seams: {file: docs/derived/readme_data.json, path: totals.seams_exact}
+  seams_total: {expr: "chunks - 1", fmt: "{:.0f}"}
+  mismatches: {file: docs/derived/readme_data.json, path: totals.mismatches}
+  forced: {file: docs/derived/readme_data.json, path: totals.forced}
+  injections: {file: docs/derived/readme_data.json, path: totals.injections}
+  tokens_raw: {file: docs/derived/readme_data.json, path: totals.free_tokens, fmt: "{:,.0f}"}
+  tokens_m: {expr: "tokens_raw / 1e6", fmt: "{:.1f}", unit: " M"}
+  halt_step: {file: docs/derived/readme_data.json, path: totals.halt_step, fmt: "{:,.0f}"}
+  job_hours: {file: docs/derived/readme_data.json, path: totals.job_hours, fmt: "{:.1f}", unit: " h"}
+  modal_chunks: {file: docs/derived/readme_data.json, path: totals.modal_chunks}
+  stock_steps: {file: docs/derived/readme_data.json, path: "stock.check=positive (real table).steps", fmt: "{:,.0f}"}
+  stock_mm: {file: docs/derived/readme_data.json, path: "stock.check=positive (real table).mismatches"}
+  stock_row: {file: docs/derived/readme_data.json, path: "stock.check=positive (real table).row_tokens", fmt: "{:,.0f}"}
+  stock_vdot: {file: docs/derived/readme_data.json, path: "stock.check=positive (real table).vdot_tokens", fmt: "{:,.0f}"}
+  neg_mm: {file: docs/derived/readme_data.json, path: "stock.check=negative control (table +1).mismatches"}
+  neg_steps: {file: docs/derived/readme_data.json, path: "stock.check=negative control (table +1).steps"}
+  vocab: {file: docs/derived/readme_data.json, path: stock_meta.vocab, fmt: "{:,.0f}"}
+  rows: {file: docs/derived/readme_data.json, path: stock_meta.rows, fmt: "{:,.0f}"}
+  hidden: {file: docs/derived/readme_data.json, path: stock_meta.hidden, fmt: "{:,.0f}"}
+  cos: {file: docs/derived/readme_data.json, path: precision.cos, fmt: "{:.3f}"}
+  gap: {file: docs/derived/readme_data.json, path: precision.gap, fmt: "{:.2f}"}
+  fw_instr_raw: {file: docs/derived/readme_data.json, path: precision.instr, fmt: "{:,.0f}"}
+  fw_instr_m: {expr: "fw_instr_raw / 1e6", fmt: "{:.0f}", unit: " M"}
+  rtx_mean: {file: docs/derived/readme_data.json, path: "hardware.gpu=RTX 4090 (Vast).mean_min", fmt: "{:.1f}", unit: " min"}
+  rtx_chunks: {file: docs/derived/readme_data.json, path: "hardware.gpu=RTX 4090 (Vast).chunks"}
+  a100_mean: {file: docs/derived/readme_data.json, path: "hardware.gpu=A100-40GB (Modal).mean_min", fmt: "{:.1f}", unit: " min"}
+
+intro_file: docs/readme/00-intro.md
+
+video:
+  url: ""   # paste the GitHub user-attachments URL here after dragging the mp4 into a GitHub issue/PR; re-run `vrm.py readme README.spec.yml`
+  caption: "Explainer video (voice-over and subtitles): one Qwen3-0.6B token computed by a circuit inside a modified Qwen3.5"
+  mp4: video/qweninqwen_explainer.mp4
+  gif: video/preview.gif
+  srt: video/qweninqwen_explainer.srt
+  poster: video/poster.png
+  out_dir: video/.render
+  fps: 24
+  max_mb: 22
+  render_crf: 20
+  concurrency: 4
+  poster_at: 60
+  music: true
+  voice: {engine: openai, voice: alloy, model: gpt-4o-mini-tts, tempo: 1.2}
+  scenes:
+    - type: title
+      title: "QIQ: qweninqwen"
+      subtitle: A Qwen3-0.6B token, computed by a CPU inside another Qwen
+      chips: [RV32IM circuit, Qwen3-0.6B firmware, Qwen3.5-style outer model]
+      say: "QIQ, qweninqwen. One real Qwen three zero point six B token, computed by a processor that lives inside the weights of a modified Qwen three point five. This is a short tour of what the repository's own results show."
+    - type: problem
+      heading: The question
+      bullets:
+        - "Qwenputer compiles a RISC-V CPU into a model's weights"
+        - "Can that CPU run another language model, not a toy program?"
+        - "And can the weights come from the outer model itself?"
+      say: "Qwenputer showed that a RISC-V processor can be compiled into a model's weights and run as the model generates tokens. The question here: can that processor run another language model, a real one, with the weights fetched from the outer model's own parameters, and the host doing nothing but looping tokens?"
+    - type: architecture
+      diagram: flow
+      heading: "The setup"
+      say: "The inner model is real Qwen three zero point six B, as a C firmware with int four weights and three layers at higher precision. It runs on the circuit, one instruction per generated trace token. Its weights arrive as ROW fetches from the outer model's embedding table, and its working memory is circuit owned RAM. It ends by emitting its answer word."
+    - type: cards
+      heading: "The outer model"
+      cards:
+        - {title: "Geometry", sub: "Qwen3.5 layer design", lines: ["Hidden size {{ n.hidden.text }}", "12 added chip layers plus Qwen's 32", "Vocabulary {{ n.vocab.text }}"]}
+        - {title: "The table", sub: "weights as embedding rows", lines: ["{{ n.rows.text }} table rows in the checkpoint", "ROW tokens fetch the inner weights", "VDOT tokens do the vector dot"]}
+        - {title: "The host", sub: "a token loop", lines: ["Boots chunk 0 from the firmware ELF", "Loops tokens, saves state at seams", "{{ n.injections.text }} injected weights, RAM or blob words"]}
+      footer: "The circuit's own HALT ends the run; the answer word is read from its output tokens"
+      say: "The outer model keeps the Qwen three point five layer design, widened to hidden size {{ n.hidden.numtext }}, with twelve added chip layers and an extended vocabulary of {{ n.vocab.numtext }}. The checkpoint holds {{ n.rows.numtext }} table rows, and the host only loops tokens. Across the whole run it injected {{ n.injections.numtext }} weight, RAM or blob words."
+    - type: stat
+      number: final_word
+      kicker: "the circuit's own HALT word, prompt token 785"
+      label: "the same token as Hugging Face"
+      sub: "Qwen3-0.6B fp32 and bf16 both give 15846"
+      say: "The result. For the prompt token seven eighty five, the circuit halts on its own with the word {{ n.final_word.numtext }}. That is exactly the token Hugging Face's Qwen three zero point six B produces, in both fp thirty two and bf sixteen."
+    - type: results
+      heading: "The full run"
+      items:
+        - {label: "chunks clean", number: clean}
+        - {label: "free-token mismatches", number: mismatches}
+        - {label: "forced tokens", number: forced}
+        - {label: "host injections", number: injections}
+        - {label: "trace tokens checked", number: tokens_m}
+        - {label: "GPU job time", number: job_hours}
+      say: "The run was split into {{ n.chunks.numtext }} chunks, and all {{ n.clean.numtext }} came back clean: {{ n.mismatches.numtext }} free token mismatches, {{ n.forced.numtext }} forced tokens, and {{ n.injections.numtext }} host injections. About {{ n.tokens_m.numtext }} million trace tokens, and {{ n.job_hours.numtext }} of GPU job time."
+    - type: chart
+      chart: chunk_line
+      say: "Each bar is one chunk, in minutes. The last chunk is short because the circuit halts at step {{ n.halt_step.numtext }}. Chunks ran on rented RTX forty nineties, A100s and an L40S, plus {{ n.modal_chunks.numtext }} on Modal A100s."
+    - type: chart
+      chart: hw_mean
+      say: "An RTX 4090 took about {{ n.rtx_mean.numtext }} per chunk on average across {{ n.rtx_chunks.numtext }} chunks, a Modal A100 about {{ n.a100_mean.numtext }}."
+    - type: stat
+      number: seams
+      kicker: "chunk seams checked"
+      label: "of {{ n.seams_total.text }} exact"
+      sub: "each job's end state equals the next job's start state"
+      say: "Chunks are stitched at seams. All {{ n.seams.numtext }} of {{ n.seams_total.numtext }} seams are exact: registers, program counter, all eight thousand one hundred ninety two RAM words and the latch. Chunk zero boots from the firmware ELF alone."
+    - type: results
+      heading: "Checked through stock Qwen3.5 modules"
+      items:
+        - {label: "steps checked on the real table", number: stock_steps}
+        - {label: "mismatches, real table", number: stock_mm}
+        - {label: "mismatches, table +1 control", number: neg_mm}
+      say: "As a separate check, the merged checkpoint was run through Hugging Face's stock Qwen three point five module classes on chunk zero. Over {{ n.stock_steps.numtext }} steps, with the argmax taken over the full vocabulary, there were {{ n.stock_mm.numtext }} mismatches. As a negative control, we shifted every table entry by one, and it fails {{ n.neg_mm.numtext }} times, so the pass depends on the table held in the checkpoint's parameters."
+    - type: caveats
+      heading: "Scope and honesty"
+      bullets:
+        - "One prompt token, one output token: this is a feasibility result"
+        - "Logits cosine to Hugging Face is {{ n.cos.text }}: int4 plus higher precision layers, not bit-identical"
+        - "Run in chunks of host-saved state, about {{ n.job_hours.text }} of GPU time for one token"
+        - "The host loops tokens, boots and stitches; the repo lists exactly what it does"
+      say: "Scope and honesty. This is one prompt token and one output token, so it is a feasibility result, not a serving system. The firmware is quantized, its logits have a cosine of {{ n.cos.numtext }} with Hugging Face, though its top one margin is wide at {{ n.gap.numtext }}. And the run took about {{ n.job_hours.numtext }} of GPU time for that single token. The host's exact roles are listed in the repo."
+    - type: end
+      title: "QIQ: qweninqwen"
+      subtitle: "Verdict, logs and the host-role audit are in the repo"
+      say: "The verdict file, the seam report, and the host role audit are all in the repository."
+
+charts:
+  - id: hw_mean
+    type: bar
+    title: "Mean minutes per chunk by hardware"
+    better: lower
+    file: docs/derived/readme_data.json
+    rows_path: hardware
+    label: gpu
+    y: mean_min
+    fmt: "{:.1f}"
+    unit: " min"
+  - id: chunk_line
+    type: line
+    title: "Job time per chunk (minutes)"
+    xlabel: chunk
+    ylabel: minutes
+    better: lower
+    file: docs/derived/readme_data.json
+    rows_path: chunks
+    x: chunk
+    y: minutes
+
+tables:
+  - id: hw_tbl
+    title: "Where the 96 chunks ran (from fleet_result.json)"
+    file: docs/derived/readme_data.json
+    rows_path: hardware
+    columns:
+      - {key: gpu, title: Hardware}
+      - {key: chunks, title: Chunks, align: right}
+      - {key: mean_min, title: "Mean minutes per chunk", align: right, fmt: "{:.2f}"}
+  - id: stock_tbl
+    title: "Stock Qwen3.5 module check on chunk 0 (merged checkpoint, full-vocabulary argmax)"
+    file: docs/derived/readme_data.json
+    rows_path: stock
+    columns:
+      - {key: check, title: Check}
+      - {key: steps, title: Steps, align: right, fmt: "{:,.0f}"}
+      - {key: mismatches, title: Mismatches, align: right}
+      - {key: row_tokens, title: "ROW tokens", align: right, fmt: "{:,.0f}"}
+      - {key: vdot_tokens, title: "VDOT tokens", align: right, fmt: "{:,.0f}"}
+      - {key: injections, title: Injections, align: right}
+
+diagrams:
+  - id: flow
+    title: "One Qwen3-0.6B token inside a modified Qwen3.5"
+    nodes:
+      - {id: host, label: "Host token loop", sub: "boots chunk 0 from the ELF, stitches seams", col: 0, row: 0, kind: io}
+      - {id: cpu, label: "Circuit (RV32IM + VDOT)", sub: "compiled into the outer weights", col: 1, row: 0, kind: accent}
+      - {id: fw, label: "Qwen3-0.6B firmware", sub: "int4, three layers at 8-bit weights", col: 2, row: 0}
+      - {id: tab, label: "ROW fetches", sub: "weights from the embedding table", col: 2, row: 1, kind: store}
+      - {id: ram, label: "Circuit-owned RAM", sub: "32 KB map", col: 1, row: 1, kind: store}
+      - {id: ans, label: "HALT, word 15846", sub: "same as Hugging Face", col: 0, row: 1, kind: io}
+    edges:
+      - {from: host, to: cpu, label: tokens}
+      - {from: cpu, to: fw, label: one instr per token}
+      - {from: tab, to: fw}
+      - {from: fw, to: ram}
+      - {from: ram, to: ans}
+
+sections:
+  - title: At a glance
+    emoji: "📊"
+    id: results
+    body: "Measured results of the full run, read from the committed run files under `experiments/circuit/fullrun/` ([`FINAL_VERDICT.json`](experiments/circuit/fullrun/logs/cfram_q_vast/FINAL_VERDICT.json))."
+    highlights:
+      - {label: "Final word", number: final_word}
+      - {label: "Chunks clean", number: clean}
+      - {label: "Seams exact", number: seams}
+      - {label: "Host injections", number: injections}
+      - {label: "Trace tokens", number: tokens_m}
+    diagrams: [flow]
+    charts: [chunk_line, hw_mean]
+    images:
+      - {src: video/preview.gif, alt: "animated overview of the explainer video", width: "70%"}
+    tables: [hw_tbl, stock_tbl]
+  - {title: "Result", emoji: "✅", body_file: docs/readme/01-result.md}
+  - {title: "Architecture", emoji: "🧱", body_file: docs/readme/02-architecture.md}
+  - {title: "The tier ladder", emoji: "🪜", body_file: docs/readme/03-the-tier-ladder.md}
+  - {title: "Metrics", emoji: "📊", body_file: docs/readme/04-metrics.md}
+  - {title: "What the host does", emoji: "👤", body_file: docs/readme/05-what-the-host-does.md}
+  - {title: "Scope", emoji: "📌", body_file: docs/readme/06-scope.md}
+  - {title: "FAQ", emoji: "❓", body_file: docs/readme/07-faq.md}
+  - {title: "Reproduce", emoji: "🔁", body_file: docs/readme/08-reproduce.md}
+  - {title: "Repository map", emoji: "🧭", body_file: docs/readme/09-repository-map.md}
+  - {title: "Credits", emoji: "🙏", body_file: docs/readme/10-credits.md}
+  - {title: "License", emoji: "📜", body_file: docs/readme/11-license.md}
+footer: "Generated with video-readme-maker from README.spec.yml and the run files under experiments/circuit/fullrun."
