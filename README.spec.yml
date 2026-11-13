@@ -22,6 +22,8 @@ badges:
   - {label: inner model, message: "Qwen3-0.6B", color: 7e57c2}
   - {label: outer model, message: "Qwen3.5-style, 4B design", color: 7e57c2}
   - {label: license, message: MIT, color: f2c14e, link: LICENSE}
+  - {label: release, message: v1.1.0, color: 27c8e8, logo: github, link: "https://github.com/Bobliuuu/qweninqwen/releases/tag/v1.1.0"}
+  - {label: "Hugging Face", message: "merged checkpoint", color: ffd21e, logo: huggingface, link: "https://huggingface.co/Bobliu/qweninqwen"}
 nav:
   - {emoji: "🎬", label: Video, anchor: video}
   - {emoji: "📊", label: At a glance, anchor: results}

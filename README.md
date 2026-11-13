@@ -6,13 +6,17 @@
 
 **A real Qwen3-0.6B token, computed by a CPU that lives inside the weights of a modified Qwen3.5-4B**
 
-![final word: 15,846](https://img.shields.io/badge/final%20word-15%2C846-3ddc97) ![chunks clean: 96 / 96](https://img.shields.io/badge/chunks%20clean-96%20%2F%2096-27c8e8) ![seams exact: 95 / 95](https://img.shields.io/badge/seams%20exact-95%20%2F%2095-27c8e8) ![host injections: 0](https://img.shields.io/badge/host%20injections-0-3ddc97) ![inner model: Qwen3-0.6B](https://img.shields.io/badge/inner%20model-Qwen3--0.6B-7e57c2) ![outer model: Qwen3.5-style, 4B design](https://img.shields.io/badge/outer%20model-Qwen3.5--style%2C%204B%20design-7e57c2) [![license: MIT](https://img.shields.io/badge/license-MIT-f2c14e)](LICENSE)
+![final word: 15,846](https://img.shields.io/badge/final%20word-15%2C846-3ddc97) ![chunks clean: 96 / 96](https://img.shields.io/badge/chunks%20clean-96%20%2F%2096-27c8e8) ![seams exact: 95 / 95](https://img.shields.io/badge/seams%20exact-95%20%2F%2095-27c8e8) ![host injections: 0](https://img.shields.io/badge/host%20injections-0-3ddc97) ![inner model: Qwen3-0.6B](https://img.shields.io/badge/inner%20model-Qwen3--0.6B-7e57c2) ![outer model: Qwen3.5-style, 4B design](https://img.shields.io/badge/outer%20model-Qwen3.5--style%2C%204B%20design-7e57c2) [![license: MIT](https://img.shields.io/badge/license-MIT-f2c14e)](LICENSE) [![release: v1.1.0](https://img.shields.io/badge/release-v1.1.0-27c8e8?logo=github&logoColor=white)](https://github.com/Bobliuuu/qweninqwen/releases/tag/v1.1.0) [![Hugging Face: merged checkpoint](https://img.shields.io/badge/Hugging%20Face-merged%20checkpoint-ffd21e?logo=huggingface&logoColor=white)](https://huggingface.co/Bobliu/qweninqwen)
 
 [🎬 Video](#video) · [📊 At a glance](#results) · [🧱 Architecture](#architecture) · [🪜 Tiers](#the-tier-ladder) · [📈 Metrics](#metrics) · [👤 Host roles](#what-the-host-does) · [📌 Scope](#scope) · [❓ FAQ](#faq) · [🔁 Reproduce](#reproduce)
 
 </div>
 
 ---
+
+**Explainer video (voice-over and subtitles): one Qwen3-0.6B token computed by a circuit inside a modified Qwen3.5**
+
+[![Explainer video preview (click for the mp4)](video/preview.gif)](video/qweninqwen_explainer.mp4)
 
 <p align="center">
   <img src="docs/assets/circuit_hero.gif" alt="A real Qwen3-0.6B token, computed inside another Qwen: the prompt token enters a Qwen3.5-style outer model, the circuit inside runs the firmware while the weights are fetched from the model's own embedding table, then halts with 15846" width="900">
